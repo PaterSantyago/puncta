@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile, mkdir, cp, rm, rename } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
+import { setTimeout as delay } from "node:timers/promises";
 
 const { values } = parseArgs({
   options: {
@@ -142,7 +143,12 @@ try {
     const tag = `${p.name}@${p.version}`;
     let existing;
     try {
-      existing = git("rev-parse", "--verify", `refs/tags/${tag}^{commit}`);
+      existing = git(
+        "rev-parse",
+        "--verify",
+        "--quiet",
+        `refs/tags/${tag}^{commit}`,
+      );
     } catch {}
     assert.ok(
       !existing || existing === verification.commit,
@@ -263,18 +269,58 @@ try {
     }
     entry.status = exists ? "matched" : "published";
     await save();
-    const metadata = await (
-      await fetch(new URL(encodeURIComponent(p.name), registry), {
+    const tagsResponse = await fetch(
+      new URL(`-/package/${encodeURIComponent(p.name)}/dist-tags`, registry),
+      {
         signal: AbortSignal.timeout(30000),
-      })
-    ).json();
+      },
+    );
+    assert.ok(
+      tagsResponse.ok,
+      `Registry dist-tags lookup failed for ${p.name}: ${tagsResponse.status}; rerun the same bundle`,
+    );
+    const distTags = await tagsResponse.json();
+    assert.ok(
+      distTags &&
+        typeof distTags === "object" &&
+        !Array.isArray(distTags) &&
+        Object.values(distTags).every((value) => typeof value === "string"),
+      `Invalid registry dist-tags for ${p.name}`,
+    );
     assert.equal(
-      metadata["dist-tags"].next,
+      distTags.next,
       p.version,
       `next does not identify ${p.name}@${p.version}; review registry tags before recovery`,
     );
-    entry.distTags = metadata["dist-tags"];
+    entry.distTags = distTags;
     await save();
+    // npm may expose the version and tags before its installable package index.
+    let visible = false;
+    for (let attempt = 0; attempt < 6; attempt++) {
+      if (attempt) await delay(2000);
+      const response = await fetch(
+        new URL(encodeURIComponent(p.name), registry),
+        {
+          signal: AbortSignal.timeout(30000),
+          cache: "no-store",
+        },
+      );
+      assert.ok(
+        response.ok || response.status === 404,
+        `Registry package index lookup failed for ${p.name}: ${response.status}; rerun the same bundle`,
+      );
+      if (response.ok) {
+        const index = await response.json();
+        if (index.name === p.name && index.versions?.[p.version]) {
+          visible = true;
+          break;
+        }
+      } else await response.arrayBuffer();
+    }
+    assert.ok(
+      visible,
+      `Package index not visible: ${p.name}; rerun the same bundle after npm makes it available`,
+    );
   }
   report.status = "verifying-consumers";
   await save();
@@ -290,7 +336,12 @@ try {
     const tag = `${p.name}@${p.version}`;
     let existing;
     try {
-      existing = git("rev-parse", "--verify", `refs/tags/${tag}^{commit}`);
+      existing = git(
+        "rev-parse",
+        "--verify",
+        "--quiet",
+        `refs/tags/${tag}^{commit}`,
+      );
     } catch {}
     if (!existing) git("tag", tag, verification.commit);
     else assert.equal(existing, verification.commit);
