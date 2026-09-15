@@ -353,6 +353,80 @@ test("an existing version with different bytes stops publication and records a c
   }
 });
 
+test("a published version with an unavailable package index retains tags and resumes without republishing", async () => {
+  const f = await fixture();
+  const { createServer, request: forward } = await import("node:http");
+  let unavailable = true;
+  const publishes = [];
+  const proxy = createServer((request, response) => {
+    const path = decodeURIComponent(request.url);
+    if (request.method === "PUT" && !path.startsWith("/-/"))
+      publishes.push(path);
+    if (
+      unavailable &&
+      request.method === "GET" &&
+      path === "/@use-puncta/core"
+    ) {
+      response.writeHead(404, { "content-type": "application/json" });
+      response.end(JSON.stringify({ error: "Not found" }));
+      return;
+    }
+    const upstream = forward(
+      `${f.registry}${request.url}`,
+      {
+        method: request.method,
+        headers: { ...request.headers, host: new URL(f.registry).host },
+      },
+      (received) => {
+        response.writeHead(received.statusCode, received.headers);
+        received.pipe(response);
+      },
+    );
+    upstream.on("error", () => {
+      response.writeHead(502);
+      response.end();
+    });
+    request.pipe(upstream);
+  });
+  await new Promise((done) => proxy.listen(0, "127.0.0.1", done));
+  const registry = `http://127.0.0.1:${proxy.address().port}`;
+  const npmrc = join(f.directory, "index-npmrc");
+  await writeFile(
+    npmrc,
+    (await readFile(f.env.NPM_CONFIG_USERCONFIG, "utf8")).replaceAll(
+      new URL(f.registry).host,
+      new URL(registry).host,
+    ),
+  );
+  const env = { ...f.env, NPM_CONFIG_USERCONFIG: npmrc };
+  try {
+    const first = await f.run(["--registry", registry], env);
+    assert.notEqual(first.code, 0);
+    assert.match(
+      first.output,
+      /Package index not visible: @use-puncta\/core.*rerun the same bundle/,
+    );
+    const partial = JSON.parse(await readFile(join(f.state, "result.json")));
+    assert.equal(partial.status, "incomplete");
+    assert.equal(partial.packages[0].status, "published");
+    assert.equal(partial.packages[0].distTags.next, "0.1.0-alpha.0");
+    assert.deepEqual(publishes, ["/@use-puncta/core"]);
+    unavailable = false;
+    const resumed = await f.run(["--registry", registry], env);
+    assert.equal(resumed.code, 0, resumed.output);
+    const complete = JSON.parse(await readFile(join(f.state, "result.json")));
+    assert.equal(complete.status, "complete");
+    assert.equal(complete.packages[0].status, "matched");
+    assert.equal(
+      publishes.filter((name) => name === "/@use-puncta/core").length,
+      1,
+    );
+  } finally {
+    await new Promise((done) => proxy.close(done));
+    await f.close();
+  }
+});
+
 test("tampered bundles and concurrent publication are refused before registry writes", async () => {
   const f = await fixture();
   try {
