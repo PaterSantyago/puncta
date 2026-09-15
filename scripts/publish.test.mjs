@@ -34,6 +34,7 @@ async function fixture() {
   // Publication tests use the current checked archives, even between releases
   // when there is no active release/plan.json in the checkout.
   const plan = { schema: 1, baseCommit: commit, tag: "next", packages: [] };
+  const archives = [];
   for (const { path, manifest } of await publicPackages()) {
     const archive = `${manifest.name.replace("@", "").replace("/", "-")}-${manifest.version}.tgz`;
     plan.packages.push({
@@ -48,16 +49,12 @@ async function fixture() {
         ),
       ),
     });
-  }
-  const archives = [];
-  for (const p of plan.packages) {
-    const file = `${p.name.replace("@", "").replace("/", "-")}-${p.version}.tgz`;
-    await copyFile(join("artifacts", file), join(bundle, file));
+    await copyFile(join("artifacts", archive), join(bundle, archive));
     archives.push({
-      name: p.name,
-      version: p.version,
-      file,
-      sha256: hash(await readFile(join(bundle, file))),
+      name: manifest.name,
+      version: manifest.version,
+      file: archive,
+      sha256: hash(await readFile(join(bundle, archive))),
     });
   }
   const bytes = JSON.stringify(plan);
