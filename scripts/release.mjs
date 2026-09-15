@@ -158,9 +158,11 @@ if (mode === "authorize") {
   const runs = api(
     `actions/workflows/check.yml/runs?head_sha=${fullPr.head.sha}&per_page=100`,
   ).workflow_runs;
-  const headRun = runs.find((r) =>
-    ["workflow_dispatch", "pull_request"].includes(r.event),
-  );
+  // Dispatch is the explicit check path for token-created PRs. GitHub may also
+  // create a separate PR run awaiting owner approval; it is not that check.
+  const headRun =
+    runs.find((r) => r.event === "workflow_dispatch") ??
+    runs.find((r) => r.event === "pull_request");
   const evidence = { repository, commit, run, pr: fullPr, headRun };
   authorize(evidence);
   command("gh", [
