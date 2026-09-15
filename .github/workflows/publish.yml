@@ -1,0 +1,66 @@
+name: Publish authorized release
+on:
+  workflow_run:
+    workflows: [Authorize release artifacts]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      authorization_run:
+        description: Successful Authorize release artifacts run ID to resume
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: npm-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: vars.NPM_OIDC_ENABLED == 'true' && github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      actions: read
+      pull-requests: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Fetch authorized archives and refresh exact GitHub checks
+        id: bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTHORIZATION_RUN: ${{ inputs.authorization_run || github.event.workflow_run.id }}
+        run: node scripts/fetch-release.mjs "$AUTHORIZATION_RUN"
+      - if: steps.bundle.outputs.ready == 'true'
+        run: npm install --global npm@11.19.0 pnpm@12.4.1
+      - if: steps.bundle.outputs.ready == 'true'
+        run: pnpm install --frozen-lockfile
+      - name: Publish exact archives through trusted publishing and verify consumers
+        if: steps.bundle.outputs.ready == 'true'
+        run: node scripts/publish.mjs --bundle publish-bundle --state publication-state --mode oidc
+      - name: Push verified package tags without moving existing tags
+        if: steps.bundle.outputs.ready == 'true'
+        run: |
+          node --input-type=module <<'JS'
+          import { readFileSync } from 'node:fs';
+          import { execFileSync } from 'node:child_process';
+          const plan = JSON.parse(readFileSync('publish-bundle/plan.json'));
+          execFileSync('git', ['push', '--atomic', 'origin', ...plan.packages.map(p => `refs/tags/${p.name}@${p.version}`)], {stdio: 'inherit'});
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.bundle.outputs.ready == 'true'
+        with:
+          name: publication-${{ steps.bundle.outputs.commit }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            publish-bundle/
+            publication-state/
+          if-no-files-found: error
+          retention-days: 30
