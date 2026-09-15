@@ -130,7 +130,7 @@ try {
         private: true,
         type: "module",
         dependencies: {
-          "@use-puncta/with-react": adapter.version,
+          "@use-puncta/with-react": externalRegistry ? "next" : adapter.version,
           react: "19.3.0",
           "react-dom": "19.3.0",
           ...(locales.length
@@ -139,8 +139,10 @@ try {
           ...Object.fromEntries(
             locales.map((id) => [
               `@use-puncta/with-${id}`,
-              archives.find(({ name }) => name === `@use-puncta/with-${id}`)
-                .version,
+              externalRegistry
+                ? "next"
+                : archives.find(({ name }) => name === `@use-puncta/with-${id}`)
+                    .version,
             ]),
           ),
         },
@@ -178,6 +180,14 @@ try {
       await copyFile(
         join(root, "scripts/consumer.mjs"),
         join(cwd, "consumer.mjs"),
+      );
+      await writeFile(
+        join(cwd, "expected-versions.json"),
+        JSON.stringify(
+          Object.fromEntries(
+            archives.map(({ name, version }) => [name, version]),
+          ),
+        ),
       );
       console.log(
         await run(
@@ -241,7 +251,7 @@ try {
         join(cwd, manager === "npm" ? "package-lock.json" : "pnpm-lock.yaml"),
       );
       console.log(
-        `${manager} ${locales.join(", ") || "react-only"}: clean named installation and dependency graph verified`,
+        `${manager} ${locales.join(", ") || "react-only"}: clean ${externalRegistry ? "@next" : "named"} installation and dependency graph verified`,
       );
     }
   }

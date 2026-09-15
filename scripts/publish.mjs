@@ -273,6 +273,8 @@ try {
       p.version,
       `next does not identify ${p.name}@${p.version}; review registry tags before recovery`,
     );
+    entry.distTags = metadata["dist-tags"];
+    await save();
   }
   report.status = "verifying-consumers";
   await save();

@@ -7,6 +7,7 @@ import test from "node:test";
 import { registryFixture } from "./registry-fixture.mjs";
 
 const cli = resolve("scripts/publish.mjs");
+const installCli = resolve("scripts/install.mjs");
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const git = (cwd, ...args) =>
   execFileSync("git", args, { cwd, encoding: "utf8" }).trim();
@@ -163,6 +164,67 @@ test("verified archives publish core first, next tags and immutable Git tags, th
     );
     assert.equal(localeReport.status, "complete");
     assert.equal(localeReport.packages.length, 1);
+  } finally {
+    await f.close();
+  }
+});
+
+test("consumer rejects a next tag resolving outside the verified bundle even when the exact version exists", async () => {
+  const f = await fixture();
+  try {
+    const published = await f.run();
+    assert.equal(published.code, 0, published.output);
+    const other = join(f.directory, "newer-adapter");
+    await mkdir(other);
+    execFileSync("tar", [
+      "-xzf",
+      join(f.bundle, "use-puncta-with-react-0.1.0-alpha.0.tgz"),
+      "-C",
+      other,
+    ]);
+    const directory = join(other, "package");
+    const manifest = JSON.parse(
+      await readFile(join(directory, "package.json")),
+    );
+    manifest.version = "0.1.0-alpha.1";
+    await writeFile(join(directory, "package.json"), JSON.stringify(manifest));
+    execFileSync(
+      "npm",
+      [
+        "publish",
+        directory,
+        "--registry",
+        f.registry,
+        "--tag",
+        "next",
+        "--access",
+        "public",
+        "--ignore-scripts",
+      ],
+      { env: f.env, stdio: "pipe" },
+    );
+    const result = await new Promise((done) => {
+      const child = spawn(process.execPath, [installCli], {
+        env: {
+          ...f.env,
+          PUNCTA_CONSUMER_REGISTRY: f.registry,
+          PUNCTA_CONSUMER_BUNDLE: f.bundle,
+        },
+      });
+      let output = "";
+      child.stdout.on("data", (data) => {
+        output += data;
+      });
+      child.stderr.on("data", (data) => {
+        output += data;
+      });
+      child.on("close", (code) => done({ code, output }));
+    });
+    assert.notEqual(result.code, 0, result.output);
+    assert.match(
+      result.output,
+      /Installed version mismatch: @use-puncta\/with-react/,
+    );
   } finally {
     await f.close();
   }
