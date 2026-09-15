@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@use-puncta/core": ["../../packages/core/src/index.ts"],
+      "@use-puncta/with-react": ["../../packages/with-react/src/index.tsx"],
+      "@use-puncta/with-en-gb": ["../../packages/with-en-gb/src/index.ts"],
+      "@use-puncta/with-es-es": ["../../packages/with-es-es/src/index.ts"]
+    }
+  },
+  "include": ["src"]
+}

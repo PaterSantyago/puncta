@@ -1,17 +1,16 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdir, readdir, readFile, rm, mkdtemp } from "node:fs/promises";
+import { mkdir, readFile, rm, mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve, join } from "node:path";
+
+import { publicPackages } from "./workspace.mjs";
 
 const artifacts = resolve("artifacts");
 await rm(artifacts, { recursive: true, force: true });
 await mkdir(artifacts);
 const entries = [];
-for (const directory of await readdir("packages")) {
-  const cwd = resolve("packages", directory);
-  const manifest = JSON.parse(await readFile(join(cwd, "package.json")));
-  if (manifest.private) continue;
+for (const { path: cwd, manifest } of await publicPackages()) {
   execFileSync("pnpm", ["pack", "--pack-destination", artifacts], {
     cwd,
     stdio: "inherit",
@@ -70,13 +69,32 @@ for (const directory of await readdir("packages")) {
       assert.match(js, /from ["']@use-puncta\/core["']/);
       assert.match(js, /from ["']react\/jsx-runtime["']/);
     }
+    if (
+      ["@use-puncta/with-en-gb", "@use-puncta/with-es-es"].includes(packed.name)
+    ) {
+      assert.deepEqual(packed.peerDependencies, {
+        "@use-puncta/core": "^0.1.0-alpha.0",
+      });
+      assert.deepEqual(packed.dependencies ?? {}, {});
+      assert.deepEqual(packed.optionalDependencies ?? {}, {});
+      const declarations = await readFile(
+        join(base, packed.exports["."].types),
+        "utf8",
+      );
+      assert.match(declarations, /from ["']@use-puncta\/core["']/);
+    }
     entries.push({ name: packed.name, version: packed.version, archive });
   } finally {
     await rm(unpacked, { recursive: true, force: true });
   }
 }
 assert.ok(entries.some(({ name }) => name === "@use-puncta/core"));
-assert.ok(entries.some(({ name }) => name === "@use-puncta/with-react"));
+for (const name of [
+  "@use-puncta/with-react",
+  "@use-puncta/with-en-gb",
+  "@use-puncta/with-es-es",
+])
+  assert.ok(entries.some((entry) => entry.name === name));
 console.log(
   "Verified package archives:",
   entries.map(({ name }) => name).join(", "),

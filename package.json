@@ -10,7 +10,7 @@
     "lint": "biome lint .",
     "format:check": "biome format . && prettier --check '**/*.{md,yml,yaml}'",
     "format": "biome format --write . && prettier --write '**/*.{md,yml,yaml}'",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && pnpm --filter puncta-example-ssr typecheck",
     "build": "pnpm -r build",
     "test:install": "node scripts/install.mjs",
     "test": "pnpm test:install",
