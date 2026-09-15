@@ -1,0 +1,121 @@
+{
+  "schema": 1,
+  "baseCommit": "a30a932d8b48bf0081a9cf7f6fe220673c469a0a",
+  "tag": "next",
+  "packages": [
+    {
+      "name": "@use-puncta/core",
+      "version": "0.1.0-alpha.0",
+      "changelogSha256": "5e758ce880f1c00d646781198567e2907b951ebbfee1686da58a5ec59ee07c5f",
+      "manifest": {
+        "name": "@use-puncta/core",
+        "version": "0.1.0-alpha.0",
+        "type": "module",
+        "license": "MIT",
+        "files": ["dist", "README.md", "LICENSE"],
+        "exports": {
+          ".": {
+            "types": "./dist/index.d.mts",
+            "import": "./dist/index.mjs"
+          }
+        },
+        "publishConfig": {
+          "access": "public"
+        },
+        "scripts": {
+          "build": "tsdown src/index.ts --format esm --dts --clean"
+        }
+      }
+    },
+    {
+      "name": "@use-puncta/with-en-gb",
+      "version": "0.1.0-alpha.0",
+      "changelogSha256": "ac466628d2040868b0549ee679ac79ef28f308003dbd163abc3fe60c470a6051",
+      "manifest": {
+        "name": "@use-puncta/with-en-gb",
+        "version": "0.1.0-alpha.0",
+        "type": "module",
+        "license": "MIT",
+        "files": ["dist", "README.md", "LICENSE"],
+        "exports": {
+          ".": {
+            "types": "./dist/index.d.mts",
+            "import": "./dist/index.mjs"
+          }
+        },
+        "publishConfig": {
+          "access": "public"
+        },
+        "peerDependencies": {
+          "@use-puncta/core": "^0.1.0-alpha.0"
+        },
+        "devDependencies": {
+          "@use-puncta/core": "^0.1.0-alpha.0"
+        },
+        "scripts": {
+          "build": "tsdown src/index.ts --format esm --dts --clean"
+        }
+      }
+    },
+    {
+      "name": "@use-puncta/with-es-es",
+      "version": "0.1.0-alpha.0",
+      "changelogSha256": "f755480a542c1393a7ad557f002f104eee24cfa5996820f0a469d8068df719dc",
+      "manifest": {
+        "name": "@use-puncta/with-es-es",
+        "version": "0.1.0-alpha.0",
+        "type": "module",
+        "license": "MIT",
+        "files": ["dist", "README.md", "LICENSE"],
+        "exports": {
+          ".": {
+            "types": "./dist/index.d.mts",
+            "import": "./dist/index.mjs"
+          }
+        },
+        "publishConfig": {
+          "access": "public"
+        },
+        "peerDependencies": {
+          "@use-puncta/core": "^0.1.0-alpha.0"
+        },
+        "devDependencies": {
+          "@use-puncta/core": "^0.1.0-alpha.0"
+        },
+        "scripts": {
+          "build": "tsdown src/index.ts --format esm --dts --clean"
+        }
+      }
+    },
+    {
+      "name": "@use-puncta/with-react",
+      "version": "0.1.0-alpha.0",
+      "changelogSha256": "f79a9da354c389fd25f695446ad07d50a034bbcf05b645ec2efb7e812c6d165a",
+      "manifest": {
+        "name": "@use-puncta/with-react",
+        "version": "0.1.0-alpha.0",
+        "type": "module",
+        "license": "MIT",
+        "files": ["dist", "README.md", "LICENSE"],
+        "exports": {
+          ".": {
+            "types": "./dist/index.d.mts",
+            "import": "./dist/index.mjs"
+          }
+        },
+        "publishConfig": {
+          "access": "public"
+        },
+        "dependencies": {
+          "@use-puncta/core": "^0.1.0-alpha.0"
+        },
+        "peerDependencies": {
+          "react": "^19.3.0"
+        },
+        "scripts": {
+          "build": "tsdown"
+        }
+      }
+    }
+  ]
+}
