@@ -82,7 +82,13 @@ if (mode === "authorize") {
     "lane",
     "alpha",
   ]);
-  command("pnpm", ["--filter", "@use-puncta/*", "version", "-r"]);
+  command("pnpm", [
+    "--filter",
+    "@use-puncta/*",
+    "version",
+    "-r",
+    "--no-git-checks",
+  ]);
   command("pnpm", ["format"]);
   const changed = [];
   for (const p of await publicPackages()) {
