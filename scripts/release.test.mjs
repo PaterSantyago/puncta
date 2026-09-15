@@ -210,3 +210,77 @@ test("native pnpm debuts at alpha.0 and releases a changed locale independently"
     await rm(cwd, { recursive: true, force: true });
   }
 });
+test("release plan checks alpha suffix and next tag separately and rejects private packages", async () => {
+  const cwd = await mkdtemp(join(tmpdir(), "puncta-plan-"));
+  try {
+    const manifest = { name: "@use-puncta/core", version: "0.1.0-alpha.0" };
+    await mkdir(join(cwd, "packages/core"), { recursive: true });
+    await mkdir(join(cwd, "artifacts"));
+    await mkdir(join(cwd, "release"));
+    await writeFile(
+      join(cwd, "package.json"),
+      JSON.stringify({ name: "fixture", private: true }),
+    );
+    await writeFile(
+      join(cwd, "pnpm-workspace.yaml"),
+      "packages:\n  - packages/*\n",
+    );
+    await writeFile(
+      join(cwd, "packages/core/package.json"),
+      JSON.stringify(manifest),
+    );
+    await writeFile(join(cwd, "packages/core/CHANGELOG.md"), "First alpha\n");
+    await mkdir(join(cwd, "packed/package"), { recursive: true });
+    await writeFile(
+      join(cwd, "packed/package/package.json"),
+      JSON.stringify(manifest),
+    );
+    assert.equal(
+      (
+        await run(
+          [
+            "tar",
+            "-czf",
+            join(cwd, "artifacts/use-puncta-core-0.1.0-alpha.0.tgz"),
+            "-C",
+            join(cwd, "packed"),
+            "package",
+          ],
+          cwd,
+        )
+      ).code,
+      0,
+    );
+    const { createHash } = await import("node:crypto");
+    const entry = {
+      ...manifest,
+      manifest,
+      changelogSha256: createHash("sha256")
+        .update("First alpha\n")
+        .digest("hex"),
+    };
+    const plan = {
+      schema: 1,
+      baseCommit: "a".repeat(40),
+      tag: "next",
+      packages: [entry],
+    };
+    const path = join(cwd, "release/plan.json");
+    await writeFile(path, JSON.stringify(plan));
+    const valid = await run([process.execPath, cli, "validate"], cwd);
+    assert.equal(valid.code, 0, valid.output);
+    for (const patch of [
+      { tag: "latest" },
+      { packages: [{ ...entry, version: "0.1.0" }] },
+      { packages: [{ ...entry, name: "fixture" }] },
+    ]) {
+      await writeFile(path, JSON.stringify({ ...plan, ...patch }));
+      assert.notEqual(
+        (await run([process.execPath, cli, "validate"], cwd)).code,
+        0,
+      );
+    }
+  } finally {
+    await rm(cwd, { recursive: true, force: true });
+  }
+});
