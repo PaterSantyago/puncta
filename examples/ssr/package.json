@@ -1,0 +1,20 @@
+{
+  "name": "puncta-example-ssr",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsdown src/index.ts --format esm --clean",
+    "start": "node dist/index.mjs"
+  },
+  "dependencies": {
+    "@use-puncta/with-react": "workspace:^",
+    "@use-puncta/with-en-gb": "workspace:^",
+    "@use-puncta/with-es-es": "workspace:^",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/react-dom": "19.3.0"
+  }
+}

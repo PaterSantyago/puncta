@@ -8,13 +8,14 @@ import {
   writeFile,
   rm,
   copyFile,
-  readdir,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { createServer } from "node:net";
 import { randomUUID } from "node:crypto";
 import { setTimeout as delay } from "node:timers/promises";
+
+import { publicPackages } from "./workspace.mjs";
 
 assert.equal(
   process.versions.node.split(".")[0],
@@ -77,13 +78,7 @@ function run(command, args, cwd, env) {
   });
 }
 try {
-  const packages = [];
-  for (const directory of await readdir(join(root, "packages"))) {
-    const manifest = JSON.parse(
-      await readFile(join(root, "packages", directory, "package.json")),
-    );
-    if (!manifest.private) packages.push(manifest);
-  }
+  const packages = (await publicPackages()).map(({ manifest }) => manifest);
   const archives = packages.map((manifest) => ({
     ...manifest,
     archive: resolve(
@@ -178,23 +173,26 @@ try {
   const adapter = archives.find(
     ({ name }) => name === "@use-puncta/with-react",
   );
-  await run(
-    "npm",
-    [
-      "publish",
-      adapter.archive,
-      "--registry",
-      registry,
-      "--tag",
-      "next",
-      "--access",
-      "public",
-      "--ignore-scripts",
-    ],
-    temporary,
-    environment,
-  );
-  async function consumer(manager, suffix) {
+  async function publish(archive) {
+    await run(
+      "npm",
+      [
+        "publish",
+        archive,
+        "--registry",
+        registry,
+        "--tag",
+        "next",
+        "--access",
+        "public",
+        "--ignore-scripts",
+      ],
+      temporary,
+      environment,
+    );
+  }
+  await publish(adapter.archive);
+  async function consumer(manager, suffix, locales = []) {
     const cwd = join(temporary, `${manager}-${suffix}`);
     await mkdir(cwd);
     await writeFile(
@@ -206,6 +204,17 @@ try {
         dependencies: {
           "@use-puncta/with-react": adapter.version,
           react: "19.3.0",
+          "react-dom": "19.3.0",
+          ...(locales.length
+            ? { typescript: "7.0.2", "@types/react": "19.3.0" }
+            : {}),
+          ...Object.fromEntries(
+            locales.map((id) => [
+              `@use-puncta/with-${id}`,
+              archives.find(({ name }) => name === `@use-puncta/with-${id}`)
+                .version,
+            ]),
+          ),
         },
       }),
     );
@@ -225,53 +234,86 @@ try {
     await assert.rejects(consumer(manager, "missing-core"), /404|not found/i);
     console.log(`${manager}: missing core fails without npm/cache fallback`);
   }
-  await run(
-    "npm",
-    [
-      "publish",
-      core.archive,
-      "--registry",
-      registry,
-      "--tag",
-      "next",
-      "--access",
-      "public",
-      "--ignore-scripts",
-    ],
-    temporary,
-    environment,
-  );
+  await publish(core.archive);
+  for (const { archive, name } of archives) {
+    if (name !== core.name && name !== adapter.name) await publish(archive);
+  }
   for (const manager of ["npm", "pnpm"]) {
-    const { cwd, env } = await consumer(manager, "complete");
-    await copyFile(
-      join(root, "scripts/consumer.mjs"),
-      join(cwd, "consumer.mjs"),
-    );
-    console.log(
-      await run(
-        process.execPath,
-        ["--experimental-import-meta-resolve", "consumer.mjs"],
+    for (const locales of [[], ["en-gb"], ["es-es"], ["en-gb", "es-es"]]) {
+      const { cwd, env } = await consumer(
+        manager,
+        locales.join("-") || "react-only",
+        locales,
+      );
+      await copyFile(
+        join(root, "scripts/consumer.mjs"),
+        join(cwd, "consumer.mjs"),
+      );
+      console.log(
+        await run(
+          process.execPath,
+          ["--experimental-import-meta-resolve", "consumer.mjs"],
+          cwd,
+          env,
+        ),
+      );
+      if (locales.length) {
+        await writeFile(
+          join(cwd, "consumer.tsx"),
+          [
+            'import { Puncta } from "@use-puncta/with-react";',
+            ...locales.map(
+              (id, index) =>
+                `import { ${id === "en-gb" ? "enGb" : "esEs"} as locale${index} } from "@use-puncta/with-${id}";`,
+            ),
+            ...locales.map(
+              (_, index) =>
+                `export const example${index} = <Puncta locale={locale${index}} />;`,
+            ),
+            "// @ts-expect-error Locale identifiers must be strings.",
+            "export const invalid = <Puncta locale={{id: 42}} />;",
+          ].join("\n"),
+        );
+        await writeFile(
+          join(cwd, "tsconfig.json"),
+          JSON.stringify({
+            compilerOptions: {
+              target: "ES2022",
+              module: "NodeNext",
+              moduleResolution: "NodeNext",
+              jsx: "react-jsx",
+              strict: true,
+              noEmit: true,
+            },
+            include: ["consumer.tsx"],
+          }),
+        );
+        await run(
+          join(cwd, "node_modules/.bin/tsc"),
+          ["--project", "tsconfig.json"],
+          cwd,
+          env,
+        );
+      }
+      const graph = await run(
+        manager,
+        ["list", "--depth", "100", "--json"],
         cwd,
         env,
-      ),
-    );
-    const graph = await run(
-      manager,
-      ["list", "--depth", "100", "--json"],
-      cwd,
-      env,
-    );
-    assert.ok(graph.includes("@use-puncta/core"));
-    assert.ok(
-      !graph.includes("@use-puncta/with-en-gb") &&
-        !graph.includes("@use-puncta/with-es-es"),
-    );
-    await readFile(
-      join(cwd, manager === "npm" ? "package-lock.json" : "pnpm-lock.yaml"),
-    );
-    console.log(
-      `${manager}: clean named installation and dependency graph verified`,
-    );
+      );
+      assert.ok(graph.includes("@use-puncta/core"));
+      for (const id of ["en-gb", "es-es"])
+        assert.equal(
+          graph.includes(`@use-puncta/with-${id}`),
+          locales.includes(id),
+        );
+      await readFile(
+        join(cwd, manager === "npm" ? "package-lock.json" : "pnpm-lock.yaml"),
+      );
+      console.log(
+        `${manager} ${locales.join(", ") || "react-only"}: clean named installation and dependency graph verified`,
+      );
+    }
   }
 } finally {
   await cleanup();
