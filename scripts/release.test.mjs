@@ -172,6 +172,39 @@ test("native pnpm debuts at alpha.0 and releases a changed locale independently"
           .version,
         name === "with-en-gb" ? "0.1.0-alpha.1" : "0.1.0-alpha.0",
       );
+    for (const args of [
+      [
+        "change",
+        "@use-puncta/core",
+        "--bump",
+        "patch",
+        "--summary",
+        "Improve core",
+      ],
+      ["version", "-r", "--registry", registry],
+    ]) {
+      const result = await run(["pnpm", ...args], cwd);
+      assert.equal(result.code, 0, result.output);
+    }
+    const core = JSON.parse(
+      await readFile(join(cwd, "packages/core/package.json")),
+    );
+    assert.equal(core.version, "0.1.0-alpha.1");
+    for (const name of ["with-react", "with-en-gb", "with-es-es"]) {
+      const manifest = JSON.parse(
+        await readFile(join(cwd, "packages", name, "package.json")),
+      );
+      assert.equal(
+        manifest.version,
+        name === "with-en-gb" ? "0.1.0-alpha.1" : "0.1.0-alpha.0",
+      );
+      assert.equal(
+        (manifest.dependencies ?? manifest.peerDependencies)[
+          "@use-puncta/core"
+        ],
+        "workspace:^",
+      );
+    }
   } finally {
     await new Promise((resolve) => server.close(resolve));
     await rm(cwd, { recursive: true, force: true });

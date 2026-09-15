@@ -29,7 +29,7 @@ Download with `gh run download <authorization-run-id> --name release-<commit>`. 
 
 ## Add a public package
 
-Follow the package template in the README, seed the first version at `0.1.0-alpha.0`, and run `pnpm --filter @use-puncta/with-new-locale lane alpha`. Add a native change intent for that package. Public discovery, plan generation and archive checking use the shared convention and do not enumerate locales. Add its public API to the consumer matrix to verify actual compatibility before release.
+Follow the package template in the README, seed the first version at `0.1.0-alpha.0`, and add a native change intent. Preparation places every discovered public package on the native alpha lane automatically. Add a native change intent for that package. Public discovery, plan generation and archive checking use the shared convention and do not enumerate locales. Add its public API to the consumer matrix to verify actual compatibility before release.
 
 ## Local verification
 

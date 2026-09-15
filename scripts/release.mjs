@@ -20,24 +20,26 @@ const packedManifest = (p) =>
     ]),
   );
 
-function authorize(e) {
-  assert.match(e.commit, /^[a-f0-9]{40}$/);
-  assert.equal(e.run.conclusion, "success");
-  assert.equal(e.run.event, "push");
-  assert.equal(e.run.head_branch, "main");
-  assert.equal(e.run.head_sha, e.commit);
-  assert.equal(e.run.path, ".github/workflows/check.yml");
-  assert.equal(e.pr.merged, true);
-  assert.equal(e.pr.merge_commit_sha, e.commit);
-  assert.equal(e.pr.user.login, "github-actions[bot]");
-  assert.equal(e.pr.head.ref, "release/pending");
-  assert.equal(e.pr.base.ref, "main");
-  assert.equal(e.pr.base.repo.full_name, e.repository);
-  assert.equal(e.pr.head.repo.full_name, e.repository);
-  assert.equal(e.headRun.head_sha, e.pr.head.sha);
-  assert.equal(e.headRun.conclusion, "success");
-  assert.equal(e.headRun.path, ".github/workflows/check.yml");
-  assert.ok(["workflow_dispatch", "pull_request"].includes(e.headRun.event));
+function authorize(evidence) {
+  assert.match(evidence.commit, /^[a-f0-9]{40}$/);
+  assert.equal(evidence.run.conclusion, "success");
+  assert.equal(evidence.run.event, "push");
+  assert.equal(evidence.run.head_branch, "main");
+  assert.equal(evidence.run.head_sha, evidence.commit);
+  assert.equal(evidence.run.path, ".github/workflows/check.yml");
+  assert.equal(evidence.pr.merged, true);
+  assert.equal(evidence.pr.merge_commit_sha, evidence.commit);
+  assert.equal(evidence.pr.user.login, "github-actions[bot]");
+  assert.equal(evidence.pr.head.ref, "release/pending");
+  assert.equal(evidence.pr.base.ref, "main");
+  assert.equal(evidence.pr.base.repo.full_name, evidence.repository);
+  assert.equal(evidence.pr.head.repo.full_name, evidence.repository);
+  assert.equal(evidence.headRun.head_sha, evidence.pr.head.sha);
+  assert.equal(evidence.headRun.conclusion, "success");
+  assert.equal(evidence.headRun.path, ".github/workflows/check.yml");
+  assert.ok(
+    ["workflow_dispatch", "pull_request"].includes(evidence.headRun.event),
+  );
 }
 async function validatePlan() {
   const plan = await json("release/plan.json");
@@ -75,7 +77,13 @@ if (mode === "authorize") {
       await readFile(join(p.path, "CHANGELOG.md"), "utf8").catch(() => ""),
     );
   const baseCommit = command("git", ["rev-parse", "HEAD"]);
+  command("pnpm", [
+    ...packages.flatMap(({ manifest }) => ["--filter", manifest.name]),
+    "lane",
+    "alpha",
+  ]);
   command("pnpm", ["--filter", "@use-puncta/*", "version", "-r"]);
+  command("pnpm", ["format"]);
   const changed = [];
   for (const p of await publicPackages()) {
     const changelog = await readFile(
@@ -94,6 +102,13 @@ if (mode === "authorize") {
       "release/plan.json",
       `${JSON.stringify({ schema: 1, baseCommit, tag: "next", packages: changed.map((p) => ({ name: p.name, version: p.version, changelogSha256: p.changelogSha256, manifest: packedManifest(p) })) }, null, 2)}\n`,
     );
+    command("pnpm", [
+      "exec",
+      "biome",
+      "format",
+      "--write",
+      "release/plan.json",
+    ]);
     await validatePlan();
     console.log(`Prepared ${changed.length} public packages`);
   } else console.log("No pending release");
@@ -111,7 +126,7 @@ if (mode === "authorize") {
       file: archiveName(entry),
       sha256: sha256(await readFile(join("artifacts", archiveName(entry)))),
     });
-  await writeFile("artifacts/plan.json", `${JSON.stringify(plan, null, 2)}\n`);
+  await writeFile("artifacts/plan.json", await readFile("release/plan.json"));
   await writeFile(
     "artifacts/verification.json",
     `${JSON.stringify({ commit, planSha256: sha256(await readFile("release/plan.json")), archives }, null, 2)}\n`,

@@ -38,7 +38,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git checkout -B release/pending
-          git add .changeset packages pnpm-lock.yaml release
+          git add .changeset packages pnpm-lock.yaml pnpm-workspace.yaml release
           git commit -m 'chore: prepare independent alpha release'
           git push --force-with-lease origin release/pending
           pr=$(gh pr list --head release/pending --base main --state open --json number --jq '.[0].number')
