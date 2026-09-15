@@ -92,6 +92,8 @@ excluded from the public package set.
 1. Copy `packages/with-en-gb` without its `dist` or `node_modules`. Name the new
    package `@use-puncta/with-<name>` and choose its independent version. Keep the
    MIT license, README, ESM root export, declaration output and build script.
+   Keep the public GitHub `repository.url` and update `repository.directory`
+   to the new package path for provenance.
 2. Export a value conforming to `Locale` from core with the new identifier. Keep
    core as `workspace:^` in both peerDependencies and devDependencies: the peer
    belongs to consumers; the devDependency lets pnpm resolve and pack the

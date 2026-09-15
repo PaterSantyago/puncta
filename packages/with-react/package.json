@@ -25,5 +25,10 @@
   },
   "scripts": {
     "build": "tsdown"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PaterSantyago/puncta.git",
+    "directory": "packages/with-react"
   }
 }

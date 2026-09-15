@@ -5,6 +5,7 @@ import { mkdir, readFile, writeFile, copyFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import test from "node:test";
 import { registryFixture } from "./registry-fixture.mjs";
+import { publicPackages } from "./workspace.mjs";
 
 const cli = resolve("scripts/publish.mjs");
 const installCli = resolve("scripts/install.mjs");
@@ -30,16 +31,30 @@ async function fixture() {
   const commit = git(cwd, "rev-parse", "HEAD");
   const bundle = join(cwd, "bundle");
   await mkdir(bundle);
-  const plan = JSON.parse(await readFile("release/plan.json"));
+  // Publication tests use the current checked archives, even between releases
+  // when there is no active release/plan.json in the checkout.
+  const plan = { schema: 1, baseCommit: commit, tag: "next", packages: [] };
   const archives = [];
-  for (const p of plan.packages) {
-    const file = `${p.name.replace("@", "").replace("/", "-")}-${p.version}.tgz`;
-    await copyFile(join("artifacts", file), join(bundle, file));
+  for (const { path, manifest } of await publicPackages()) {
+    const archive = `${manifest.name.replace("@", "").replace("/", "-")}-${manifest.version}.tgz`;
+    plan.packages.push({
+      name: manifest.name,
+      version: manifest.version,
+      changelogSha256: hash(await readFile(join(path, "CHANGELOG.md"))),
+      manifest: JSON.parse(
+        execFileSync(
+          "tar",
+          ["-xOf", join("artifacts", archive), "package/package.json"],
+          { encoding: "utf8" },
+        ),
+      ),
+    });
+    await copyFile(join("artifacts", archive), join(bundle, archive));
     archives.push({
-      name: p.name,
-      version: p.version,
-      file,
-      sha256: hash(await readFile(join(bundle, file))),
+      name: manifest.name,
+      version: manifest.version,
+      file: archive,
+      sha256: hash(await readFile(join(bundle, archive))),
     });
   }
   const bytes = JSON.stringify(plan);
