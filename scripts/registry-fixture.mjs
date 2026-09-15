@@ -26,8 +26,12 @@ export async function registryFixture() {
     ["--config", config, "--listen", `127.0.0.1:${port}`],
     { stdio: "ignore" },
   );
+  let startupError;
+  child.once("error", (error) => {
+    startupError = error;
+  });
   async function close() {
-    if (child.exitCode === null && child.signalCode === null) {
+    if (child.pid && child.exitCode === null && child.signalCode === null) {
       child.kill("SIGTERM");
       await Promise.race([once(child, "exit"), delay(5000)]);
       if (child.exitCode === null && child.signalCode === null)
@@ -38,8 +42,16 @@ export async function registryFixture() {
   try {
     const deadline = Date.now() + 30000;
     while (true) {
+      if (startupError) throw startupError;
       try {
-        if ((await fetch(`${registry}/-/ping`)).ok) break;
+        if (
+          (
+            await fetch(`${registry}/-/ping`, {
+              signal: AbortSignal.timeout(1000),
+            })
+          ).ok
+        )
+          break;
       } catch {}
       assert.ok(
         child.exitCode === null && Date.now() < deadline,
