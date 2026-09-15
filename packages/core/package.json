@@ -19,5 +19,10 @@
   },
   "scripts": {
     "build": "tsdown src/index.ts --format esm --dts --clean"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PaterSantyago/puncta.git",
+    "directory": "packages/core"
   }
 }

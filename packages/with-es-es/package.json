@@ -25,5 +25,10 @@
   },
   "devDependencies": {
     "@use-puncta/core": "workspace:^"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PaterSantyago/puncta.git",
+    "directory": "packages/with-es-es"
   }
 }

@@ -33,6 +33,11 @@ for (const { path: cwd, manifest } of packages) {
     assert.equal(packed.version, manifest.version);
     assert.equal(packed.type, "module");
     assert.equal(packed.license, "MIT");
+    assert.equal(
+      packed.repository?.url,
+      "git+https://github.com/PaterSantyago/puncta.git",
+      "Packed repository must match the public GitHub provenance source",
+    );
     assert.deepEqual(Object.keys(packed.exports), ["."]);
     assert.deepEqual(Object.keys(packed.exports["."]).sort(), [
       "import",
