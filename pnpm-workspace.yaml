@@ -3,3 +3,11 @@ packages:
   - examples/*
 strictPeerDependencies: true
 saveExact: true
+versioning:
+  lanes:
+    "@use-puncta/core": alpha
+    "@use-puncta/with-en-gb": alpha
+    "@use-puncta/with-es-es": alpha
+    "@use-puncta/with-react": alpha
+  changelog:
+    storage: repository

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import semver from "semver";
 import { execFileSync } from "node:child_process";
 import { mkdir, readFile, rm, mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -10,7 +11,11 @@ const artifacts = resolve("artifacts");
 await rm(artifacts, { recursive: true, force: true });
 await mkdir(artifacts);
 const entries = [];
-for (const { path: cwd, manifest } of await publicPackages()) {
+const packages = await publicPackages();
+const coreVersion = packages.find(
+  ({ manifest }) => manifest.name === "@use-puncta/core",
+).manifest.version;
+for (const { path: cwd, manifest } of packages) {
   execFileSync("pnpm", ["pack", "--pack-destination", artifacts], {
     cwd,
     stdio: "inherit",
@@ -60,7 +65,9 @@ for (const { path: cwd, manifest } of await publicPackages()) {
         assert.deepEqual(packed[section] ?? {}, {});
       }
     if (packed.name === "@use-puncta/with-react") {
-      assert.equal(packed.dependencies["@use-puncta/core"], "^0.1.0-alpha.0");
+      assert.ok(
+        semver.satisfies(coreVersion, packed.dependencies["@use-puncta/core"]),
+      );
       assert.equal(packed.peerDependencies.react, "^19.3.0");
       assert.equal(packed.dependencies.react, undefined);
       assert.equal(packed.dependencies["react-dom"], undefined);
@@ -69,12 +76,13 @@ for (const { path: cwd, manifest } of await publicPackages()) {
       assert.match(js, /from ["']@use-puncta\/core["']/);
       assert.match(js, /from ["']react\/jsx-runtime["']/);
     }
-    if (
-      ["@use-puncta/with-en-gb", "@use-puncta/with-es-es"].includes(packed.name)
-    ) {
-      assert.deepEqual(packed.peerDependencies, {
-        "@use-puncta/core": "^0.1.0-alpha.0",
-      });
+    if (packed.peerDependencies?.["@use-puncta/core"]) {
+      assert.ok(
+        semver.satisfies(
+          coreVersion,
+          packed.peerDependencies["@use-puncta/core"],
+        ),
+      );
       assert.deepEqual(packed.dependencies ?? {}, {});
       assert.deepEqual(packed.optionalDependencies ?? {}, {});
       const declarations = await readFile(
