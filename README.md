@@ -139,3 +139,7 @@ service is required. GitHub Issues hold specifications and implementation tasks.
 
 These packages are verified through local registry archives. This does not claim
 that the first public npm release has happened.
+
+## Release workflow
+
+See [independent alpha releases](docs/releases.md) for native pnpm change intents, the automated release PR, required head checks and verified artifact retrieval. npm publication is a separate task.

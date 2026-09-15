@@ -20,3 +20,13 @@ jobs:
       - run: npm install --global pnpm@12.4.1
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
+      - name: Bind checked archives to the release plan and commit
+        if: github.ref == 'refs/heads/main' && hashFiles('release/plan.json') != ''
+        run: node scripts/release.mjs bundle
+      - uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/main' && hashFiles('release/plan.json') != ''
+        with:
+          name: checked-${{ github.sha }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 30
