@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
-import semver from "semver";
 import { execFileSync } from "node:child_process";
-import { mkdir, readFile, rm, mkdtemp } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { resolve, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import semver from "semver";
 
 import { publicPackages } from "./workspace.mjs";
 
@@ -74,7 +74,9 @@ for (const { path: cwd, manifest } of packages) {
       ]) {
         assert.deepEqual(
           packed[section] ?? {},
-          section === "dependencies" ? { parse5: "8.0.0" } : {},
+          section === "dependencies"
+            ? { entities: "6.0.1", parse5: "8.0.0" }
+            : {},
         );
       }
     if (packed.name === "@use-puncta/with-react") {
@@ -87,10 +89,20 @@ for (const { path: cwd, manifest } of packages) {
       assert.equal(packed.peerDependencies["react-dom"], undefined);
       const js = await readFile(join(base, packed.exports["."].import), "utf8");
       assert.match(js, /^"use client";/);
-      const pure = await readFile(
-        join(base, packed.exports["./pure"].import),
-        "utf8",
-      );
+      const pureModules = [];
+      const pending = [join(base, packed.exports["./pure"].import)];
+      const visited = new Set();
+      while (pending.length) {
+        const path = pending.pop();
+        if (visited.has(path)) continue;
+        visited.add(path);
+        const module = await readFile(path, "utf8");
+        pureModules.push(module);
+        // Follow tsdown's relative static imports rather than assuming one output file.
+        for (const match of module.matchAll(/from ["'](\.[^"']+)["']/g))
+          pending.push(resolve(dirname(path), match[1]));
+      }
+      const pure = pureModules.join("\n");
       assert.doesNotMatch(pure, /["']use client["']/);
       assert.match(pure, /from ["']@use-puncta\/core["']/);
       assert.match(pure, /from ["']react["']/);

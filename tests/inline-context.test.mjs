@@ -273,3 +273,43 @@ test("all two-way splits preserve Unicode, dot-run length and three-representati
     }
   }
 });
+
+test("static React siblings do not gain key warnings after transformation", () => {
+  const instance = createPuncta({ locales: [enGb], locale: "en-gb" });
+  const tree = [
+    h(
+      Fragment,
+      { key: "f" },
+      null,
+      false,
+      h("span", null, "..."),
+      undefined,
+      true,
+    ),
+  ];
+  const errors = [];
+  const original = console.error;
+  console.error = (...args) => errors.push(args);
+  try {
+    assert.equal(renderToString(tree), "<span>...</span>");
+    assert.equal(
+      renderToString(transformReact(tree, { instance })),
+      "<span>…</span>",
+    );
+  } finally {
+    console.error = original;
+  }
+  assert.deepEqual(errors, []);
+});
+
+test("standard slot fallback is available inline text in HTML and React", () => {
+  const instance = createPuncta({ locales: [enGb], locale: "en-gb" });
+  assert.equal(instance.html(".<slot>.</slot>."), "…<slot></slot>");
+  const report = transformReact([".", h("slot", { key: "slot" }, "."), "."], {
+    instance,
+    detailed: true,
+  });
+  assert.equal(report.result[0], "…");
+  assert.equal(report.result[1].props.children, "");
+  assert.equal(report.result[2], "");
+});

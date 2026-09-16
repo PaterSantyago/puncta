@@ -8,11 +8,27 @@ import {
   cloneElement,
   Fragment,
   isValidElement,
+  type ReactElement,
   type ReactNode,
   Suspense,
 } from "react";
 import { elementSemantics } from "../../shared/elements.js";
 import { TextContext } from "../../shared/text-context.js";
+
+type ChildProps = { children?: ReactNode; fallback?: ReactNode };
+
+/** Variadic children preserve React's static-sibling key validation. Passing the
+ * rebuilt array as one argument would turn valid static siblings into a list. */
+function cloneChildren(
+  node: ReactElement<ChildProps>,
+  children: ReactNode,
+  props?: Partial<ChildProps>,
+): ReactElement<ChildProps> {
+  if (!Array.isArray(children)) return cloneElement(node, props, children);
+  const result = cloneElement(node, props, ...children);
+  // cloneElement collapses zero/one variadic children; retain the input array shape.
+  return children.length > 1 ? result : cloneElement(result, { children });
+}
 
 export interface ReactTransformOptions extends TextOptions {
   readonly instance: PunctaInstance;
@@ -71,7 +87,7 @@ export function transformReact(
       return () => children.map((child) => child());
     }
     if (node == null || typeof node === "boolean") return () => node;
-    if (!isValidElement<{ children?: ReactNode; fallback?: ReactNode }>(node)) {
+    if (!isValidElement<ChildProps>(node)) {
       context.boundary("opaque");
       return () => node;
     }
@@ -81,7 +97,7 @@ export function transformReact(
       context.boundary("block");
       const fallback = visit(node.props.fallback, [...path, "fallback"]);
       context.boundary("block");
-      return () => cloneElement(node, { fallback: fallback() }, children());
+      return () => cloneChildren(node, children(), { fallback: fallback() });
     }
     if (node.type !== Fragment && typeof node.type !== "string") {
       context.boundary("opaque");
@@ -97,7 +113,7 @@ export function transformReact(
         ? visit(node.props.children, [...path, "children"])
         : undefined;
     if (semantics.boundary) context.boundary(semantics.boundary);
-    return () => (children ? cloneElement(node, undefined, children()) : node);
+    return () => (children ? cloneChildren(node, children()) : node);
   }
   const resultTree = visit(children, []);
   context.finish();

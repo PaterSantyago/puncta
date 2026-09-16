@@ -11,7 +11,7 @@ const protectedElements = new Set(
   ),
 );
 const inline = new Set(
-  "a abbr acronym area b base basefont bdi bdo big button cite col colgroup data del dfn em font i ins label link map mark meta meter nobr output picture progress q rb rp rt rtc s small source span strike strong sub sup time track tt u var".split(
+  "a abbr acronym area b base basefont bdi bdo big button cite col colgroup data del dfn em font i ins label link map mark meta meter nobr output picture progress q rb rp rt rtc s small slot source span strike strong sub sup time track tt u var".split(
     " ",
   ),
 );

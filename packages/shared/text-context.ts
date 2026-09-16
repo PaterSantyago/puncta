@@ -26,16 +26,7 @@ export class TextContext {
     const sourceId = this.sources.length;
     this.sources.push({ id: sourceId, text, path });
     this.values.push(text);
-    let start = 0;
-    // A whitespace-only line ends quote context; a single newline does not.
-    for (const match of text.matchAll(
-      /(?:\r\n|\r|\n)(?:[ \t]*(?:\r\n|\r|\n))*/gu,
-    )) {
-      this.parts.push({ span: { sourceId, start, end: match.index } });
-      this.boundary(/^(?:\r\n|\r|\n)$/u.test(match[0]) ? "line" : "block");
-      start = match.index + match[0].length;
-    }
-    this.parts.push({ span: { sourceId, start, end: text.length } });
+    this.parts.push({ span: { sourceId, start: 0, end: text.length } });
     return () => this.values[sourceId];
   }
 
@@ -55,20 +46,8 @@ export class TextContext {
       const report = this.transform(text);
       for (const edit of report.edits) {
         const ranges: Span[] = [];
-        let offset = 0;
         const range = edit.ranges[0];
-        for (const span of spans) {
-          const length = span.end - span.start;
-          const start = Math.max(range.start, offset);
-          const end = Math.min(range.end, offset + length);
-          if (start < end)
-            ranges.push({
-              sourceId: span.sourceId,
-              start: span.start + start - offset,
-              end: span.start + end - offset,
-            });
-          offset += length;
-        }
+        ranges.push(...sourceRanges(spans, range.start, range.end));
         this.edits.push({ ...edit, ranges });
       }
       for (const rule of report.appliedRules) {
@@ -82,7 +61,7 @@ export class TextContext {
       }
       spans = [];
     };
-    for (const part of this.parts) {
+    for (const part of splitLines(this.parts, this.sources)) {
       if ("boundary" in part) flush();
       else spans.push(part.span);
     }
@@ -99,4 +78,67 @@ export class TextContext {
       }
     }
   }
+}
+
+/** Convert a position in joined accessible text back to separate original leaves. */
+function sourceRanges(
+  spans: readonly Span[],
+  start: number,
+  end: number,
+): Span[] {
+  const ranges: Span[] = [];
+  let offset = 0;
+  for (const span of spans) {
+    const length = span.end - span.start;
+    const overlapStart = Math.max(start, offset);
+    const overlapEnd = Math.min(end, offset + length);
+    if (overlapStart < overlapEnd)
+      ranges.push({
+        sourceId: span.sourceId,
+        start: span.start + overlapStart - offset,
+        end: span.start + overlapEnd - offset,
+      });
+    offset += length;
+  }
+  return ranges;
+}
+
+/** Detect CRLF and whitespace-only lines across transparent leaves too. Structural
+ * boundaries stop this joining; their word/bond/quote semantics remain distinct. */
+function splitLines(
+  parts: readonly Part[],
+  sources: readonly Source[],
+): Part[] {
+  const result: Part[] = [];
+  let spans: Span[] = [];
+  function flush() {
+    const text = spans
+      .map((span) => sources[span.sourceId].text.slice(span.start, span.end))
+      .join("");
+    let start = 0;
+    for (const match of text.matchAll(
+      /(?:\r\n|\r|\n)(?:[ \t]*(?:\r\n|\r|\n))*/gu,
+    )) {
+      result.push(
+        ...sourceRanges(spans, start, match.index).map((span) => ({ span })),
+      );
+      result.push({
+        boundary: /^(?:\r\n|\r|\n)$/u.test(match[0]) ? "line" : "block",
+      });
+      start = match.index + match[0].length;
+    }
+    result.push(
+      ...sourceRanges(spans, start, text.length).map((span) => ({ span })),
+    );
+    spans = [];
+  }
+  for (const part of parts) {
+    if ("span" in part) spans.push(part.span);
+    else {
+      flush();
+      result.push(part);
+    }
+  }
+  flush();
+  return result;
 }
