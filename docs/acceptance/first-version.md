@@ -35,12 +35,59 @@ calls and a separate client-owned instance.
 
 ## Revision and execution record
 
-Final execution evidence is pending the exact-candidate gate. No unfinished row
-is a pass. The completed record will bind command exits, browser/RSC results,
-archives, corpus/resources and measurements to one tested commit. A subsequent
-report-only commit cannot include its own hash; it will explicitly name that
-candidate and leave the product/tests/lockfile unchanged. PR CI runs on GitHub's
-synthetic merge commit, whose parents identify the submitted head and develop base.
+All required local gates passed on commit `6381d3c820082647147cde9732173a4b5b78afde`
+(tree `e7dda7a7f41965f4677640d2b4888ccd7939013d`). The clean tracked tree, archive
+hashes, lockfile hash, frozen corpora and resource manifests are recorded in
+[measurements.json](evidence/measurements.json). [run.json](evidence/run.json)
+records command exits and transcript hashes; [browser.json](evidence/browser.json)
+and [rsc.json](evidence/rsc.json) retain the detailed per-engine results.
+
+| Gate                | Result on that candidate                                                                                                                                               |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm check`        | PASS: lint/format/typecheck/build/pack, 209 functional tests, 3 release tests, 6 publish tests, 8 installed consumers and release-plan validation                      |
+| `pnpm test:browser` | PASS in every engine: 145 shared tests, 14 mounted updates, 8 protection/reorder scenarios, all 3 SSR/hydration renderers                                              |
+| `pnpm test:rsc`     | PASS: real production Flight/client references, server/client boundary, initial HTML without JavaScript, hydration and text/locale/hyphenation updates in every engine |
+| Measurement command | PASS: four archive identities/byte comparisons, independent linguistic totals and 74 timing scenarios                                                                  |
+| Private SSR example | PASS: two `Wait…` lines; public README/report examples also independently executed against installed archives                                                          |
+
+The initial candidate `4b2fca0bdca3dd1bf0fb15f313bcf7e4c48288bf`
+passed its local check, then review found a missing literal `a cat` no-bond oracle.
+The final candidate above adds it to the existing common spacing corpus. The full
+check was repeated after that substantive coverage correction. A separate new
+Node test injects a no-position parser diagnostic at the parse5 boundary while
+retaining real tree construction/serialization; it verifies the defensive
+`unavailable` warning contract without claiming a natural input triggers it.
+Neither change alters runtime code, contract or frozen language corpus.
+
+All four packages remain **0.1.0-alpha.0**. Local environment:
+Node **v24.21.0**, npm **11.19.0**, pnpm **12.4.1**,
+React/React DOM **19.3.0**, Playwright **1.58.2**, esbuild **0.28.2**,
+TypeScript **7.0.2**, tsdown **0.23.0**, parse5 **8.0.0**;
+darwin **27.0.0**, **arm64**,
+Apple M3 (8 logical CPUs,
+17179869184 bytes RAM). The lockfile pins the dependency graph.
+
+| Engine   | Observed local version | Playwright revision |
+| -------- | ---------------------- | ------------------- |
+| chromium | 145.0.7632.6           | 1208                |
+| firefox  | 146.0.1                | 1509                |
+| webkit   | 26.0                   | 2248                |
+
+The private RSC consumer uses **Next 16.3.5**, production webpack, with application
+React/React DOM **19.3.0**. Next's actually executed server/client React is
+**19.3.0-canary-cbb046ab-20260731**, recorded separately in the RSC report.
+These versions must not be conflated. Node SSR tests also cover parallel/reversed
+requests, aborted/repeated renders, no browser globals and no diagnostic render
+side effects. Both stream fixtures observe the transformed shell before releasing
+content; they do not claim a byte-delivery deadline for every React fragment.
+
+The report/evidence commit follows the tested candidate without changing product
+source, tests, package documents, tools or lockfile. It cannot contain its own
+commit hash. PR CI separately runs both required jobs (`check` and
+`browser (Chromium, Firefox, WebKit)`) on Ubuntu and retains browser/RSC reports.
+GitHub's synthetic merge SHA differs from the submitted head: its parents identify
+the head and develop base. The PR's final check record is the authority for that
+Linux execution; local results above are not relabelled as CI results.
 
 ## Language evidence and resource provenance
 
@@ -68,6 +115,24 @@ corpora are also exercised in each browser. Required words and required position
 are distinct counts. Category membership overlaps; category counts must not be
 summed to obtain the unique-word or unique-position totals.
 
+| Locale/category                | Words | Allowed positions | Added | Mandatory positions | Incorrect | Missing mandatory | Optional omitted |
+| ------------------------------ | ----: | ----------------: | ----: | ------------------: | --------: | ----------------: | ---------------: |
+| en-gb / british-spelling       |    11 |                 4 |     3 |                   0 |         0 |                 0 |                1 |
+| en-gb / closed-compound        |   174 |               174 |   157 |                  60 |         0 |                 0 |               17 |
+| en-gb / derivatives-suffixes   |    28 |                32 |    18 |                   0 |         0 |                 0 |               14 |
+| en-gb / different-lengths      |   313 |               217 |   175 |                  60 |         0 |                 0 |               42 |
+| en-gb / monosyllable           |   105 |                 0 |     0 |                   0 |         0 |                 0 |                0 |
+| en-gb / removed-exception-word |     8 |                17 |     0 |                   0 |         0 |                 0 |               17 |
+| es-es / adjacent-vowels        |    11 |                22 |    22 |                   0 |         0 |                 0 |                0 |
+| es-es / ch-ll-rr               |    12 |                24 |    24 |                   0 |         0 |                 0 |                0 |
+| es-es / diacritics             |    12 |                25 |    25 |                   0 |         0 |                 0 |                0 |
+| es-es / false-prefixes         |     5 |                12 |    12 |                   0 |         0 |                 0 |                0 |
+| es-es / h                      |     7 |                13 |    13 |                   0 |         0 |                 0 |                0 |
+| es-es / loanwords              |     5 |                 6 |     6 |                   0 |         0 |                 0 |                0 |
+| es-es / prefixes               |     7 |                22 |    21 |                   0 |         0 |                 0 |                1 |
+| es-es / regular-syllables      |   295 |               591 |   591 |                 120 |         0 |                 0 |                0 |
+| es-es / x                      |     7 |                14 |    14 |                   0 |         0 |                 0 |                0 |
+
 Detailed word omissions remain in [English results](en-gb-hyphenation-result.md)
 and [Spanish results](es-es-hyphenation-result.md). All eight removed English
 upstream exception words remain tested and account for 17 optional missing
@@ -88,21 +153,44 @@ consumer gates inspect those shipped documents and table identities.
 
 ## Measured size and processing time
 
-Final measurements are pending. `scripts/measure-acceptance.mjs` records each
-archive's compressed bytes, sum of uncompressed file bytes, distribution JavaScript
-bytes and SHA-256. These are package-own sizes, excluding transitive dependencies,
-and are not tree-shaken browser bundle sizes.
+Measured package-own bytes (excluding dependencies; not tree-shaken browser bundles):
 
-It measures two locales × three input sizes × text/HTML/pure React × ordinary/
-detailed result × hyphenation off/on, plus instance creation. Inputs are exact
-repeated literal seeds recorded with UTF-16 lengths, UTF-8 bytes and hashes.
-There are three warmups and nine retained samples per scenario; per-call median,
-minimum, maximum and raw samples are saved. Imports/input construction are outside
-warm-call timing. HTML includes parsing/serialization; React measures pure tree
-transformation, not SSR or mounting. Instance creation is measured separately
-with warm imports and ten new instances per sample. No forced GC or outlier
-filtering is used. This is a local descriptive measurement, not a benchmark claim
-across machines, a cold-start result or an arbitrary acceptance threshold.
+| Package                | Version       | `.tgz` bytes | Unpacked file bytes | Distribution JS bytes |
+| ---------------------- | ------------- | -----------: | ------------------: | --------------------: |
+| @use-puncta/core       | 0.1.0-alpha.0 |        30828 |              103954 |                 79789 |
+| @use-puncta/with-en-gb | 0.1.0-alpha.0 |        40898 |              190618 |                181934 |
+| @use-puncta/with-es-es | 0.1.0-alpha.0 |        15222 |              105903 |                 98296 |
+| @use-puncta/with-react | 0.1.0-alpha.0 |        10956 |               33334 |                 23475 |
+
+The script verifies each packed distribution file equals the workspace file used
+for timing. It records every archive SHA-256, file count and byte total. The
+ordinary `text` examples below show median milliseconds per warm invocation;
+all 74 scenarios (ordinary/detailed text, HTML, pure React, both insertion modes,
+three sizes and separate creation) retain raw samples/minimum/median/maximum in
+[measurements.json](evidence/measurements.json).
+
+| Locale | Text UTF-16 length | Typography only | Typography + SHY |
+| ------ | -----------------: | --------------: | ---------------: |
+| en-gb  |                 43 |        0.103 ms |         0.134 ms |
+| en-gb  |                430 |        1.299 ms |         1.851 ms |
+| en-gb  |               4300 |      100.652 ms |       108.583 ms |
+| es-es  |                 34 |        0.067 ms |         0.114 ms |
+| es-es  |                340 |        0.978 ms |         1.402 ms |
+| es-es  |               3400 |       67.932 ms |        73.261 ms |
+
+Warm-import instance creation medians: en-gb 3.728 ms, es-es 1.518 ms.
+
+Inputs are exact literal seeds repeated 1, 10 or 100 times, recorded with UTF-16
+lengths, UTF-8 bytes and SHA-256. Each scenario has three warmups and nine retained
+samples. A warm processing sample contains one invocation; a creation sample
+contains ten new instances and is divided by ten. Imports and input/tree
+construction are outside timing. HTML includes parsing/serialization. React
+measures pure tree transformation, not SSR or mounting. No forced GC or outlier
+filtering is used; allocation/GC variability remains visible in the raw samples.
+The measurements ran sequentially after gates, without concurrent builds/tests.
+There are no millisecond/kilobyte acceptance thresholds, cold-start claims or
+inferences about other machines. The repeated-seed results above grow faster
+than input length; they do not support assuming linear throughput on longer inputs.
 
 ## Public use and limits
 
