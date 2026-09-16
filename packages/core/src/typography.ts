@@ -1,3 +1,4 @@
+import { numberBonds } from "./number-bonds.js";
 import { quotes } from "./quotes.js";
 import { accessibleParts, technicalRanges } from "./protection.js";
 import type { resolveSettings } from "./settings.js";
@@ -64,6 +65,27 @@ export function segmentTypography(
           location: { kind: "text", ranges: [range(start, end)] },
         });
       }
+      const bonds = numberBonds(text, settings);
+      for (const bond of bonds) {
+        if (!bond.enabled) continue;
+        if (bond.warning) {
+          warnings.push({
+            code: bond.warning,
+            source: "rule",
+            message:
+              bond.warning === "currency.order"
+                ? "Currency order is atypical for the selected profile; the construction was preserved."
+                : "Currency attachment is ambiguous; the construction was preserved.",
+            details: {},
+            locale: settings.locale,
+            ruleId: "currencies",
+            location: {
+              kind: "text",
+              ranges: [range(bond.construction.start, bond.construction.end)],
+            },
+          });
+        } else edit(bond.start, bond.end, bond.after, bond.ruleId);
+      }
       if (settings.rules.ellipsis?.enabled !== false) {
         for (const match of text.matchAll(/(?<!\.)\.{3}(?!\.)/gu))
           edit(match.index, match.index + 3, "…", "ellipsis");
@@ -71,7 +93,9 @@ export function segmentTypography(
       if (settings.rules.spaces?.enabled === false) continue;
 
       // These intervals have a role general whitespace cleanup must not override.
-      const preserved: ProtectedRange[] = [];
+      const preserved: ProtectedRange[] = bonds.map(
+        (bond) => bond.construction,
+      );
       for (const match of text.matchAll(/ *(?:[.…](?:[. …]*[.…])|…) */gu)) {
         const start = match.index;
         const end = start + match[0].length;

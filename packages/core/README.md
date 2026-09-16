@@ -2,8 +2,8 @@
 
 Synchronous ESM typography, with explicitly installed locales and no React or DOM
 requirement. The current implementation covers quotes, apostrophes, ordinary spaces, punctuation intervals and
-ellipses, including recognition across transparent inline leaves and nested
-configuration scopes (#39–#44).
+ellipses, units, percentages and currencies, including recognition across transparent inline leaves and nested
+configuration scopes (#39–#45).
 
 ```ts
 import { createPuncta } from "@use-puncta/core";
@@ -25,7 +25,7 @@ conversion creates no new edits. Read a locale identifier from `locale.id`;
 The `spaces` rule collapses repeated U+0020 spaces and fixes unambiguous punctuation
 intervals. It retains line endings, blank lines, indentation, tabs, existing NBSP,
 numeric punctuation and dates. In es-es it removes ordinary inner spaces after
-existing `¿`/`¡` and before `?`/`!`; it does not supply missing signs. Dashes, units, percentages and currencies are not reformatted by this slice.
+existing `¿`/`¡` and before `?`/`!`; it does not supply missing signs. Dashes are not reformatted by this slice.
 
 Spacing around ambiguous ellipses (including separated dots), spaced numeric
 punctuation and periods directly between text stays conservative. Detailed results
@@ -48,6 +48,25 @@ Feet/inches and unresolved quote roles are not guessed. Quotes can span a single
 line break, br/wbr, or an opaque inline fragment. Blank lines, blocks and Suspense
 end a quote context. A child typography scope has independent depth while the
 outer pair can surround it. Protected content never supplies quote delimiters.
+
+Known case-sensitive units bind to numbers with U+00A0 NBSP, including composite
+notations such as `km/h` and `m²`. The angle degree stays attached (`30°`), while
+`°C` and `°F` take NBSP. `rules.units.additional` adds literal whole designations;
+its array replaces inherited additions, removes case-sensitive duplicates and
+rejects empty strings, edge whitespace and control characters. Additions retain
+the distinct percentage, currency and angle roles.
+
+Percentages use no space in en-gb and NBSP in es-es; set
+`rules.percentages.space` to `"none"` or `"nbsp"` to override. Currency codes
+`GBP`, `EUR`, `USD` use NBSP before or after a number. Symbols `£`, `€`, `$` attach
+before the number in en-gb and use NBSP after it in es-es. The opposite symbol
+order preserves its original interval and reports `currency.order`; currency and
+number notation are never reordered or rewritten. A currency between two numbers
+belongs to its attached side (no ordinary space, including existing NBSP). When
+both sides have equal attachment, the construction remains unchanged with
+`typography.ambiguous`. These recognised intervals survive general space cleanup
+even when their own rule is disabled. New bonds stop at line breaks, opaque
+fragments and nested typography scopes.
 
 Both the locale modules and the active locale are required. A call can explicitly
 select another loaded locale. Invalid arguments throw `PunctaConfigError` with
@@ -106,8 +125,8 @@ tags. Entity/CRLF decoding and astral characters retain UTF-16 provenance;
 unmappable parser repairs report `accuracy: "unavailable"` with a reason.
 
 This is a narrow implementation, not completion of the first-version contract.
-All accepted shared option forms are validated and retained, but quotes, apostrophes, spaces and ellipsis
-currently change text. Enabling another rule or hyphenation does not implement
+All accepted shared option forms are validated and retained, but quotes, apostrophes, spaces, ellipsis, units, percentages and
+currencies currently change text. Enabling another rule or hyphenation does not implement
 that transformation. Hyphenation resources and their errors, HTML document/other fragment contexts and
 the full warning catalogue remain subsequent work. Unsupported
 call options are rejected rather than treated as implemented settings. Word admission and future special intervals require their own rule-specific acceptance.

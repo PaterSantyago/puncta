@@ -1,9 +1,10 @@
 # Puncta
 
-Puncta is an MIT-licensed ESM typography library. Its first functional slice
-converts unambiguous `...` to `…`. It contains four packages:
+Puncta is an MIT-licensed ESM typography library. It implements quotes,
+apostrophes, spacing, ellipses and number bonds with protection and nested scopes.
+It contains four packages:
 `@use-puncta/core`, `@use-puncta/with-react`, `@use-puncta/with-en-gb` and
-`@use-puncta/with-es-es`. Full typography, protection, structured areas and
+`@use-puncta/with-es-es`. Dashes, ranges, minus signs and
 hyphenation remain subsequent work. Public npm releases are separate work.
 See [the implemented API and limitations](packages/core/README.md).
 
