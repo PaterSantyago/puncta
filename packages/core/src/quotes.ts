@@ -1,6 +1,6 @@
 import {
   accessibleParts,
-  createsTechnicalToken,
+  changesTechnicalContext,
   technicalRanges,
 } from "./protection.js";
 import type { Settings } from "./settings.js";
@@ -282,7 +282,7 @@ export function quotes(
         change.after +
         candidate.slice(range.end);
     }
-    if (createsTechnicalToken(technicalSource, candidate)) {
+    if (changesTechnicalContext(technicalSource, candidate)) {
       edits.length = editsStart;
       warn(root.start, "typography.ambiguous");
     }

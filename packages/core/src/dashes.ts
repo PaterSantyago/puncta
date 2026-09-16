@@ -1,5 +1,5 @@
 import type { NumberBond } from "./number-bonds.js";
-import { createsTechnicalToken } from "./protection.js";
+import { changesTechnicalContext } from "./protection.js";
 import type { Settings } from "./settings.js";
 import type { ProtectedRange, RuleId } from "./types.js";
 
@@ -120,7 +120,7 @@ export function textualDashes(
         candidate.slice(0, change.start) +
         change.after +
         candidate.slice(change.end);
-    if (createsTechnicalToken(text, candidate)) {
+    if (changesTechnicalContext(text, candidate)) {
       changes.length = changesStart;
       if (settings.rules.dashes.enabled)
         ambiguous.push(...roles.slice(rolesStart));
