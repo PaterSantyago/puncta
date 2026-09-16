@@ -13,13 +13,14 @@
     "typecheck": "tsc --noEmit && pnpm --filter puncta-example-ssr typecheck",
     "build": "pnpm -r build",
     "test:install": "node scripts/install.mjs",
-    "test": "pnpm test:release && pnpm test:publish && pnpm test:install",
+    "test": "pnpm test:functional && pnpm test:release && pnpm test:publish && pnpm test:install",
     "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm build && pnpm pack:check && pnpm test && node scripts/release.mjs validate",
     "pack:check": "node scripts/pack.mjs",
     "test:release": "node --test scripts/release.test.mjs",
     "release:prepare": "node scripts/release.mjs prepare",
     "test:publish": "node --test scripts/publish.test.mjs",
-    "release:publish": "node scripts/publish.mjs"
+    "release:publish": "node scripts/publish.mjs",
+    "test:functional": "node --test tests/*.test.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.13",

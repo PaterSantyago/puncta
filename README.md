@@ -1,9 +1,11 @@
 # Puncta
 
-Puncta is an MIT-licensed ESM library scaffold. It contains four technical packages:
+Puncta is an MIT-licensed ESM typography library. Its first functional slice
+converts unambiguous `...` to `…`. It contains four packages:
 `@use-puncta/core`, `@use-puncta/with-react`, `@use-puncta/with-en-gb` and
-`@use-puncta/with-es-es`. There is no domain functionality yet. Public npm
-releases are subsequent work.
+`@use-puncta/with-es-es`. Full typography, protection, structured areas and
+hyphenation remain subsequent work. Public npm releases are separate work.
+See [the implemented API and limitations](packages/core/README.md).
 
 ## Development
 
@@ -74,7 +76,7 @@ before starting the registry.
 ## Private SSR example
 
 [examples/ssr](examples/ssr/src/index.ts) explicitly passes both locales to the
-technical component. After installing dependencies:
+component through explicit instances. After installing dependencies:
 
 ```sh
 pnpm typecheck
@@ -82,7 +84,7 @@ pnpm build
 pnpm --filter puncta-example-ssr start
 ```
 
-Output: `<span>en-gb</span><span>es-es</span>`. The example has its own typecheck
+Output: `Wait…` on each of two lines. The example has its own typecheck
 and uses source aliases for development. The isolated consumers above verify the
 published declarations independently. The example and root are private and are
 excluded from the public package set.
@@ -94,7 +96,8 @@ excluded from the public package set.
    MIT license, README, ESM root export, declaration output and build script.
    Keep the public GitHub `repository.url` and update `repository.directory`
    to the new package path for provenance.
-2. Export a value conforming to `Locale` from core with the new identifier. Keep
+2. Extend the internal locale format and supported `LocaleId` union. Locale
+   modules are opaque; arbitrary user-created locale objects are unsupported. Keep
    core as `workspace:^` in both peerDependencies and devDependencies: the peer
    belongs to consumers; the devDependency lets pnpm resolve and pack the
    workspace peer. Add no React dependency and no registration in core.
@@ -132,8 +135,8 @@ service is required. GitHub Issues hold specifications and implementation tasks.
 
 ## Packages
 
-- [Core](packages/core/README.md): shared technical locale shape and identifier.
-- [React adapter](packages/with-react/README.md): component displaying a locale id;
+- [Core](packages/core/README.md): synchronous text/HTML ellipsis conversion and diagnostics.
+- [React adapter](packages/with-react/README.md): wrapper-free component and pure tree transformation;
   regular core dependency and React `^19.3.0` peer, without mandatory React DOM.
 
 - [en-gb locale](packages/with-en-gb/README.md): named `enGb` export.

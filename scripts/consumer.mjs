@@ -18,7 +18,15 @@ const core = import.meta.resolve(
   "@use-puncta/core",
   import.meta.resolve("@use-puncta/with-react"),
 );
-assert.equal(typeof (await import(core)).localeId, "function");
+const { createPuncta, PunctaConfigError } = await import(core);
+const { transformReact } = await import("@use-puncta/with-react/pure");
+assert.equal(typeof createPuncta, "function");
+assert.equal("localeId" in (await import(core)), false);
+assert.throws(() => createPuncta(), { code: "config.invalid-option" });
+assert.throws(() => createPuncta({ locales: [], locale: "en-gb" }), {
+  code: "locale.unavailable",
+});
+assert.throws(() => transformReact("Wait..."), PunctaConfigError);
 const app = JSON.parse(
   readFileSync(new URL("./package.json", import.meta.url)),
 );
@@ -71,22 +79,46 @@ for (const [id, exportName] of [
   verifyVersion(name);
   assert.equal("default" in module, false);
   const locale = module[exportName];
+  assert.equal(locale.id, id);
+  assert.equal(locale.version, expected[name]);
+  const instance = createPuncta({ locales: [locale], locale: locale.id });
+  const input = "😀 Wait... Wait....";
+  const output = "😀 Wait… Wait....";
+  assert.equal(instance.text(input), output);
   assert.equal(
-    renderToString(createElement(adapter.Puncta, { locale })),
-    `<span>${id}</span>`,
+    instance.html(`<span>${input}</span>`),
+    `<span>${output}</span>`,
+  );
+  assert.equal(transformReact(input, { instance }), output);
+  assert.equal(
+    renderToString(createElement(adapter.Puncta, { instance }, input)),
+    output,
+  );
+  const report = instance.text(input, { detailed: true });
+  assert.deepEqual(report.edits[0].ranges, [
+    { sourceId: 0, start: 7, end: 10 },
+  ]);
+  assert.equal(report.outputChanged, true);
+  assert.equal(report.hasEdits, true);
+  assert.equal(
+    instance.text(report.result, { detailed: true }).hasEdits,
+    false,
+  );
+  assert.throws(
+    () => instance.text(input, { locale: id === "en-gb" ? "es-es" : "en-gb" }),
+    { code: "locale.unavailable" },
   );
   const localeCore = import.meta.resolve(
     "@use-puncta/core",
     import.meta.resolve(name),
   );
   assert.equal(realpathSync(new URL(localeCore)), realpathSync(new URL(core)));
-  selected.push(createElement(adapter.Puncta, { locale, key: id }));
+  selected.push(
+    createElement(adapter.Puncta, { instance, key: id }, "Wait..."),
+  );
 }
 if (selected.length === 2)
-  assert.equal(
-    renderToString(selected),
-    "<span>en-gb</span><span>es-es</span>",
-  );
+  assert.equal(renderToString(selected), "Wait…<!-- -->Wait…");
 const domRequire = createRequire(import.meta.resolve("react-dom/server"));
 assert.equal(
   realpathSync(require.resolve("react")),

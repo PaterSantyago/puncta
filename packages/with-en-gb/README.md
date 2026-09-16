@@ -1,5 +1,18 @@
 # @use-puncta/with-en-gb
 
-Technical en-gb locale scaffold. Named ESM export: `enGb`. Pass it explicitly to
-`Puncta` from `@use-puncta/with-react`. Core is a peer dependency; React is not a
-dependency of this package. No registration or domain functionality.
+Explicitly installed en-gb locale module. Named ESM export: `enGb`.
+
+```ts
+import { createPuncta } from "@use-puncta/core";
+import { enGb } from "@use-puncta/with-en-gb";
+
+const puncta = createPuncta({ locales: [enGb], locale: enGb.id });
+puncta.text("Wait..."); // "Wait…"
+```
+
+The module is immutable, exposes readonly `id` and package `version`, and is ready
+synchronously after import. There is no global registration or runtime loading.
+Only ellipsis conversion is implemented in this first slice; the full locale
+profile and hyphenation resources are subsequent work. Core is a peer dependency.
+
+MIT licensed. Public publication is separate work.

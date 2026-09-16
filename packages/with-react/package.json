@@ -12,6 +12,10 @@
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
+    },
+    "./pure": {
+      "types": "./dist/pure.d.mts",
+      "import": "./dist/pure.mjs"
     }
   },
   "publishConfig": {

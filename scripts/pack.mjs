@@ -38,12 +38,17 @@ for (const { path: cwd, manifest } of packages) {
       "git+https://github.com/PaterSantyago/puncta.git",
       "Packed repository must match the public GitHub provenance source",
     );
-    assert.deepEqual(Object.keys(packed.exports), ["."]);
+    assert.deepEqual(
+      Object.keys(packed.exports),
+      packed.name === "@use-puncta/with-react" ? [".", "./pure"] : ["."],
+    );
     assert.deepEqual(Object.keys(packed.exports["."]).sort(), [
       "import",
       "types",
     ]);
-    for (const target of Object.values(packed.exports["."])) {
+    for (const target of Object.values(packed.exports).flatMap((entry) =>
+      Object.values(entry),
+    )) {
       assert.ok(target.startsWith("./dist/"));
       assert.ok((await readFile(join(base, target))).length);
     }
@@ -67,7 +72,10 @@ for (const { path: cwd, manifest } of packages) {
         "peerDependencies",
         "optionalDependencies",
       ]) {
-        assert.deepEqual(packed[section] ?? {}, {});
+        assert.deepEqual(
+          packed[section] ?? {},
+          section === "dependencies" ? { parse5: "8.0.0" } : {},
+        );
       }
     if (packed.name === "@use-puncta/with-react") {
       assert.ok(
@@ -78,8 +86,14 @@ for (const { path: cwd, manifest } of packages) {
       assert.equal(packed.dependencies["react-dom"], undefined);
       assert.equal(packed.peerDependencies["react-dom"], undefined);
       const js = await readFile(join(base, packed.exports["."].import), "utf8");
-      assert.match(js, /from ["']@use-puncta\/core["']/);
-      assert.match(js, /from ["']react\/jsx-runtime["']/);
+      assert.match(js, /^"use client";/);
+      const pure = await readFile(
+        join(base, packed.exports["./pure"].import),
+        "utf8",
+      );
+      assert.doesNotMatch(pure, /["']use client["']/);
+      assert.match(pure, /from ["']@use-puncta\/core["']/);
+      assert.match(pure, /from ["']react["']/);
     }
     if (packed.peerDependencies?.["@use-puncta/core"]) {
       assert.ok(

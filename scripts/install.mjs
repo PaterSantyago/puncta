@@ -202,16 +202,45 @@ try {
           join(cwd, "consumer.tsx"),
           [
             'import { Puncta } from "@use-puncta/with-react";',
+            'import { createPuncta, type TextResult, type HtmlResult, type Locale } from "@use-puncta/core";',
+            'import { transformReact, type ReactResult } from "@use-puncta/with-react/pure";',
+            'import type { ReactNode } from "react";',
             ...locales.map(
               (id, index) =>
                 `import { ${id === "en-gb" ? "enGb" : "esEs"} as locale${index} } from "@use-puncta/with-${id}";`,
             ),
             ...locales.map(
               (_, index) =>
-                `export const example${index} = <Puncta locale={locale${index}} />;`,
+                `const instance${index} = createPuncta({locales: [locale${index}], locale: locale${index}.id});\nexport const example${index} = <Puncta instance={instance${index}}>Wait...</Puncta>;`,
             ),
-            "// @ts-expect-error Locale identifiers must be strings.",
-            "export const invalid = <Puncta locale={{id: 42}} />;",
+            ...[
+              "const instance = instance0;",
+              "declare const detailed: boolean;",
+              'const text: string = instance.text("Wait...");',
+              'const textFalse: string = instance.text("Wait...", {detailed: false});',
+              'const textReport: TextResult = instance.text("Wait...", {detailed: true});',
+              'const textUnion: string | TextResult = instance.text("Wait...", {detailed});',
+              'const html: string = instance.html("Wait...");',
+              'const htmlReport: HtmlResult = instance.html("Wait...", {detailed: true});',
+              'const htmlUnion: string | HtmlResult = instance.html("Wait...", {detailed});',
+              'const tree: ReactNode = transformReact("Wait...", {instance});',
+              'const treeReport: ReactResult = transformReact("Wait...", {instance, detailed: true});',
+              'const treeUnion: ReactNode | ReactResult = transformReact("Wait...", {instance, detailed});',
+              "// @ts-expect-error Detailed is not a string.",
+              'const wrong: string = instance.text("...", {detailed: true});',
+              "// @ts-expect-error A boolean variable requires a union result.",
+              'const wrongUnion: TextResult = instance.text("...", {detailed});',
+              "// @ts-expect-error The active locale is required.",
+              "createPuncta({locales: [locale0]});",
+              "// @ts-expect-error Locales are opaque package modules.",
+              'const fake: Locale = {id: "en-gb", version: "1"};',
+              "// @ts-expect-error Pure calls need an instance.",
+              'transformReact("...");',
+              "// @ts-expect-error Standalone components need an instance.",
+              "const missing = <Puncta>Wait...</Puncta>;",
+              "// @ts-expect-error React reports have no outputChanged.",
+              "treeReport.outputChanged;",
+            ],
           ].join("\n"),
         );
         await writeFile(
