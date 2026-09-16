@@ -38,7 +38,7 @@ export interface HyphenationOptions {
   readonly minLeft?: number | null;
   readonly minRight?: number | null;
 }
-/** Shared configuration; only ellipsis currently transforms text. */
+/** Shared configuration; spaces and ellipsis currently transform text. */
 export interface PunctaOptions {
   readonly locale?: LocaleId;
   readonly enabled?: boolean;
@@ -57,7 +57,7 @@ export interface HtmlOptions extends Omit<TextOptions, "protect"> {
   readonly mode?: "fragment";
   readonly context?: "div";
 }
-export type RuleId = "ellipsis";
+export type RuleId = "spaces" | "ellipsis";
 export interface Source {
   readonly id: number;
   readonly text: string;
@@ -79,7 +79,7 @@ export interface HtmlRange extends TextRange {
   readonly inputRange: InputRange;
 }
 export interface Edit<Range = TextRange> {
-  readonly kind: "replace";
+  readonly kind: "replace" | "insert" | "delete";
   readonly before: string;
   readonly after: string;
   readonly locale: LocaleId;
@@ -111,7 +111,12 @@ export interface PunctaWarning {
   readonly details: Readonly<Record<string, unknown>>;
   readonly locale: LocaleId | null;
   readonly ruleId: RuleId | null;
-  readonly location: ConfigLocation;
+  readonly location:
+    | ConfigLocation
+    | {
+        readonly kind: "text";
+        readonly ranges: readonly (TextRange | HtmlRange)[];
+      };
 }
 export interface TextResult {
   readonly result: string;

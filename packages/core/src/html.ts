@@ -145,6 +145,22 @@ export function transformHtml(source: string, scope: Scope): HtmlResult {
       inputRange: mappings[range.sourceId](range.start, range.end),
     })),
   }));
+  warnings.push(
+    ...contextText.warnings.map((warning) =>
+      warning.location.kind === "text"
+        ? {
+            ...warning,
+            location: {
+              kind: "text" as const,
+              ranges: warning.location.ranges.map((range) => ({
+                ...range,
+                inputRange: mappings[range.sourceId](range.start, range.end),
+              })),
+            },
+          }
+        : warning,
+    ),
+  );
   for (const update of updates) update();
   const result = serialize(fragment);
   return {

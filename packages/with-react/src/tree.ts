@@ -159,6 +159,6 @@ export function transformTree(
     edits,
     hasEdits: edits.length > 0,
     appliedRules,
-    warnings,
+    warnings: [...warnings, ...context.warnings],
   };
 }

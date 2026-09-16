@@ -1,6 +1,7 @@
 import type {
   AppliedRule,
   Edit,
+  PunctaWarning,
   Source,
   TextResult,
 } from "../core/src/types.js";
@@ -17,6 +18,7 @@ type Part = { span: Span } | { boundary: Boundary } | { transform: Transform };
 export class TextContext {
   readonly sources: Source[] = [];
   readonly edits: Edit[] = [];
+  readonly warnings: PunctaWarning[] = [];
   readonly appliedRules: AppliedRule[] = [];
   private readonly parts: Part[] = [];
   private readonly values: string[] = [];
@@ -56,6 +58,21 @@ export class TextContext {
         const range = edit.ranges[0];
         ranges.push(...sourceRanges(spans, range.start, range.end));
         this.edits.push({ ...edit, ranges });
+      }
+      for (const warning of report.warnings) {
+        this.warnings.push(
+          warning.location.kind === "text"
+            ? {
+                ...warning,
+                location: {
+                  kind: "text",
+                  ranges: warning.location.ranges.flatMap((range) =>
+                    sourceRanges(spans, range.start, range.end),
+                  ),
+                },
+              }
+            : warning,
+        );
       }
       for (const rule of report.appliedRules) {
         if (
@@ -100,6 +117,20 @@ function sourceRanges(
   let offset = 0;
   for (const span of spans) {
     const length = span.end - span.start;
+    // An insertion at a transparent seam belongs to the left nonempty leaf.
+    if (
+      start === end &&
+      length > 0 &&
+      start >= offset &&
+      start <= offset + length
+    )
+      return [
+        {
+          sourceId: span.sourceId,
+          start: span.start + start - offset,
+          end: span.start + start - offset,
+        },
+      ];
     const overlapStart = Math.max(start, offset);
     const overlapEnd = Math.min(end, offset + length);
     if (overlapStart < overlapEnd)

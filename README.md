@@ -137,7 +137,7 @@ service is required. GitHub Issues hold specifications and implementation tasks.
 
 ## Packages
 
-- [Core](packages/core/README.md): synchronous text/HTML ellipsis conversion and diagnostics.
+- [Core](packages/core/README.md): synchronous text/HTML spaces, punctuation intervals, ellipses and diagnostics.
 - [React adapter](packages/with-react/README.md): wrapper-free component and pure tree transformation;
   regular core dependency and React `^19.3.0` peer, without mandatory React DOM.
 
