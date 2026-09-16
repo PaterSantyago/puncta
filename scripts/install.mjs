@@ -10,6 +10,7 @@ import {
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { isolatedPackageEnvironment } from "./package-environment.mjs";
 import { registryFixture } from "./registry-fixture.mjs";
 import { publicPackages } from "./workspace.mjs";
 
@@ -147,7 +148,7 @@ try {
         },
       }),
     );
-    const env = { ...environment, NPM_CONFIG_CACHE: join(cwd, "cache") };
+    const env = isolatedPackageEnvironment(cwd, environment);
     const args = ["install", "--ignore-scripts", "--registry", registry];
     if (manager === "pnpm")
       args.push(
@@ -351,6 +352,10 @@ try {
             ],
           ].join("\n"),
         );
+        await copyFile(
+          join(root, "scripts/consumer-types.ts"),
+          join(cwd, "consumer-types.ts"),
+        );
         await writeFile(
           join(cwd, "tsconfig.json"),
           JSON.stringify({
@@ -362,7 +367,7 @@ try {
               strict: true,
               noEmit: true,
             },
-            include: ["consumer.tsx"],
+            include: ["consumer.tsx", "consumer-types.ts"],
           }),
         );
         await run(

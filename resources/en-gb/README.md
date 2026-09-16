@@ -93,5 +93,7 @@ The English data is MIT, attributed to Dominik Wujastyk and Graham Toal. The OUP
 training list is not redistributed. The kernel and compiler are ISC, attributed
 to Yevhen Tiurin. The English locale archive and core archive contain their own
 `NOTICE.md`; the compiler's notice remains beside the build tooling. Archive
-checks read these notices from real packed artifacts. Puncta's own code and
+checks read these notices from real packed artifacts. The locale also ships
+`hyphenation-manifest.json`, reproduced with its data and checked against the
+installed table hash. Puncta's own code and
 refinement are covered by its MIT licence.
