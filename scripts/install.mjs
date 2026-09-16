@@ -273,8 +273,8 @@ try {
           join(cwd, "consumer.tsx"),
           [
             'import { Puncta, PunctaProvider } from "@use-puncta/with-react";',
-            'import { createPuncta, type TextResult, type HtmlResult, type Locale } from "@use-puncta/core";',
-            'import { transformReact, type ReactResult } from "@use-puncta/with-react/pure";',
+            'import { createPuncta, type TextResult, type HtmlResult, type StripSoftHyphensOptions, type Locale } from "@use-puncta/core";',
+            'import { transformReact, stripSoftHyphensReact, type ReactResult } from "@use-puncta/with-react/pure";',
             'import type { ReactNode } from "react";',
             ...locales.map(
               (id, index) =>
@@ -289,6 +289,17 @@ try {
               "declare const detailed: boolean;",
               'const text: string = instance.text("Wait...");',
               'const textFalse: string = instance.text("Wait...", {detailed: false});',
+              'const stripOptions: StripSoftHyphensOptions = {format: "html", detailed: true};',
+              'const stripped: string = instance.stripSoftHyphens("a\\u00adb");',
+              'const strippedText: TextResult = instance.stripSoftHyphens("a", {format: "text", detailed: true});',
+              'const strippedHtml: HtmlResult = instance.stripSoftHyphens("a", {format: "html", detailed: true});',
+              'const strippedReact: ReactResult = stripSoftHyphensReact("a", {instance, detailed: true});',
+              "// @ts-expect-error text removal rejects HTML options",
+              'instance.stripSoftHyphens("a", {format: "text", mode: "fragment"});',
+              "// @ts-expect-error HTML removal rejects text protection",
+              'instance.stripSoftHyphens("a", {format: "html", protect: []});',
+              "// @ts-expect-error pure React removal rejects format",
+              'stripSoftHyphensReact("a", {instance, format: "text"});',
               'const textReport: TextResult = instance.text("Wait...", {detailed: true});',
               'const protectedReport: TextResult = instance.text("...", {protect: [{start: 0, end: 3}] as const, detailed: true});',
               "// @ts-expect-error Protection ranges belong only to a text call.",

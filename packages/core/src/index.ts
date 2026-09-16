@@ -1,6 +1,7 @@
 import { instanceScope } from "../../shared/scopes.js";
 import { checkObject, invalidOption, PunctaConfigError } from "./config.js";
 import { transformHtml } from "./html.js";
+import { removeSoftHyphens } from "./strip-soft-hyphens.js";
 import { protectedRanges } from "./protection.js";
 import {
   mergeSettings,
@@ -16,6 +17,7 @@ import type {
   PunctaInstance,
   PunctaOptions,
   RuleId,
+  StripSoftHyphensOptions,
   TextOptions,
   TextResult,
 } from "./types.js";
@@ -71,12 +73,43 @@ export function createPuncta(
     loaded,
   );
   return makeInstance(initial);
-  function makeInstance(settings: Settings): PunctaInstance {
+  function makeInstance(
+    settings: Settings,
+    operation: "typography" | "remove" = "typography",
+  ): PunctaInstance {
+    const recognition =
+      operation === "remove"
+        ? {
+            text: removeSoftHyphens,
+            segment: removeSoftHyphens,
+            quotation: () => ({ edits: [], warnings: [] }),
+            requiresResource: false,
+          }
+        : {
+            text: typography,
+            segment: segmentTypography,
+            quotation: quotationTypography,
+            requiresResource: true,
+          };
+    function validateResource(effective: Settings) {
+      // Language resources land with insertion; removal never needs one.
+      if (
+        recognition.requiresResource &&
+        effective.hyphenation.enabled === true
+      )
+        throw new PunctaConfigError(
+          "hyphenation.resource-unavailable",
+          "Hyphenation resource is unavailable.",
+          { locale: effective.locale },
+          ["hyphenation", "enabled"],
+        );
+    }
+    validateResource(settings);
     function text(
       source: string,
       call: TextOptions = {},
       initialLineStart = true,
-      recognize: typeof typography = typography,
+      recognize: typeof typography = recognition.text,
     ): string | TextResult {
       if (typeof source !== "string")
         invalidOption(["source"], source === undefined ? "required" : "type");
@@ -85,6 +118,7 @@ export function createPuncta(
       if (call.detailed !== undefined && typeof call.detailed !== "boolean")
         invalidOption(["detailed"], "type");
       const effective = resolveSettings(mergeSettings(settings, call, loaded));
+      validateResource(effective);
       const { locale } = effective;
       const { edits, warnings } = recognize(
         source,
@@ -134,18 +168,50 @@ export function createPuncta(
       text("", textCall);
       const report = transformHtml(
         source,
-        instanceScope(makeInstance(mergeSettings(settings, textCall, loaded))),
+        instanceScope(
+          makeInstance(mergeSettings(settings, textCall, loaded), operation),
+        ),
       );
       return call.detailed ? report : report.result;
     }
     return Object.freeze({
       text,
       html,
+      stripSoftHyphens(
+        source: string,
+        call: StripSoftHyphensOptions = {},
+      ): string | TextResult | HtmlResult {
+        checkObject(call, [
+          ...sharedKeys,
+          "detailed",
+          "format",
+          "protect",
+          "mode",
+          "context",
+        ]);
+        const { format = "text", ...options } = call;
+        if (format !== "text" && format !== "html")
+          invalidOption(["format"], "value");
+        const removal = makeInstance(settings, "remove");
+        return format === "html"
+          ? removal.html(source, options)
+          : removal.text(source, options);
+      },
       with(overrides: PunctaOptions) {
         checkObject(overrides, sharedKeys);
-        return makeInstance(mergeSettings(settings, overrides, loaded));
+        return makeInstance(
+          mergeSettings(settings, overrides, loaded),
+          operation,
+        );
       },
       [Symbol.for("@use-puncta/scope")]: Object.freeze({
+        removal: (overrides: PunctaOptions) => {
+          checkObject(overrides, sharedKeys);
+          return makeInstance(
+            mergeSettings(settings, overrides, loaded),
+            "remove",
+          );
+        },
         locale: settings.locale,
         enabled: settings.enabled,
         // Private adapter entry keeps structural line context out of public options.
@@ -155,10 +221,10 @@ export function createPuncta(
               source,
               { detailed: true },
               initialLineStart,
-              segmentTypography,
+              recognition.segment,
             ),
           quotation: (source: string) =>
-            text(source, { detailed: true }, true, quotationTypography),
+            text(source, { detailed: true }, true, recognition.quotation),
         }),
       }),
     }) as PunctaInstance;

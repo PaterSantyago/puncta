@@ -57,7 +57,11 @@ export interface HtmlOptions extends Omit<TextOptions, "protect"> {
   readonly mode?: "fragment";
   readonly context?: "div";
 }
+export type StripTextOptions = TextOptions & { readonly format?: "text" };
+export type StripHtmlOptions = HtmlOptions & { readonly format: "html" };
+export type StripSoftHyphensOptions = StripTextOptions | StripHtmlOptions;
 export type RuleId =
+  | "hyphenation.remove"
   | "dashes"
   | "ranges"
   | "minus"
@@ -142,6 +146,22 @@ export interface HtmlResult extends Omit<TextResult, "edits"> {
 }
 export interface PunctaInstance {
   with(overrides: PunctaOptions): PunctaInstance;
+  stripSoftHyphens(
+    source: string,
+    options: StripHtmlOptions & { detailed: true },
+  ): HtmlResult;
+  stripSoftHyphens(
+    source: string,
+    options: StripTextOptions & { detailed: true },
+  ): TextResult;
+  stripSoftHyphens(
+    source: string,
+    options?: StripSoftHyphensOptions & { detailed?: false },
+  ): string;
+  stripSoftHyphens(
+    source: string,
+    options: StripSoftHyphensOptions,
+  ): string | TextResult | HtmlResult;
   text(source: string, options: TextOptions & { detailed: true }): TextResult;
   text(source: string, options?: TextOptions & { detailed?: false }): string;
   text(source: string, options: TextOptions): string | TextResult;

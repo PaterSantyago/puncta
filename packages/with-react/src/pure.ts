@@ -5,7 +5,11 @@ import {
   type TextResult,
 } from "@use-puncta/core";
 import type { ReactNode } from "react";
-import { instanceScope, requireInstance } from "../../shared/scopes.js";
+import {
+  instanceScope,
+  removalScope,
+  requireInstance,
+} from "../../shared/scopes.js";
 import { transformTree } from "./tree.js";
 
 export interface ReactTransformOptions extends Omit<TextOptions, "protect"> {
@@ -32,13 +36,40 @@ export function transformReact(
   children: ReactNode,
   options: ReactTransformOptions,
 ): ReactNode | ReactResult {
+  return transform(children, options, (instance, settings) =>
+    instanceScope(instance.with(settings)),
+  );
+}
+
+export function stripSoftHyphensReact(
+  children: ReactNode,
+  options: ReactTransformOptions & { detailed: true },
+): ReactResult;
+export function stripSoftHyphensReact(
+  children: ReactNode,
+  options: ReactTransformOptions & { detailed?: false },
+): ReactNode;
+export function stripSoftHyphensReact(
+  children: ReactNode,
+  options: ReactTransformOptions,
+): ReactNode | ReactResult;
+export function stripSoftHyphensReact(
+  children: ReactNode,
+  options: ReactTransformOptions,
+): ReactNode | ReactResult {
+  return transform(children, options, removalScope);
+}
+
+function transform(
+  children: ReactNode,
+  options: ReactTransformOptions,
+  scopeFor: typeof removalScope,
+): ReactNode | ReactResult {
   requireInstance(options?.instance, PunctaConfigError);
-  const { instance, ...call } = options;
-  const { detailed, ...settings } = call;
-  // Validate the shared-only settings before invoking the text API, whose
-  // input-specific protect option is deliberately unavailable to React.
-  const scope = instanceScope(instance.with(settings));
+  const { instance, detailed, ...settings } = options;
+  // Shared-only validation excludes protect/mode/context/format from React.
+  const scope = scopeFor(instance, settings);
   scope.instance.text("", { detailed });
   const report = transformTree(children, scope);
-  return options.detailed ? report : report.result;
+  return detailed ? report : report.result;
 }
