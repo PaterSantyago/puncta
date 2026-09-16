@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Puncta · React-прототип</title>
+<style>
+  * { box-sizing: border-box; } body { margin: 0 auto; padding: 36px 24px; max-width: 1100px; font: 16px/1.5 system-ui, sans-serif; color: #203027; background: #fafbf9; }
+  h1 { margin: 6px 0 12px; font-size: 30px; } h2 { font-size: 20px; margin: 0 0 12px; } p { max-width: 850px; } .eyebrow { color: #5b7061; font-size: 13px; letter-spacing: 1px; }
+  section { border: 1px solid #d9e2d9; border-radius: 10px; padding: 22px; margin: 22px 0; background: white; }
+  button, input { font: inherit; padding: 8px 12px; border: 1px solid #91aa98; border-radius: 5px; background: white; color: inherit; } button { cursor: pointer; } button:hover, button[aria-selected=true] { background: #e1efe5; } button:focus-visible { outline: 3px solid #719e80; }
+  nav, .controls { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; } .hint { color: #58665e; } .ok { color: #146b39; } .fail { color: #b11f24; }
+  dl { display: grid; grid-template-columns: minmax(130px, 220px) 1fr; gap: 8px; } dt { color: #58665e; } dd { margin: 0; overflow-wrap: anywhere; }
+  #experiment > * { display: block; padding: 8px; border-bottom: 1px dashed #d9e2d9; } #experiment > *::before { content: attr(data-case) ' → '; color: #738277; font: 12px monospace; } .card button { margin-left: 10px; } .card + .card { margin-left: 14px; }
+  table { width: 100%; border-collapse: collapse; } th, td { padding: 9px; text-align: left; border-bottom: 1px solid #e3e8e3; vertical-align: top; } pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; background: #f4f6f3; padding: 14px; } small { color: #58665e; }
+</style>
+<div class="eyebrow">THROWAWAY PROTOTYPE · REACT 19.3.0 · НЕ РЕАЛИЗАЦИЯ БИБЛИОТЕКИ</div>
+<h1>Защита и владение исходным текстом</h1>
+<p>Доходит ли запрет через непрозрачный компонент до вложенной области типографики, сохраняя исходники, DOM и состояние? Заглушка добавляет <b>⟦локаль:исходник⟧</b>. Вложенные скобки означают обработку чужого результата. Это проверка механизма, а не языковых правил.</p>
+<section>
+<h2>Сценарии</h2>
+<nav role="tablist" aria-label="Сценарии">
+<button role="tab" data-tab="protection">1. Защита</button><button role="tab" data-tab="ownership">2. Исходники</button><button role="tab" data-tab="identity">3. Состояние и ref</button>
+</nav>
+<p id="guide"></p><div id="steps" class="controls"></div>
+</section>
+<section>
+<h2>Свободная проверка</h2>
+<div class="controls"><button id="code">Защита code</button><button id="off">Защита data-puncta=off</button><button id="none">Снять защиту</button><button id="locale">Сменить локаль</button><button id="rerender">Повторить render</button><button id="reverse">Переставить a / b</button></div>
+<label>Исходный текст <input id="source" value="Card source"></label>
+<dl id="state"></dl>
+</section>
+<section><h2>Результат настоящего React</h2><p class="hint">Кнопки a / b хранят состояние внутри Card. Кнопка Outer source проверяет сохранение обработчика.</p><div id="experiment"></div></section>
+<section><h2 id="summary">Наблюдения</h2><table><thead><tr><th>Проверка</th><th>Результат</th></tr></thead><tbody id="checks"></tbody></table>
+<details><summary>DOM, исходники внешней области и сохранение props</summary><pre id="detail"></pre></details></section>
+<p><small>Проверяются только code, data-puncta=off, enabled=false, вложенные области, Fragment, массивы и используемые здесь host-элементы. Полная SSR / streaming / hydration / RSC-матрица и языковая приёмка остаются работой реализации. React работает в development + StrictMode. Никакие счётчики рендеров не используются как критерий владения текстом.</small></p>
+<script>/* BUNDLE */</script>
+</html>

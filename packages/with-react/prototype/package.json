@@ -1,0 +1,16 @@
+{
+  "name": "puncta-react-protection-prototype",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "demo": "node build.mjs",
+    "observe": "node observe.mjs"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

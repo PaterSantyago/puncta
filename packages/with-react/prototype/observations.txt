@@ -1,0 +1,82 @@
+
+> observe
+> node observe.mjs
+
+PROTOTYPE — React 19.3.0; Node v24.21.0
+
+code / es-es
+<code data-case="protection"><span class="card" title="title -- unchanged">Card source</span></code><span data-case="sibling">⟦en-gb:Sibling source⟧</span><span data-case="nested">⟦es-es:Card source⟧</span><span data-case="provider">Provider raw⟦es-es:Card source⟧</span><span data-case="disabled"><span class="card" title="title -- unchanged">Card source</span></span><button data-case="direct" title="original -- title" style="color:inherit" type="button">⟦en-gb:Outer source⟧</button><span data-case="keys"><span class="card" title="title -- unchanged">⟦es-es:key a⟧<button type="button">a: 0</button></span><span class="card" title="title -- unchanged">⟦es-es:key b⟧<button type="button">b: 0</button></span></span>
+
+code / en-gb
+<code data-case="protection"><span class="card" title="title -- unchanged">Card source</span></code><span data-case="sibling">⟦en-gb:Sibling source⟧</span><span data-case="nested">⟦en-gb:Card source⟧</span><span data-case="provider">Provider raw⟦en-gb:Card source⟧</span><span data-case="disabled"><span class="card" title="title -- unchanged">Card source</span></span><button data-case="direct" title="original -- title" style="color:inherit" type="button">⟦en-gb:Outer source⟧</button><span data-case="keys"><span class="card" title="title -- unchanged">⟦en-gb:key a⟧<button type="button">a: 0</button></span><span class="card" title="title -- unchanged">⟦en-gb:key b⟧<button type="button">b: 0</button></span></span>
+
+off / es-es
+<span data-case="protection" data-puncta="off"><span class="card" title="title -- unchanged">Card source</span></span><span data-case="sibling">⟦en-gb:Sibling source⟧</span><span data-case="nested">⟦es-es:Card source⟧</span><span data-case="provider">Provider raw⟦es-es:Card source⟧</span><span data-case="disabled"><span class="card" title="title -- unchanged">Card source</span></span><button data-case="direct" title="original -- title" style="color:inherit" type="button">⟦en-gb:Outer source⟧</button><span data-case="keys" data-puncta="off"><span class="card" title="title -- unchanged">key a<button type="button">a: 0</button></span><span class="card" title="title -- unchanged">key b<button type="button">b: 0</button></span></span>
+
+off / en-gb
+<span data-case="protection" data-puncta="off"><span class="card" title="title -- unchanged">Card source</span></span><span data-case="sibling">⟦en-gb:Sibling source⟧</span><span data-case="nested">⟦en-gb:Card source⟧</span><span data-case="provider">Provider raw⟦en-gb:Card source⟧</span><span data-case="disabled"><span class="card" title="title -- unchanged">Card source</span></span><button data-case="direct" title="original -- title" style="color:inherit" type="button">⟦en-gb:Outer source⟧</button><span data-case="keys" data-puncta="off"><span class="card" title="title -- unchanged">key a<button type="button">a: 0</button></span><span class="card" title="title -- unchanged">key b<button type="button">b: 0</button></span></span>
+
+none / es-es
+<span data-case="protection"><span class="card" title="title -- unchanged">⟦es-es:Card source⟧</span></span><span data-case="sibling">⟦en-gb:Sibling source⟧</span><span data-case="nested">⟦es-es:Card source⟧</span><span data-case="provider">Provider raw⟦es-es:Card source⟧</span><span data-case="disabled"><span class="card" title="title -- unchanged">Card source</span></span><button data-case="direct" title="original -- title" style="color:inherit" type="button">⟦en-gb:Outer source⟧</button><span data-case="keys"><span class="card" title="title -- unchanged">⟦es-es:key a⟧<button type="button">a: 0</button></span><span class="card" title="title -- unchanged">⟦es-es:key b⟧<button type="button">b: 0</button></span></span>
+
+none / en-gb
+<span data-case="protection"><span class="card" title="title -- unchanged">⟦en-gb:Card source⟧</span></span><span data-case="sibling">⟦en-gb:Sibling source⟧</span><span data-case="nested">⟦en-gb:Card source⟧</span><span data-case="provider">Provider raw⟦en-gb:Card source⟧</span><span data-case="disabled"><span class="card" title="title -- unchanged">Card source</span></span><button data-case="direct" title="original -- title" style="color:inherit" type="button">⟦en-gb:Outer source⟧</button><span data-case="keys"><span class="card" title="title -- unchanged">⟦en-gb:key a⟧<button type="button">a: 0</button></span><span class="card" title="title -- unchanged">⟦en-gb:key b⟧<button type="button">b: 0</button></span></span>
+
+Changed source
+<span data-case="protection"><span class="card" title="title -- unchanged">⟦es-es:New source⟧</span></span><span data-case="sibling">⟦en-gb:Sibling source⟧</span><span data-case="nested">⟦es-es:New source⟧</span><span data-case="provider">Provider raw⟦es-es:New source⟧</span><span data-case="disabled"><span class="card" title="title -- unchanged">New source</span></span><button data-case="direct" title="original -- title" style="color:inherit" type="button">⟦en-gb:Outer source⟧</button><span data-case="keys"><span class="card" title="title -- unchanged">⟦es-es:key a⟧<button type="button">a: 0</button></span><span class="card" title="title -- unchanged">⟦es-es:key b⟧<button type="button">b: 0</button></span></span>
+
+Pure walker observation
+{
+  "inputs": [
+    {
+      "path": "$.children[0]",
+      "source": "outer input",
+      "locale": "en-gb"
+    }
+  ],
+  "boundaries": [
+    {
+      "path": "$.children[1]",
+      "kind": "opaque"
+    },
+    {
+      "path": "$.children[2]",
+      "kind": "Puncta"
+    },
+    {
+      "path": "$.children[3]",
+      "kind": "Provider"
+    }
+  ],
+  "retained": [
+    {
+      "path": "$",
+      "type": true,
+      "key": true,
+      "ref": true,
+      "props": true
+    }
+  ],
+  "opaqueElementSame": true,
+  "nestedElementSame": true,
+  "providerElementSame": true,
+  "sourceStillOriginal": true
+}
+
+Protected traversal
+{
+  "inputs": [],
+  "retained": [
+    {
+      "path": "$",
+      "type": true,
+      "key": true,
+      "ref": true,
+      "props": true
+    }
+  ],
+  "reads": 0,
+  "childIdentity": true
+}
+nested instance while disabled instance.nested
+invalid locale while disabled locale.unavailable

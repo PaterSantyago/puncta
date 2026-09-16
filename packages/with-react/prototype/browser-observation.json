@@ -1,0 +1,56 @@
+{
+  "checks": [
+    {
+      "name": "Защита через непрозрачный Card",
+      "result": "PASS — ⟦en-gb:New source⟧"
+    },
+    {
+      "name": "Независимая соседняя область",
+      "result": "PASS — ⟦en-gb:Sibling source⟧"
+    },
+    {
+      "name": "Вложенный Puncta получает исходник",
+      "result": "PASS — ⟦en-gb:New source⟧"
+    },
+    {
+      "name": "Provider оставляет свой текст исходным",
+      "result": "PASS — Provider raw⟦en-gb:New source⟧"
+    },
+    {
+      "name": "enabled=true не отменяет запрет предка",
+      "result": "PASS — New source"
+    },
+    {
+      "name": "Внешняя область обрабатывает свой текст",
+      "result": "PASS — ⟦en-gb:Outer source⟧"
+    },
+    {
+      "name": "Нет дополнительных DOM-узлов",
+      "result": "PASS — span[span[]],span[],span[],span[],span[span[]],button[],span[span[button[]],span[button[]]]"
+    },
+    {
+      "name": "Host ref сохраняет тот же DOM-узел",
+      "result": "PASS — title: original -- title"
+    },
+    {
+      "name": "Card ref сохраняется при перестановке и защите",
+      "result": "PASS — состояние: a: 1"
+    },
+    {
+      "name": "Остальные DOM props сохранены",
+      "result": "PASS — обработчик вызван: 2"
+    },
+    {
+      "name": "Внешний обход не раскрывает чужие исходники",
+      "result": "PASS — Прочитан только outer; Card, Puncta, Provider сохранены по ссылке"
+    },
+    {
+      "name": "Тип / key / ref / остальные props",
+      "result": "PASS — Сравнение React-элементов по ссылкам, включая обработчик и style"
+    }
+  ],
+  "html": "<span data-case=\"protection\"><span class=\"card\" title=\"title -- unchanged\">⟦en-gb:New source⟧</span></span><span data-case=\"sibling\">⟦en-gb:Sibling source⟧</span><span data-case=\"nested\">⟦en-gb:New source⟧</span><span data-case=\"provider\">Provider raw⟦en-gb:New source⟧</span><span data-case=\"disabled\"><span class=\"card\" title=\"title -- unchanged\">New source</span></span><button data-case=\"direct\" title=\"original -- title\" type=\"button\" style=\"color: inherit;\">⟦en-gb:Outer source⟧</button><span data-case=\"keys\"><span class=\"card\" title=\"title -- unchanged\">⟦en-gb:key a⟧<button type=\"button\">a: 1</button></span><span class=\"card\" title=\"title -- unchanged\">⟦en-gb:key b⟧<button type=\"button\">b: 0</button></span></span>",
+  "state": "ЗащитаnoneЛокаль дочерней областиen-gbИсходникNew sourceВнешняя локальen-gbЯвных render из панели15Порядок Carda, bСостояние Carda: 1 · b: 0Вызовов обработчика2",
+  "summary": "Наблюдения: 12 / 12",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36"
+}
