@@ -71,9 +71,14 @@ marker changes and reordering with unchanged protection are tested; arbitrary de
 protection toggles do not have a state-preservation guarantee. The implementation
 does not inspect protected descendants to retain those bridges.
 
-Real SSR checks and an optional mounted Chromium/hydration check cover this slice
-(see `tests/browser/run-scopes.mjs` in the repository). Three-browser/server-streaming
-acceptance and RSC integration remain subsequent work. Quotes, apostrophes, spaces, ellipsis, textual dashes, numeric ranges, minus, units, percentages and currencies are implemented; accepting other shared settings does not claim
+Node 24.21.0 and React/React DOM 19.3.0 checks cover `renderToString`,
+`renderToPipeableStream` and `renderToReadableStream` through the compatible
+`react-dom/server.node` entry. Controlled Suspense delays verify transformed bytes
+before content resolves, independent contexts, concurrent requests and abort/retry
+with original source ownership. See `docs/acceptance/ssr-streaming.md` in the repository
+for commands and React document-preamble buffering limits. The optional mounted
+Chromium/hydration check remains `tests/browser/run-scopes.mjs`; the full
+three-browser hydration matrix and RSC integration remain subsequent work. Quotes, apostrophes, spaces, ellipsis, textual dashes, numeric ranges, minus, units, percentages and currencies are implemented; accepting other shared settings does not claim
 their transformations are complete. See the core README for remaining scope.
 
 MIT licensed. Public publication is separate work.
