@@ -70,6 +70,16 @@ new independent source reasoning, an explicit review and a new corpus version;
 engine mismatches are evidence to investigate, never a reason to erase required
 positions or restore prohibited runtime exceptions.
 
+The corpus-only freeze commit is
+`9cc05f13b2e61d7944e93d888d24244e9d2e924b`. Version 1 contains 313 distinct
+words, 60 required positives and 19 separate negative cases. Categories overlap:
+174 closed compounds, 105 monosyllables, 28 derivatives/suffixes, 11 British
+spellings and all eight special words.
+
+| Letters | 6   | 7   | 8   | 9   | 10  | 11  | 12  |
+| ------- | --- | --- | --- | --- | --- | --- | --- |
+| Words   | 100 | 43  | 76  | 54  | 31  | 7   | 2   |
+
 ## Data interpretation
 
 - Positions are zero-based UTF-16 offsets in the exact source, between graphemes.
