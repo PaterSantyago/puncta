@@ -1,23 +1,18 @@
 import assert from "node:assert/strict";
-
 import {
   validateMetadata,
   validatePositions,
 } from "./validate-corpus-entry.mjs";
+
 const requiredCategories = [
-  "british-spelling",
-  "derivatives-suffixes",
-  "different-lengths",
-];
-const specialWords = [
-  "university",
-  "universities",
-  "however",
-  "manuscript",
-  "manuscripts",
-  "reciprocity",
-  "throughout",
-  "something",
+  "adjacent-vowels",
+  "diacritics",
+  "h",
+  "ch-ll-rr",
+  "x",
+  "prefixes",
+  "false-prefixes",
+  "loanwords",
 ];
 const skipReasons = [
   "short-word",
@@ -30,15 +25,21 @@ const skipReasons = [
   "protected",
   "unsupported-characters",
   "mixed-scripts",
+  "language-ambiguity",
+];
+const warningReasons = [
+  "unsupported-characters",
+  "mixed-scripts",
+  "language-ambiguity",
 ];
 
 function validateNegativeEntries(entries) {
   const ids = new Set();
   const reasons = new Set();
   for (const entry of entries) {
-    validateMetadata(entry, "en-gb", 3);
-    assert.ok(!ids.has(entry.id), `duplicate negative id: ${entry.id}`);
+    validateMetadata(entry, "es-es", 2);
     assert.ok(typeof entry.id === "string" && entry.id.length > 0);
+    assert.ok(!ids.has(entry.id), `duplicate negative id: ${entry.id}`);
     ids.add(entry.id);
     reasons.add(entry.reason);
     assert.ok(skipReasons.includes(entry.reason), `${entry.id}: skip reason`);
@@ -51,12 +52,14 @@ function validateNegativeEntries(entries) {
     assert.equal(entry.expectedSourceAfterHyphenation, entry.source);
     assert.equal(entry.protected, entry.reason === "protected");
     assert.deepEqual(entry.expectedDiagnostics.ordinary, []);
-    const warning = ["unsupported-characters", "mixed-scripts"].includes(
-      entry.reason,
-    )
+    const warning = warningReasons.includes(entry.reason)
       ? [`hyphenation.${entry.reason}`]
       : [];
     assert.deepEqual(entry.expectedDiagnostics.detailed, warning, entry.id);
+    if (entry.reason === "language-ambiguity") {
+      assert.ok(entry.source.includes("tl"), `${entry.id}: whole-word tl`);
+      assert.ok(entry.source.length >= entry.settings.minWordLength);
+    }
   }
   for (const reason of skipReasons) {
     assert.ok(reasons.has(reason), `missing negative class: ${reason}`);
@@ -65,8 +68,8 @@ function validateNegativeEntries(entries) {
     ["apostrophe", ["'", "’", "ʼ"]],
     ["hyphen", ["-", "‐", "‑"]],
     ["existing-shy", ["\u00ad"]],
-    ["unsupported-characters", ["é", "\u0301", "ﬃ"]],
-    ["mixed-scripts", ["с"]],
+    ["unsupported-characters", ["ç", "\u0327", "ﬃ"]],
+    ["mixed-scripts", ["а"]],
   ]) {
     for (const character of characters) {
       assert.ok(
@@ -78,31 +81,45 @@ function validateNegativeEntries(entries) {
       );
     }
   }
-  for (const source of ["backbone", "résumé", "manusсript"]) {
+  for (const source of ["camino", "façade", "cаmino", "atletismo"]) {
     assert.ok(
       entries.some((entry) => entry.protected && entry.source === source),
       `missing protection-priority example: ${source}`,
     );
   }
+  for (const reason of skipReasons.filter(
+    (reason) => !warningReasons.includes(reason),
+  )) {
+    assert.ok(
+      entries.some(
+        (entry) =>
+          entry.reason === reason && entry.source.toLowerCase().includes("tl"),
+      ),
+      `missing tl skip priority: ${reason}`,
+    );
+  }
 }
 
-/** Checks frozen evidence only; never computes linguistic positions. */
-export function validateEnGbCorpus(positive, negative) {
+/** Checks literal evidence, without computing linguistic positions. */
+export function validateEsEsCorpus(positive, negative) {
   assert.equal(positive.positionUnit, "UTF-16 offset in source");
   const words = new Set();
   const categories = {};
   const lengths = {};
-  const diverseLengths = new Set();
   let requiredWords = 0;
   for (const entry of positive.entries) {
-    validateMetadata(entry, "en-gb", 3);
+    validateMetadata(entry, "es-es", 2);
     const length = validatePositions(entry);
+    const identity = entry.source.normalize("NFC").toLowerCase();
     assert.match(
-      entry.source,
-      /^[a-z]+$/,
+      entry.source.normalize("NFC"),
+      /^[a-záéíóúüñ]+$/,
       `${entry.source}: admitted spelling`,
     );
-    const identity = entry.source.normalize("NFC").toLowerCase();
+    assert.ok(
+      !identity.includes("tl"),
+      `${entry.source}: tl belongs in negatives`,
+    );
     assert.ok(!words.has(identity), `duplicate word: ${entry.source}`);
     words.add(identity);
     assert.ok(entry.categories.length > 0, `${entry.source}: categories`);
@@ -112,8 +129,6 @@ export function validateEnGbCorpus(positive, negative) {
       categories[category] = (categories[category] ?? 0) + 1;
     }
     lengths[length] = (lengths[length] ?? 0) + 1;
-    if (entry.categories.includes("different-lengths"))
-      diverseLengths.add(length);
     if (entry.requiredPositions.length > 0) requiredWords += 1;
   }
   assert.ok(words.size >= 200, "at least 200 distinct admitted words");
@@ -121,12 +136,15 @@ export function validateEnGbCorpus(positive, negative) {
   for (const category of requiredCategories) {
     assert.ok(categories[category] >= 5, `at least five words: ${category}`);
   }
-  assert.ok(
-    diverseLengths.size >= 5,
-    "at least five genuinely different lengths",
-  );
-  for (const word of specialWords) {
-    assert.ok(words.has(word), `missing required special word: ${word}`);
+  for (const digraph of ["ch", "ll", "rr"]) {
+    assert.ok(
+      positive.entries.some(
+        (entry) =>
+          entry.categories.includes("ch-ll-rr") &&
+          entry.source.includes(digraph),
+      ),
+      `missing actual digraph: ${digraph}`,
+    );
   }
   validateNegativeEntries(negative.entries);
   return {
