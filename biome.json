@@ -7,7 +7,9 @@
       "**/*.mjs",
       "**/*.json",
       "!**/dist",
-      "!**/artifacts"
+      "!**/artifacts",
+      "!**/.next",
+      "!**/next-env.d.ts"
     ]
   },
   "formatter": {

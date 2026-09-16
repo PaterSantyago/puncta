@@ -45,9 +45,12 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium firefox webkit
       - run: pnpm build
       - run: pnpm test:browser
+      - run: pnpm test:rsc
       - uses: actions/upload-artifact@v4
         with:
           name: browser-${{ github.sha }}
-          path: artifacts/browser/
+          path: |
+            artifacts/browser/
+            artifacts/rsc/
           if-no-files-found: error
           retention-days: 30
