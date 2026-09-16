@@ -114,6 +114,10 @@ export function createsTechnicalToken(
   source: string,
   candidate: string,
 ): boolean {
+  // SHY is a discretionary boundary inside a word. Ignoring it in this
+  // lookahead keeps a guarded punctuation edit guarded after insertion too.
+  source = source.replaceAll("\u00ad", "");
+  candidate = candidate.replaceAll("\u00ad", "");
   const existing = technicalRanges(source).map((range) =>
     source.slice(range.start, range.end),
   );

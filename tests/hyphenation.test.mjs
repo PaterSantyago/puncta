@@ -289,9 +289,10 @@ test("disabled and raised minima stay isolated and existing SHY remains authorit
   assert.throws(() => en.with({ hyphenation: { minRight: 2 } }), {
     code: "config.invalid-option",
   });
-  assert.throws(() => en.with({ locale: "es-es" }), {
-    code: "hyphenation.resource-unavailable",
-  });
+  assert.equal(
+    en.with({ locale: "es-es" }).text("camino"),
+    "ca\u00admi\u00adno",
+  );
   assert.equal(
     en
       .with({ locale: "es-es", hyphenation: { enabled: false } })

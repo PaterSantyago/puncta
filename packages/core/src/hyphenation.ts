@@ -51,7 +51,9 @@ export function snapshotResource(locale: Locale): ResourceState {
         return false;
       return Object.entries(value).every(
         ([letter, node]) =>
-          /^[.a-z]$/u.test(letter) &&
+          (locale.id === "es-es" ? /^[.a-záéíóúüñ]$/u : /^[.a-z]$/u).test(
+            letter,
+          ) &&
           (typeof node === "number"
             ? validIndex(node)
             : Array.isArray(node)
@@ -115,8 +117,8 @@ function transformedView(source: string, edits: readonly Edit[]) {
   return { text, origins, range };
 }
 
-/** The English alphabet has one UTF-16 unit per admitted grapheme. Unsupported
- * graphemes remain in whole tokens so accents/joiners cannot expose subwords. */
+/** Admit whole words, compute on NFC graphemes, and map every candidate back
+ * through the typography view. No source spelling or normalization is rewritten. */
 export function insertHyphens(
   source: string,
   settings: Settings,
@@ -193,17 +195,37 @@ export function insertHyphens(
           /[\p{N}'’ʼ\-\u2010\u2011\u00ad]/u.test(word)
         )
           continue;
-        const lower = word.toLowerCase();
-        if (word !== lower && word !== lower[0].toUpperCase() + lower.slice(1))
+        const normalized = graphemes
+          .map(({ segment }) => segment.normalize("NFC"))
+          .join("");
+        const lower = normalized.toLowerCase();
+        if (
+          normalized !== lower &&
+          normalized !== lower[0].toUpperCase() + lower.slice(1)
+        )
           continue;
-        if (!/^[a-zA-Z]+$/u.test(word)) {
+        const alphabet =
+          settings.locale === "es-es" ? /^[a-záéíóúüñ]+$/u : /^[a-z]+$/u;
+        // Canonical equivalents of supported accented letters are accepted, but
+        // normalization must not admit a foreign base letter (e.g. Kelvin sign).
+        const sourceAlphabet =
+          settings.locale === "es-es"
+            ? /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\p{M}]+$/u
+            : /^[a-zA-Z]+$/u;
+        const supported = sourceAlphabet.test(word) && alphabet.test(lower);
+        const ambiguous =
+          supported && settings.locale === "es-es" && lower.includes("tl");
+        if (!supported || ambiguous) {
           warnings.push({
-            code: hasMixedScripts(word)
-              ? "hyphenation.mixed-scripts"
-              : "hyphenation.unsupported-characters",
+            code: ambiguous
+              ? "hyphenation.language-ambiguity"
+              : hasMixedScripts(word)
+                ? "hyphenation.mixed-scripts"
+                : "hyphenation.unsupported-characters",
             source: "rule",
-            message:
-              "The word uses characters outside the locale's supported alphabet.",
+            message: ambiguous
+              ? "The word contains the regionally ambiguous sequence tl."
+              : "The word uses characters outside the locale's supported alphabet.",
             details: {},
             locale: settings.locale,
             ruleId: "hyphenation.insert",
@@ -219,7 +241,7 @@ export function insertHyphens(
         for (const position of liangPositions(lower, resource)) {
           if (
             position < Number(settings.hyphenation.minLeft) ||
-            word.length - position < Number(settings.hyphenation.minRight)
+            graphemes.length - position < Number(settings.hyphenation.minRight)
           )
             continue;
           edits.push({
@@ -229,7 +251,10 @@ export function insertHyphens(
             locale: settings.locale,
             ruleIds: ["hyphenation.insert"],
             ranges: [
-              view.range(offset + start + position, offset + start + position),
+              view.range(
+                offset + start + graphemes[position].index,
+                offset + start + graphemes[position].index,
+              ),
             ],
           });
         }

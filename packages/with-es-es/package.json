@@ -6,7 +6,9 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "NOTICE.md",
+    "hyphenation-manifest.json"
   ],
   "exports": {
     ".": {
