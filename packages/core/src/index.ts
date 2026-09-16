@@ -89,7 +89,11 @@ export function createPuncta(
         protection,
         initialLineStart,
       );
-      edits.sort((a, b) => a.ranges[0].start - b.ranges[0].start);
+      edits.sort(
+        (a, b) =>
+          a.ranges[0].start - b.ranges[0].start ||
+          a.ranges[0].end - b.ranges[0].end,
+      );
       warnings.sort((a, b) =>
         a.location.kind === "text" && b.location.kind === "text"
           ? a.location.ranges[0].start - b.location.ranges[0].start

@@ -66,7 +66,7 @@ does not inspect protected descendants to retain those bridges.
 
 Real SSR checks and an optional mounted Chromium/hydration check cover this slice
 (see `tests/browser/run-scopes.mjs` in the repository). Three-browser/server-streaming
-acceptance and RSC integration remain subsequent work. Quotes, apostrophes, spaces, ellipsis, units, percentages and currencies are implemented; accepting other shared settings does not claim
+acceptance and RSC integration remain subsequent work. Quotes, apostrophes, spaces, ellipsis, textual dashes, numeric ranges, minus, units, percentages and currencies are implemented; accepting other shared settings does not claim
 their transformations are complete. See the core README for remaining scope.
 
 MIT licensed. Public publication is separate work.

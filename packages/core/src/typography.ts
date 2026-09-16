@@ -1,3 +1,4 @@
+import { numericDashes, textualDashes } from "./dashes.js";
 import { numberBonds } from "./number-bonds.js";
 import { quotes } from "./quotes.js";
 import { accessibleParts, technicalRanges } from "./protection.js";
@@ -54,18 +55,35 @@ export function segmentTypography(
           ranges: [range(start, end)],
         });
       }
-      function ambiguous(start: number, end: number, message: string) {
+      function ambiguous(
+        start: number,
+        end: number,
+        message: string,
+        ruleId: RuleId = "spaces",
+      ) {
         warnings.push({
           code: "typography.ambiguous",
           source: "rule",
           message,
           details: {},
           locale: settings.locale,
-          ruleId: "spaces",
+          ruleId,
           location: { kind: "text", ranges: [range(start, end)] },
         });
       }
+      const dashes = textualDashes(text, settings);
       const bonds = numberBonds(text, settings);
+      const numeric = numericDashes(text, settings, bonds, dashes.roles);
+      for (const change of numeric.changes)
+        edit(change.start, change.end, change.after, change.ruleId);
+      for (const span of numeric.ambiguous) {
+        ambiguous(
+          span.start,
+          span.end,
+          "Numeric dash is ambiguous; the construction was preserved.",
+          span.ruleId,
+        );
+      }
       for (const bond of bonds) {
         if (!bond.enabled) continue;
         if (bond.warning) {
@@ -93,9 +111,11 @@ export function segmentTypography(
       if (settings.rules.spaces?.enabled === false) continue;
 
       // These intervals have a role general whitespace cleanup must not override.
-      const preserved: ProtectedRange[] = bonds.map(
-        (bond) => bond.construction,
-      );
+      const preserved: ProtectedRange[] = [
+        ...dashes.preserved,
+        ...numeric.preserved,
+        ...bonds.map((bond) => bond.construction),
+      ];
       for (const match of text.matchAll(/ *(?:[.…](?:[. …]*[.…])|…) */gu)) {
         const start = match.index;
         const end = start + match[0].length;
@@ -111,7 +131,12 @@ export function segmentTypography(
         const start = match.index;
         const end = start + match[0].length;
         preserved.push({ start, end });
-        if (match[0].includes(" "))
+        if (
+          match[0].includes(" ") &&
+          !numeric.preserved.some(
+            (span) => start < span.end && end > span.start,
+          )
+        )
           ambiguous(
             start,
             end,

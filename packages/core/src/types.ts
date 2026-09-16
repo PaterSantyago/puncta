@@ -58,6 +58,9 @@ export interface HtmlOptions extends Omit<TextOptions, "protect"> {
   readonly context?: "div";
 }
 export type RuleId =
+  | "dashes"
+  | "ranges"
+  | "minus"
   | "quotes"
   | "apostrophes"
   | "spaces"
