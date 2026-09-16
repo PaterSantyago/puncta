@@ -162,6 +162,14 @@ export interface PunctaInstance {
   ): string;
   stripSoftHyphens(
     source: string,
+    options: StripHtmlOptions,
+  ): string | HtmlResult;
+  stripSoftHyphens(
+    source: string,
+    options: StripTextOptions,
+  ): string | TextResult;
+  stripSoftHyphens(
+    source: string,
     options: StripSoftHyphensOptions,
   ): string | TextResult | HtmlResult;
   text(source: string, options: TextOptions & { detailed: true }): TextResult;

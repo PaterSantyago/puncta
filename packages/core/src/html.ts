@@ -2,9 +2,7 @@ import {
   type DefaultTreeAdapterMap,
   defaultTreeAdapter,
   html,
-  parse,
   type ParserOptions,
-  parseFragment,
   serialize,
 } from "parse5";
 import {
@@ -15,6 +13,7 @@ import {
 import { hostScope, type Scope, scopeTransform } from "../../shared/scopes.js";
 import { TextContext } from "../../shared/text-context.js";
 import { invalidOption, PunctaConfigError } from "./config.js";
+import { parseHtml } from "./html-parser.js";
 import { htmlSourceMap } from "./html-source.js";
 import type { HtmlOptions, HtmlResult, PunctaWarning } from "./types.js";
 
@@ -57,10 +56,12 @@ export function transformHtml(
     html.NS.HTML,
     [],
   );
-  const tree =
-    options.mode === "document"
-      ? parse(source, parserOptions)
-      : parseFragment(fragmentContext, source, parserOptions);
+  const parsed = parseHtml(
+    source,
+    options.mode === "document" ? undefined : fragmentContext,
+    parserOptions,
+  );
+  const { tree } = parsed;
   // parseFragment detaches its children from the context. Restore that parent
   // only for serialization/decoding semantics, keeping paths and the tree intact.
   const treeAdapter = {
@@ -210,7 +211,9 @@ export function transformHtml(
     ),
   );
   for (const update of updates) update();
-  const result = serialize(tree, { treeAdapter });
+  const result =
+    parsed.serializePlaintext(leaves, contextText.edits) ??
+    serialize(tree, { treeAdapter });
   return {
     result,
     hasEdits: edits.length > 0,

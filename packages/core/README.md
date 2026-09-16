@@ -130,6 +130,13 @@ location. Protection does not suppress parsing diagnostics. An absence of warnin
 does not establish validity or imply that no recovery took place. Edit reports
 explain typography; they are not patches for reproducing serialized HTML.
 
+Raw-text fragment contexts retain literal entities during serialization. Inputs
+containing an actual HTML `plaintext` element retain their original markup
+scaffold, with changed text serialized through parser token origins. This avoids
+adding closing tags that a later parse would consume as plaintext, and preserves
+foster-parented table structure. The implementation's character-token integration
+is pinned to parse5 8.0.0 and covered by malformed-input regression tests.
+
 Inline elements and comments share recognition context. For example,
 `<b>.</b><em>..</em>` becomes `<b>…</b><em></em>`: a replacement belongs to the
 first affected leaf, while empty elements and untouched letters stay in place.

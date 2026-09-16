@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createPuncta } from "../packages/core/dist/index.mjs";
+import { esEs } from "../packages/with-es-es/dist/index.mjs";
 import { enGb } from "../packages/with-en-gb/dist/index.mjs";
 
 import {
@@ -318,5 +319,84 @@ test("accessible raw-text elements retain literal entities and exact document or
     const { start, end } = report.edits[0].ranges[0].inputRange;
     assert.equal(source.slice(start, end), "...");
     assert.ok(report.result.includes("Wait… &amp;"));
+  }
+});
+
+test("actual plaintext keeps recovery structure and does not turn serializer tags into text", () => {
+  for (const options of [{ mode: "document" }, {}, { context: "table" }]) {
+    for (const source of [
+      "<plaintext>hyphenation...",
+      "<table><plaintext>hyphenation...",
+      "<table>Wait...<tr><td>Next...</td></tr> More...<b><plaintext>hyphenation...",
+      "<template><plaintext>hyphenation...",
+      "<p>Wait...</p><pre>\n\nProtected...</pre><plaintext>hyphenation...",
+    ]) {
+      const report = en.html(source, {
+        ...options,
+        hyphenation: { enabled: true },
+        detailed: true,
+      });
+      assert.deepEqual(
+        structure(parsed(report.result, options)),
+        structure(parsed(source, options)),
+      );
+      const again = en.html(report.result, {
+        ...options,
+        hyphenation: { enabled: true },
+        detailed: true,
+      });
+      assert.equal(again.result, report.result);
+      assert.deepEqual(again.edits, []);
+      assert.deepEqual(again.appliedRules, []);
+    }
+  }
+});
+
+function textLeaves(node) {
+  if (node.nodeName === "#text") return node.value ? [node.value] : [];
+  return [
+    ...(node.childNodes ?? []).flatMap(textLeaves),
+    ...(node.content ? textLeaves(node.content) : []),
+  ];
+}
+
+test("plaintext serialization places changes in original fostered token chunks", () => {
+  for (const locale of [enGb, esEs]) {
+    const instance = createPuncta({ locales: [locale], locale: locale.id });
+    const source =
+      '<p title="&quot;">Wait...</p><table>.<tr><td>Next...</td></tr>..<plaintext>Final... &amp;';
+    for (const options of [{ mode: "document" }, {}]) {
+      const report = instance.html(source, { ...options, detailed: true });
+      assert.deepEqual(textLeaves(parsed(report.result, options)), [
+        "Wait…",
+        "…",
+        "Final… &amp;",
+        "Next…",
+      ]);
+      assert.deepEqual(
+        structure(parsed(report.result, options)),
+        structure(parsed(source, options)),
+      );
+      const removalInput =
+        "<table>a&shy;<tr><td>b&shy;</td></tr>c&shy;<plaintext>d\u00ad &shy;";
+      const removed = instance.stripSoftHyphens(removalInput, {
+        ...options,
+        format: "html",
+        detailed: true,
+      });
+      assert.deepEqual(textLeaves(parsed(removed.result, options)), [
+        "ac",
+        "d &shy;",
+        "b",
+      ]);
+      assert.deepEqual(
+        instance.stripSoftHyphens(removed.result, {
+          ...options,
+          format: "html",
+          detailed: true,
+        }).edits,
+        [],
+      );
+    }
   }
 });
