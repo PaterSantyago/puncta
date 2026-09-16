@@ -2,7 +2,7 @@
 
 Synchronous ESM typography, with explicitly installed locales and no React or DOM
 requirement. The current implementation covers unambiguous ellipses, including
-recognition across transparent inline leaves and nested configuration scopes (#39–#41).
+recognition across transparent inline leaves and nested configuration scopes (#39–#42).
 
 ```ts
 import { createPuncta } from "@use-puncta/core";
@@ -45,6 +45,21 @@ inline context. Unavailable language preserves text with a structured warning;
 a nested supported language resumes processing unless protected. Disabled subtrees
 and protected elements skip declarative configuration parsing.
 
+Plain-text calls accept `protect: [{ start, end }]` in original UTF-16 offsets.
+Ranges must end at grapheme boundaries; adjacent/overlapping ranges merge, empty
+ranges have no effect, and invalid ranges throw `protect.invalid-range`. Protection
+belongs to that call, not an instance. Recognised URLs with an explicit scheme or
+`www.`, email, IP addresses and `v1.2.3` versions are protected automatically,
+including across transparent inline joins. URL bodies conservatively retain
+punctuation that may belong to a path or query. Markdown and other technical text
+require explicit protection.
+
+HTML protects code/pre/script/style, kbd/samp, form values (including standalone
+option), template/noscript, SVG/MathML/ruby and embedded/media content. The presence
+of `hidden` and editable content protect entire subtrees; `aria-hidden` alone does
+not. Protected contents and nested declarative settings are not analysed. Unknown
+elements remain opaque and produce `markup.element-unsupported` warnings.
+
 HTML uses parse5 8.0.0 in fragment mode with explicit div context, without adding a
 wrapper. Serialization can change the HTML string without typographic edits:
 `outputChanged` and `hasEdits` are independent. Attributes are not transformed.
@@ -62,10 +77,8 @@ unmappable parser repairs report `accuracy: "unavailable"` with a reason.
 This is a narrow implementation, not completion of the first-version contract.
 All accepted shared option forms are validated and retained, but only ellipsis
 currently changes text. Enabling another rule or hyphenation does not implement
-that transformation. Hyphenation resources and their errors, plain-text protection
-ranges, HTML document/other fragment contexts and the full warning catalogue remain
-subsequent work. Special protected elements and unknown
-elements are opaque; other attribute-driven protection remains pending beyond data-puncta=off. Unsupported
+that transformation. Hyphenation resources and their errors, HTML document/other fragment contexts and
+the full warning catalogue remain subsequent work. Unsupported
 call options are rejected rather than treated as implemented settings. The different
 line/opaque/block boundary kinds are retained for future rules; quote continuation,
 word admission and insertion placement require their own rule-specific acceptance.

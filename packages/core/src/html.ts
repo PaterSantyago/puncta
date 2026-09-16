@@ -5,7 +5,11 @@ import {
   parseFragment,
   serialize,
 } from "parse5";
-import { elementSemantics } from "../../shared/elements.js";
+import {
+  elementSemantics,
+  protectsHost,
+  unsupportedElement,
+} from "../../shared/elements.js";
 import { hostScope, type Scope, scopeTransform } from "../../shared/scopes.js";
 import { TextContext } from "../../shared/text-context.js";
 import { PunctaConfigError } from "./config.js";
@@ -51,17 +55,47 @@ export function transformHtml(source: string, scope: Scope): HtmlResult {
     }
     if (defaultTreeAdapter.isElementNode(node)) {
       const semantics = elementSemantics(node.tagName);
-      if (semantics.boundary) contextText.boundary(semantics.boundary);
+      const attributes = Object.fromEntries(
+        node.attrs.map(({ name, value }) => [name, value]),
+      );
+      const hostProtected = protectsHost(attributes, "html");
+      if (
+        semantics.unsupported &&
+        !parent.protected &&
+        !hostProtected &&
+        node.namespaceURI === html.NS.HTML
+      ) {
+        const position = node.sourceCodeLocation;
+        warnings.push(
+          unsupportedElement(node.tagName, node.namespaceURI, parent.locale, {
+            kind: "element",
+            path,
+            inputRange:
+              position && position.endOffset >= position.startOffset
+                ? {
+                    accuracy: "exact",
+                    start: position.startOffset,
+                    end: position.endOffset,
+                  }
+                : {
+                    accuracy: "unavailable",
+                    reason: "Parser supplied no element position",
+                  },
+          }),
+        );
+      }
+      const boundary =
+        semantics.boundary ?? (hostProtected ? "opaque" : undefined);
+      if (boundary) contextText.boundary(boundary);
       if (
         !semantics.protected &&
         !parent.protected &&
+        !hostProtected &&
         node.namespaceURI === html.NS.HTML
       ) {
         const childScope = hostScope(
           parent,
-          Object.fromEntries(
-            node.attrs.map(({ name, value }) => [name, value]),
-          ),
+          attributes,
           (name) => {
             const position = node.sourceCodeLocation?.attrs?.[name];
             return {
@@ -90,7 +124,7 @@ export function transformHtml(source: string, scope: Scope): HtmlResult {
           });
         if (childScope !== parent) contextText.use(scopeTransform(parent));
       }
-      if (semantics.boundary) contextText.boundary(semantics.boundary);
+      if (boundary) contextText.boundary(boundary);
     } else if ("childNodes" in node)
       node.childNodes.forEach((child, index) => {
         visit(child, [...path, index], parent);

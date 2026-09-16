@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 import { instanceScope, requireInstance } from "../../shared/scopes.js";
 import { transformTree } from "./tree.js";
 
-export interface ReactTransformOptions extends TextOptions {
+export interface ReactTransformOptions extends Omit<TextOptions, "protect"> {
   readonly instance: PunctaInstance;
 }
 export interface ReactResult

@@ -45,10 +45,15 @@ export interface PunctaOptions {
   readonly rules?: RulesOptions;
   readonly hyphenation?: HyphenationOptions | null;
 }
+export interface ProtectedRange {
+  readonly start: number;
+  readonly end: number;
+}
 export interface TextOptions extends PunctaOptions {
+  readonly protect?: readonly ProtectedRange[];
   readonly detailed?: boolean;
 }
-export interface HtmlOptions extends TextOptions {
+export interface HtmlOptions extends Omit<TextOptions, "protect"> {
   readonly mode?: "fragment";
   readonly context?: "div";
 }

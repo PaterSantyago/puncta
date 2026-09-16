@@ -2,6 +2,11 @@ import { instanceScope } from "../../shared/scopes.js";
 import { checkObject, invalidOption, PunctaConfigError } from "./config.js";
 import { transformHtml } from "./html.js";
 import {
+  accessibleParts,
+  protectedRanges,
+  technicalRanges,
+} from "./protection.js";
+import {
   mergeSettings,
   resolveSettings,
   type Settings,
@@ -68,26 +73,39 @@ export function createPuncta(
     function text(source: string, call: TextOptions = {}): string | TextResult {
       if (typeof source !== "string")
         invalidOption(["source"], source === undefined ? "required" : "type");
-      checkObject(call, [...sharedKeys, "detailed"]);
+      checkObject(call, [...sharedKeys, "detailed", "protect"]);
+      const protection = protectedRanges(source, call.protect);
       if (call.detailed !== undefined && typeof call.detailed !== "boolean")
         invalidOption(["detailed"], "type");
       const effective = resolveSettings(mergeSettings(settings, call, loaded));
       const { locale } = effective;
       const edits: TextResult["edits"][number][] = [];
-      const result =
-        !effective.enabled || effective.rules.ellipsis?.enabled === false
-          ? source
-          : source.replace(/(?<!\.)\.{3}(?!\.)/gu, (before, start: number) => {
+      if (effective.enabled && effective.rules.ellipsis?.enabled !== false) {
+        for (const accessible of accessibleParts(source, protection)) {
+          for (const part of accessibleParts(
+            accessible.text,
+            technicalRanges(accessible.text),
+          )) {
+            for (const match of part.text.matchAll(/(?<!\.)\.{3}(?!\.)/gu)) {
+              const start = accessible.start + part.start + match.index;
               edits.push({
                 kind: "replace",
-                before,
+                before: match[0],
                 after: "…",
                 locale,
                 ruleIds: ["ellipsis"],
                 ranges: [{ sourceId: 0, start, end: start + 3 }],
               });
-              return "…";
-            });
+            }
+          }
+        }
+      }
+      let result = source;
+      for (const edit of [...edits].reverse()) {
+        const range = edit.ranges[0];
+        result =
+          result.slice(0, range.start) + edit.after + result.slice(range.end);
+      }
       if (!call.detailed) return result;
       return {
         result,
