@@ -11,3 +11,5 @@ versioning:
     "@use-puncta/with-react": alpha
   changelog:
     storage: repository
+allowBuilds:
+  esbuild: true
