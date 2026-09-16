@@ -15,7 +15,7 @@ optional omission is `desamparo` at UTF-16 position 2, category `prefixes`:
 
 The unchanged 4,694-pattern research baseline has zero erroneous positions,
 seven missing mandatory positions (camino, casino, divino, domino, felino,
-gusano and humano, each at position 4), and optional omissions in 27 words.
+gusano and humano, each at position 4), and omissions in 27 words in total.
 Its general `2no.` pattern suppresses these final-syllable boundaries.
 The versioned `V3no.` spelling-class layer resolves that suppression without
 whole-word exceptions. Independent pointwise family holdouts also pass; their
@@ -40,8 +40,9 @@ also pass: 792 Spanish NFC/NFD/case variants, 6,320 transparent splits across th
 three surfaces, 60,000 mixed-locale idempotence/replay cases, 9,000 equivalent-input
 cases, exact entity coordinates, warning ranges and source-alphabet priority.
 English's 313-word corpus and independent 5,438 split checks remain unchanged.
-The final full repository and installed-artifact gate is recorded in the PR
-verification result after review.
+Run `pnpm check` for the complete repository and installed-artifact gate.
+Its execution result, review closeout and exact-head CI status are recorded
+in PR #72 and the issue #51 completion report.
 
 ## Technical-token regressions
 
