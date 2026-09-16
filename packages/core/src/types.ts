@@ -54,8 +54,9 @@ export interface TextOptions extends PunctaOptions {
   readonly detailed?: boolean;
 }
 export interface HtmlOptions extends Omit<TextOptions, "protect"> {
-  readonly mode?: "fragment";
-  readonly context?: "div";
+  readonly mode?: "fragment" | "document";
+  /** Standard HTML element name used only for fragment parsing. */
+  readonly context?: string;
 }
 export type StripTextOptions = TextOptions & { readonly format?: "text" };
 export type StripHtmlOptions = HtmlOptions & { readonly format: "html" };

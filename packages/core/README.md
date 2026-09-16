@@ -107,10 +107,28 @@ of `hidden` and editable content protect entire subtrees; `aria-hidden` alone do
 not. Protected contents and nested declarative settings are not analysed. Unknown
 elements remain opaque and produce `markup.element-unsupported` warnings.
 
-HTML uses parse5 8.0.0 in fragment mode with explicit div context, without adding a
-wrapper. Serialization can change the HTML string without typographic edits:
-`outputChanged` and `hasEdits` are independent. Attributes are not transformed.
-HTML is not sanitized.
+HTML uses parse5 8.0.0. `mode` defaults to `"fragment"` with explicit `"div"`
+context; `mode: "document"` parses a full document. The mode is never inferred.
+For contextual fragments, use a supported standard HTML element name such as
+`{ context: "table" }` or `{ context: "title" }`. Context names use lowercase HTML
+spelling and the shared supported-element table; unknown/custom names and
+SVG/MathML contexts are rejected. `context` is forbidden in document mode.
+
+The context affects parsing only: it adds neither an output wrapper nor a
+protected ancestor. Protection applies to elements in the supplied markup.
+HTML title uses RCDATA, so entities are decoded and `<b>` inside it is text.
+Standard parser recovery defines the tree; typography preserves that tree and
+attribute values without sanitizing HTML. SVG/MathML subtrees remain protected,
+including integration points containing HTML descendants.
+
+Serialization can change the HTML string without typographic edits, including
+with `enabled: false`: `outputChanged` and `hasEdits` are independent. Protected
+text and attributes are preserved after parsing, without a byte-for-byte promise.
+Available parser diagnostics use `html.parse`, `source: "parser"` and
+`details.parserCode`, with original input positions or an explicit unavailable
+location. Protection does not suppress parsing diagnostics. An absence of warnings
+does not establish validity or imply that no recovery took place. Edit reports
+explain typography; they are not patches for reproducing serialized HTML.
 
 Inline elements and comments share recognition context. For example,
 `<b>.</b><em>..</em>` becomes `<b>…</b><em></em>`: a replacement belongs to the
@@ -126,7 +144,7 @@ unmappable parser repairs report `accuracy: "unavailable"` with a reason.
 
 `stripSoftHyphens(source, options?)` removes author and previously inserted U+00AD
 without typography. `format` defaults to `"text"`; explicit `"html"` uses the same
-fragment/div parser mode as `html()`. Text accepts `protect`; HTML accepts
+fragment/document modes and context options as `html()`. Text accepts `protect`; HTML accepts
 `mode`/`context`; options from the other format are rejected. Shared options and
 `detailed` work as usual, with `hyphenation.remove` deletions in original UTF-16
 coordinates. Protection, attributes, disabled and unavailable-language regions
@@ -143,9 +161,8 @@ insertions belong to the left leaf. Missing or incompatible resources produce
 a result is returned. Spanish insertion remains subsequent work; separate SHY
 removal still needs no insertion resource.
 
-This is not completion of the first-version contract. HTML document/other
-fragment contexts, Spanish insertion and the full warning catalogue remain
-subsequent work. Unsupported call options are rejected.
+This is not completion of the first-version contract. The full warning catalogue
+and combined-rule acceptance remain subsequent work. Unsupported call options are rejected.
 
 MIT licensed, with ISC kernel attribution and Unicode data licensing in `NOTICE.md`.
 The API remains experimental; public publication is separate work.

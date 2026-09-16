@@ -2,6 +2,8 @@ import {
   type DefaultTreeAdapterMap,
   defaultTreeAdapter,
   html,
+  parse,
+  type ParserOptions,
   parseFragment,
   serialize,
 } from "parse5";
@@ -12,15 +14,28 @@ import {
 } from "../../shared/elements.js";
 import { hostScope, type Scope, scopeTransform } from "../../shared/scopes.js";
 import { TextContext } from "../../shared/text-context.js";
-import { PunctaConfigError } from "./config.js";
+import { invalidOption, PunctaConfigError } from "./config.js";
 import { htmlSourceMap } from "./html-source.js";
-import type { HtmlResult, PunctaWarning } from "./types.js";
+import type { HtmlOptions, HtmlResult, PunctaWarning } from "./types.js";
 
-/** Parse a div fragment without requiring a browser or adding a wrapper. */
-export function transformHtml(source: string, scope: Scope): HtmlResult {
+/** Parsing context affects the parser, without adding an ancestor or wrapper. */
+export function transformHtml(
+  source: string,
+  scope: Scope,
+  options: HtmlOptions,
+): HtmlResult {
   const warnings: PunctaWarning[] = [];
-  const context = defaultTreeAdapter.createElement("div", html.NS.HTML, []);
-  const fragment = parseFragment(context, source, {
+  const context = options.context ?? "div";
+  if (
+    options.context !== undefined &&
+    (options.mode === "document" ||
+      typeof options.context !== "string" ||
+      options.context === "svg" ||
+      options.context === "math" ||
+      elementSemantics(options.context).unsupported)
+  )
+    invalidOption(["context"], "value");
+  const parserOptions: ParserOptions<DefaultTreeAdapterMap> = {
     sourceCodeLocationInfo: true,
     onParseError(error) {
       warnings.push({
@@ -36,7 +51,27 @@ export function transformHtml(source: string, scope: Scope): HtmlResult {
             : { kind: "unavailable", reason: "Parser supplied no position" },
       });
     },
-  });
+  };
+  const fragmentContext = defaultTreeAdapter.createElement(
+    context,
+    html.NS.HTML,
+    [],
+  );
+  const tree =
+    options.mode === "document"
+      ? parse(source, parserOptions)
+      : parseFragment(fragmentContext, source, parserOptions);
+  // parseFragment detaches its children from the context. Restore that parent
+  // only for serialization/decoding semantics, keeping paths and the tree intact.
+  const treeAdapter = {
+    ...defaultTreeAdapter,
+    getParentNode(node: DefaultTreeAdapterMap["node"]) {
+      const parent = defaultTreeAdapter.getParentNode(node);
+      return options.mode !== "document" && parent === tree
+        ? fragmentContext
+        : parent;
+    },
+  };
   const contextText = new TextContext(scopeTransform(scope));
   const leaves: DefaultTreeAdapterMap["textNode"][] = [];
   const updates: (() => void)[] = [];
@@ -132,14 +167,25 @@ export function transformHtml(source: string, scope: Scope): HtmlResult {
         visit(child, [...path, index], parent);
       });
   }
-  fragment.childNodes.forEach((node, index) => {
+  tree.childNodes.forEach((node, index) => {
     if (!scope.protected) visit(node, [index], scope);
   });
   contextText.finish();
   const { sources, appliedRules } = contextText;
-  const mappings = leaves.map((node, index) =>
-    htmlSourceMap(source, sources[index].text, node.sourceCodeLocation),
-  );
+  const mappings = leaves.map((node, index) => {
+    const parent = treeAdapter.getParentNode(node);
+    const rawText =
+      parent &&
+      defaultTreeAdapter.isElementNode(parent) &&
+      parent.namespaceURI === html.NS.HTML &&
+      html.hasUnescapedText(parent.tagName, true);
+    return htmlSourceMap(
+      source,
+      sources[index].text,
+      node.sourceCodeLocation,
+      !rawText,
+    );
+  });
   const edits = contextText.edits.map((edit) => ({
     ...edit,
     ranges: edit.ranges.map((range) => ({
@@ -164,7 +210,7 @@ export function transformHtml(source: string, scope: Scope): HtmlResult {
     ),
   );
   for (const update of updates) update();
-  const result = serialize(fragment);
+  const result = serialize(tree, { treeAdapter });
   return {
     result,
     hasEdits: edits.length > 0,
