@@ -35,6 +35,7 @@ function view({
   marker,
   enabled = true,
   spaces = true,
+  hyphenation = false,
   source = "Wait...",
 } = {}) {
   return h(
@@ -47,6 +48,7 @@ function view({
         Puncta,
         {
           options: {
+            hyphenation: hyphenation === null ? null : { enabled: hyphenation },
             rules: { ellipsis: { enabled }, spaces: { enabled: spaces } },
           },
         },
@@ -63,18 +65,29 @@ window.runScopesCheck = async () => {
   const button = container.querySelector("button");
   await act(() => button.click());
   check(container.textContent, "Wait… 1");
-  for (const [props, expected] of [
+  const updates = [
     [{ lang: "es" }, "Wait… 1"],
     [{ marker: "" }, "Wait… 1"],
     [{ marker: "off" }, "Wait... 1"],
     [{ enabled: false }, "Wait... 1"],
     [{ source: "New..." }, "New… 1"],
     [{}, "Wait… 1"],
+    [
+      { source: '"backbone 24kg..."', hyphenation: true },
+      "‘back\u00adbone 24\u00a0kg…’ 1",
+    ],
+    [
+      { source: '"backbone 24kg..."', hyphenation: null },
+      "‘backbone 24\u00a0kg…’ 1",
+    ],
+    [{ source: '"Hola..."', lang: "es" }, "«Hola…» 1"],
+    [{ source: '"Hola..."', lang: "en" }, "‘Hola…’ 1"],
     [{ source: "Hello ,  world..." }, "Hello, world… 1"],
     [{ source: "Hello ,  world...", spaces: false }, "Hello ,  world… 1"],
     [{ source: "¿ Hola ?", lang: "es" }, "¿Hola? 1"],
     [{ source: "¿ Hola ?", lang: "es", spaces: null }, "¿Hola? 1"],
-  ]) {
+  ];
+  for (const [props, expected] of updates) {
     await act(() => root.render(view(props)));
     check(container.textContent, expected);
     check(container.querySelector("button"), button);
@@ -99,7 +112,7 @@ window.runScopesCheck = async () => {
   await act(() => hydrated.unmount());
   container.remove();
   return {
-    updates: 10,
+    updates: updates.length,
     stateAndNodePreserved: true,
     hydrationErrors: errors,
     ...(await runProtectionCheck()),
