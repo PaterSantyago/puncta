@@ -203,7 +203,25 @@ test("the complete protected catalog, namespaces, fields and attributes remain u
     assert.equal(report.result[1].props.title, "...");
     assert.equal(report.result[2], ". ");
     assert.equal(report.result[3].props.children, "…");
-    assert.deepEqual(report.warnings, []);
+    // Only the accessible ". ..." after protection is ambiguous; the protected
+    // tree and its deliberately invalid configuration contribute no warnings.
+    assert.deepEqual(report.warnings, [
+      {
+        code: "typography.ambiguous",
+        source: "rule",
+        ruleId: "spaces",
+        locale: "en-gb",
+        details: {},
+        message: "Ellipsis spacing is ambiguous; its intervals were preserved.",
+        location: {
+          kind: "text",
+          ranges: [
+            { sourceId: 1, start: 0, end: 2 },
+            { sourceId: 2, start: 0, end: 3 },
+          ],
+        },
+      },
+    ]);
     const input = ["input", "embed"].includes(tag)
       ? `<${tag} value="..." title="..." data-puncta-options="broken">`
       : `<${tag} title="..." data-puncta-options="broken">...</${tag}>`;

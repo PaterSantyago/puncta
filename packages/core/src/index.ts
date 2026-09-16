@@ -1,11 +1,7 @@
 import { instanceScope } from "../../shared/scopes.js";
 import { checkObject, invalidOption, PunctaConfigError } from "./config.js";
 import { transformHtml } from "./html.js";
-import {
-  accessibleParts,
-  protectedRanges,
-  technicalRanges,
-} from "./protection.js";
+import { protectedRanges } from "./protection.js";
 import {
   mergeSettings,
   resolveSettings,
@@ -19,9 +15,11 @@ import type {
   LocaleId,
   PunctaInstance,
   PunctaOptions,
+  RuleId,
   TextOptions,
   TextResult,
 } from "./types.js";
+import { typography } from "./typography.js";
 
 export { PunctaConfigError } from "./config.js";
 export type * from "./types.js";
@@ -70,7 +68,11 @@ export function createPuncta(
   );
   return makeInstance(initial);
   function makeInstance(settings: Settings): PunctaInstance {
-    function text(source: string, call: TextOptions = {}): string | TextResult {
+    function text(
+      source: string,
+      call: TextOptions = {},
+      initialLineStart = true,
+    ): string | TextResult {
       if (typeof source !== "string")
         invalidOption(["source"], source === undefined ? "required" : "type");
       checkObject(call, [...sharedKeys, "detailed", "protect"]);
@@ -79,27 +81,12 @@ export function createPuncta(
         invalidOption(["detailed"], "type");
       const effective = resolveSettings(mergeSettings(settings, call, loaded));
       const { locale } = effective;
-      const edits: TextResult["edits"][number][] = [];
-      if (effective.enabled && effective.rules.ellipsis?.enabled !== false) {
-        for (const accessible of accessibleParts(source, protection)) {
-          for (const part of accessibleParts(
-            accessible.text,
-            technicalRanges(accessible.text),
-          )) {
-            for (const match of part.text.matchAll(/(?<!\.)\.{3}(?!\.)/gu)) {
-              const start = accessible.start + part.start + match.index;
-              edits.push({
-                kind: "replace",
-                before: match[0],
-                after: "…",
-                locale,
-                ruleIds: ["ellipsis"],
-                ranges: [{ sourceId: 0, start, end: start + 3 }],
-              });
-            }
-          }
-        }
-      }
+      const { edits, warnings } = typography(
+        source,
+        effective,
+        protection,
+        initialLineStart,
+      );
       let result = source;
       for (const edit of [...edits].reverse()) {
         const range = edit.ranges[0];
@@ -113,8 +100,10 @@ export function createPuncta(
         outputChanged: result !== source,
         edits,
         sources: [{ id: 0, text: source, path: [] }],
-        appliedRules: edits.length ? [{ ruleId: "ellipsis", locale }] : [],
-        warnings: [],
+        appliedRules: [
+          ...new Set<RuleId>(edits.flatMap((edit) => edit.ruleIds)),
+        ].map((ruleId) => ({ ruleId, locale })),
+        warnings,
       };
     }
     function html(source: string, call: HtmlOptions = {}): string | HtmlResult {
@@ -144,6 +133,9 @@ export function createPuncta(
       [Symbol.for("@use-puncta/scope")]: Object.freeze({
         locale: settings.locale,
         enabled: settings.enabled,
+        // Private adapter entry keeps structural line context out of public options.
+        transform: (source: string, initialLineStart: boolean) =>
+          text(source, { detailed: true }, initialLineStart),
       }),
     }) as PunctaInstance;
   }

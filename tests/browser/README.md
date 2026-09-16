@@ -1,8 +1,10 @@
-# Mounted scope and protection checks (#41–#42)
+# Mounted scope and protection checks (#41–#43)
 
 This optional check exercises the public React components in StrictMode: source and
 option updates, language/marker changes, preservation of direct child state and DOM
-identity, and hydration. Eight protection scenarios also reorder keyed stateful
+identity, and hydration. Space-rule disable/reset, Spanish punctuation and source updates
+are included in the ten mounted updates; hydration also exercises punctuation and
+spaces. Eight protection scenarios also reorder keyed stateful
 components behind multiple hosts under Puncta and Provider, checking inherited
 protection, refs, props, an independent neighbour, and the absence of DOM wrappers.
 It is narrower than the full browser/server matrix planned for #55.

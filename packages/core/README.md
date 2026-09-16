@@ -1,15 +1,16 @@
 # @use-puncta/core
 
 Synchronous ESM typography, with explicitly installed locales and no React or DOM
-requirement. The current implementation covers unambiguous ellipses, including
-recognition across transparent inline leaves and nested configuration scopes (#39–#42).
+requirement. The current implementation covers ordinary spaces, punctuation intervals and
+ellipses, including recognition across transparent inline leaves and nested
+configuration scopes (#39–#43).
 
 ```ts
 import { createPuncta } from "@use-puncta/core";
 import { enGb } from "@use-puncta/with-en-gb";
 
 const puncta = createPuncta({ locales: [enGb], locale: enGb.id });
-puncta.text("Wait..."); // "Wait…"
+puncta.text("Hello ,  world..."); // "Hello, world…"
 puncta.html("<span>Wait...</span>"); // "<span>Wait…</span>"
 puncta.text("😀 Wait...", { detailed: true });
 ```
@@ -20,6 +21,19 @@ Ranges use UTF-16 offsets in original text leaves. A boolean variable produces a
 union return type. Four or more consecutive dots stay unchanged. Repeating the
 conversion creates no new edits. Read a locale identifier from `locale.id`;
 `localeId` has been removed.
+
+The `spaces` rule collapses repeated U+0020 spaces and fixes unambiguous punctuation
+intervals. It retains line endings, blank lines, indentation, tabs, existing NBSP,
+numeric punctuation and dates. In es-es it removes ordinary inner spaces after
+existing `¿`/`¡` and before `?`/`!`; it does not supply missing signs. Quotes,
+dashes, units, percentages and currencies are not reformatted by this slice.
+
+Spacing around ambiguous ellipses (including separated dots), spaced numeric
+punctuation and periods directly between text stays conservative. Detailed results
+use `typography.ambiguous`, `ruleId: "spaces"` and original `location.ranges` for
+those intervals. Recognition of ellipses continues when their conversion is off,
+so general space cleanup cannot destroy their intervals. Warnings may repeat on
+unchanged ambiguous text; disabled rules and protected text produce no rule warnings.
 
 Both the locale modules and the active locale are required. A call can explicitly
 select another loaded locale. Invalid arguments throw `PunctaConfigError` with
@@ -68,6 +82,9 @@ HTML is not sanitized.
 Inline elements and comments share recognition context. For example,
 `<b>.</b><em>..</em>` becomes `<b>…</b><em></em>`: a replacement belongs to the
 first affected leaf, while empty elements and untouched letters stay in place.
+A new insertion at a leaf boundary belongs to the left nonempty leaf; an existing
+space stays owned by its original leaf. Reports distinguish replace/insert/delete
+and map text warnings through the same source coordinates as edits.
 Blocks, br/wbr/hr and opaque fragments interrupt this recognition without adding
 characters. Source paths index the parsed tree, including comments and elements
 inserted by the parser. Multi-leaf edits have separate ranges without intervening
@@ -75,12 +92,12 @@ tags. Entity/CRLF decoding and astral characters retain UTF-16 provenance;
 unmappable parser repairs report `accuracy: "unavailable"` with a reason.
 
 This is a narrow implementation, not completion of the first-version contract.
-All accepted shared option forms are validated and retained, but only ellipsis
-currently changes text. Enabling another rule or hyphenation does not implement
+All accepted shared option forms are validated and retained, but only spaces and ellipsis
+currently change text. Enabling another rule or hyphenation does not implement
 that transformation. Hyphenation resources and their errors, HTML document/other fragment contexts and
 the full warning catalogue remain subsequent work. Unsupported
 call options are rejected rather than treated as implemented settings. The different
 line/opaque/block boundary kinds are retained for future rules; quote continuation,
-word admission and insertion placement require their own rule-specific acceptance.
+word admission and future special intervals require their own rule-specific acceptance.
 
 MIT licensed. The API remains experimental; public publication is separate work.

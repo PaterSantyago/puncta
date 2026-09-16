@@ -5,6 +5,7 @@ import type {
   PunctaInstance,
   PunctaOptions,
   PunctaWarning,
+  TextResult,
 } from "../core/src/types.js";
 
 export interface Scope {
@@ -14,7 +15,8 @@ export interface Scope {
 }
 
 /** Private cross-package metadata: immutable and bundled, not a public export.
- * It carries scope identity, never the registry, resources, or mutable settings. */
+ * It carries scope identity and a text transform, never the registry, resources,
+ * or mutable settings. */
 export function requireInstance(
   instance: unknown,
   ErrorType: typeof PunctaConfigError,
@@ -50,11 +52,14 @@ export function instanceScope(instance: PunctaInstance): Scope {
 }
 
 export function scopeTransform(scope: Scope) {
-  return (text: string) =>
-    scope.instance.text(text, {
-      detailed: true,
-      ...(scope.locale === null || scope.protected ? { enabled: false } : {}),
-    });
+  const instance =
+    scope.locale === null || scope.protected
+      ? scope.instance.with({ enabled: false })
+      : scope.instance;
+  const metadata = Reflect.get(instance, Symbol.for("@use-puncta/scope")) as {
+    transform: (text: string, initialLineStart: boolean) => TextResult;
+  };
+  return metadata.transform;
 }
 
 /** Resolve host markers once for both adapters; protection is checked by the caller first. */

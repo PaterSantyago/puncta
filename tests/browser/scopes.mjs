@@ -1,4 +1,3 @@
-import { runProtectionCheck } from "./protection.mjs";
 import { act, createElement as h, StrictMode, useState } from "react";
 import {
   createRoot,
@@ -12,6 +11,7 @@ import {
   Puncta,
   PunctaProvider,
 } from "../../packages/with-react/dist/index.mjs";
+import { runProtectionCheck } from "./protection.mjs";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const instance = createPuncta({ locales: [enGb, esEs], locale: "en-gb" });
@@ -34,6 +34,7 @@ function view({
   lang = "en",
   marker,
   enabled = true,
+  spaces = true,
   source = "Wait...",
 } = {}) {
   return h(
@@ -44,7 +45,11 @@ function view({
       { instance },
       h(
         Puncta,
-        { options: { rules: { ellipsis: { enabled } } } },
+        {
+          options: {
+            rules: { ellipsis: { enabled }, spaces: { enabled: spaces } },
+          },
+        },
         h("span", { lang, "data-puncta": marker }, h(Counter, { source })),
       ),
     ),
@@ -65,6 +70,10 @@ window.runScopesCheck = async () => {
     [{ enabled: false }, "Wait... 1"],
     [{ source: "New..." }, "New… 1"],
     [{}, "Wait… 1"],
+    [{ source: "Hello ,  world..." }, "Hello, world… 1"],
+    [{ source: "Hello ,  world...", spaces: false }, "Hello ,  world… 1"],
+    [{ source: "¿ Hola ?", lang: "es" }, "¿Hola? 1"],
+    [{ source: "¿ Hola ?", lang: "es", spaces: null }, "¿Hola? 1"],
   ]) {
     await act(() => root.render(view(props)));
     check(container.textContent, expected);
@@ -72,23 +81,25 @@ window.runScopesCheck = async () => {
     check(container.querySelectorAll("*").length, 2);
   }
   await act(() => root.unmount());
-  const server = renderToString(view({ lang: "es", source: "Hydrate..." }));
+  const server = renderToString(
+    view({ lang: "es", source: "¿ Hola ?  Wait..." }),
+  );
   container.innerHTML = server;
   const errors = [];
   let hydrated;
   await act(() => {
     hydrated = hydrateRoot(
       container,
-      view({ lang: "es", source: "Hydrate..." }),
+      view({ lang: "es", source: "¿ Hola ?  Wait..." }),
       { onRecoverableError: (error) => errors.push(error.message) },
     );
   });
-  check(container.textContent, "Hydrate… 0");
+  check(container.textContent, "¿Hola? Wait… 0");
   check(errors.length, 0);
   await act(() => hydrated.unmount());
   container.remove();
   return {
-    updates: 6,
+    updates: 10,
     stateAndNodePreserved: true,
     hydrationErrors: errors,
     ...(await runProtectionCheck()),

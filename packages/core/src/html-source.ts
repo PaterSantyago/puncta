@@ -54,6 +54,20 @@ export function htmlSourceMap(
   }
   if (decoded !== text) return () => unavailable;
   return (start, end) => {
+    if (start === end) {
+      const boundary =
+        start === 0
+          ? location.startOffset
+          : origins.find((origin) => origin.decodedEnd === start)?.end;
+      if (boundary !== undefined)
+        return { accuracy: "exact", start: boundary, end: boundary };
+      const containing = origins.find(
+        (origin) => start > origin.decodedStart && start < origin.decodedEnd,
+      );
+      return containing
+        ? { accuracy: "covering", start: containing.start, end: containing.end }
+        : unavailable;
+    }
     const first = origins.find(
       (origin) => start >= origin.decodedStart && start < origin.decodedEnd,
     );
