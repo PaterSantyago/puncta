@@ -421,3 +421,26 @@ test("protection spans preserve arbitrary grapheme payloads and do not create cr
     }
   }
 });
+
+test("quoted email local parts protect actual ellipses across inline nodes", async () => {
+  const { createElement: h } = await import("react");
+  const { transformReact } = await import(
+    "../packages/with-react/dist/pure.mjs"
+  );
+  assert.equal(
+    instance.text('"a...b"@example.org ...'),
+    '"a...b"@example.org …',
+  );
+  assert.equal(
+    instance.html('"a.<em>..b"@example.org</em> ...'),
+    '"a.<em>..b"@example.org</em> …',
+  );
+  const report = transformReact(
+    ['"a.', h("em", { key: "mail" }, '..b"@example.org'), " ..."],
+    { instance, detailed: true },
+  );
+  assert.equal(report.result[0], '"a.');
+  assert.equal(report.result[1].props.children, '..b"@example.org');
+  assert.equal(report.result[2], " …");
+  assert.equal(report.edits.length, 1);
+});

@@ -55,7 +55,8 @@ function mergeRanges(ranges: ProtectedRange[]): ProtectedRange[] {
   return result;
 }
 
-/** Protection is an opaque gap, never a deletion that joins its two sides. */
+/** Protection is an opaque gap, never a deletion that joins its two sides.
+ * Ranges must be valid, sorted and merged by protectedRanges/technicalRanges. */
 export function accessibleParts(
   source: string,
   ranges: readonly ProtectedRange[],
@@ -85,6 +86,9 @@ export function technicalRanges(source: string): ProtectedRange[] {
   }
   collect(
     /(?<![\p{L}\p{N}_])(?:[a-z][a-z\d+.-]*:[^\s<>"`]+|www\.[^\s<>"`]+)/giu,
+  );
+  collect(
+    /"(?:[^"\\\r\n]|\\[^\r\n])*"@[a-z\d](?:[a-z\d-]*[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]*[a-z\d])?)+(?![\w-])/giu,
   );
   collect(
     /(?<![\w.+-])[\w.!#$%&'*+/=?^`{|}~-]+@[a-z\d](?:[a-z\d-]*[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]*[a-z\d])?)+(?![\w-])/giu,
