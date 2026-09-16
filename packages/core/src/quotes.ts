@@ -82,7 +82,9 @@ export function quotes(
     });
   }
   const measurementDelimiters = new Set<number>();
-  for (const match of text.matchAll(/\p{N}+'[ \t]*\p{N}+"/gu)) {
+  for (const match of text.matchAll(
+    /\p{N}+(?:[.,]\p{N}+)?'[ \t]*\p{N}+(?:[.,/]\p{N}+)*(?:[ \t]+\p{N}+\/\p{N}+)?"/gu,
+  )) {
     measurementDelimiters.add(match.index + match[0].indexOf("'"));
     measurementDelimiters.add(match.index + match[0].length - 1);
   }
@@ -114,9 +116,16 @@ export function quotes(
       single && /[\p{L}\p{M}]$/u.test(before) && /^\p{L}/u.test(after);
     const singleQuoteOpen =
       top && (top.original === "'" || top.original === "‘");
-    const nextSingle = /['‘’]/u.exec(after);
+    const nextSingle = [...after.matchAll(/['‘’]/gu)].find(
+      (match) =>
+        !(
+          match[0] !== "‘" &&
+          /[\p{L}\p{M}]$/u.test(after.slice(0, match.index)) &&
+          /^\p{L}/u.test(after.slice(match.index + 1))
+        ),
+    );
     const laterSingleClose =
-      nextSingle !== null &&
+      nextSingle !== undefined &&
       nextSingle[0] !== "‘" &&
       !/[\s([{:;¿¡—–"'‘“«\uFFFC]$/u.test(after.slice(0, nextSingle.index));
     const possessive =

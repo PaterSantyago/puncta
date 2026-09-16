@@ -486,3 +486,16 @@ test("quote closures after s, measurements and line indentation retain their dis
   }
   assert.equal(es.html('"Hola<br>  "'), "«Hola<br>  »");
 });
+
+test("contractions do not supply a quote partner and fractional measurements retain inches", () => {
+  for (const [input, expected] of [
+    ["'authors' don't agree", "‘authors’ don’t agree"],
+    ["'authors' O'Neill met 'editors'", "‘authors’ O’Neill met ‘editors’"],
+    [`He said "6' 2.5" tall"`, `He said ‘6' 2.5" tall’`],
+    [`He said "6' 2 1/2" tall"`, `He said ‘6' 2 1/2" tall’`],
+  ]) {
+    assert.equal(en.text(input), expected, input);
+    assert.equal(visible(en.html(input)), expected, input);
+    assert.deepEqual(en.text(expected, { detailed: true }).edits, [], input);
+  }
+});
