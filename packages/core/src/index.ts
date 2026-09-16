@@ -77,9 +77,26 @@ export function createPuncta(
     settings: Settings,
     operation: "typography" | "remove" = "typography",
   ): PunctaInstance {
+    const recognition =
+      operation === "remove"
+        ? {
+            text: removeSoftHyphens,
+            segment: removeSoftHyphens,
+            quotation: () => ({ edits: [], warnings: [] }),
+            requiresResource: false,
+          }
+        : {
+            text: typography,
+            segment: segmentTypography,
+            quotation: quotationTypography,
+            requiresResource: true,
+          };
     function validateResource(effective: Settings) {
       // Language resources land with insertion; removal never needs one.
-      if (operation === "typography" && effective.hyphenation.enabled === true)
+      if (
+        recognition.requiresResource &&
+        effective.hyphenation.enabled === true
+      )
         throw new PunctaConfigError(
           "hyphenation.resource-unavailable",
           "Hyphenation resource is unavailable.",
@@ -92,9 +109,7 @@ export function createPuncta(
       source: string,
       call: TextOptions = {},
       initialLineStart = true,
-      recognize: typeof typography = operation === "remove"
-        ? removeSoftHyphens
-        : typography,
+      recognize: typeof typography = recognition.text,
     ): string | TextResult {
       if (typeof source !== "string")
         invalidOption(["source"], source === undefined ? "required" : "type");
@@ -206,17 +221,10 @@ export function createPuncta(
               source,
               { detailed: true },
               initialLineStart,
-              operation === "remove" ? removeSoftHyphens : segmentTypography,
+              recognition.segment,
             ),
           quotation: (source: string) =>
-            text(
-              source,
-              { detailed: true },
-              true,
-              operation === "remove"
-                ? () => ({ edits: [], warnings: [] })
-                : quotationTypography,
-            ),
+            text(source, { detailed: true }, true, recognition.quotation),
         }),
       }),
     }) as PunctaInstance;
