@@ -448,3 +448,41 @@ test("generated quote roles are idempotent, protected text is identity, and edit
       }
     }
 });
+
+test("preserved descendants constrain every new neighbouring pair", () => {
+  const options = { rules: { quotes: { normalizeExisting: false } } };
+  const input = `"outer 'middle “fixed” middle' outer"`;
+  const expected = "“outer ‘middle “fixed” middle’ outer”";
+  assert.equal(en.text(input, options), expected);
+  assert.deepEqual(en.text(expected, { ...options, detailed: true }).edits, []);
+});
+
+test("quote closures after s, measurements and line indentation retain their distinct roles", () => {
+  for (const [instance, input, expected] of [
+    [en, "'authors' and 'editors'", "‘authors’ and ‘editors’"],
+    [en, "'authors' \n 'readers'", "‘authors’ \n ‘readers’"],
+    [en, "The authors'\nnotes", "The authors’\nnotes"],
+    [en, `"The authors' notes"`, "‘The authors’ notes’"],
+    [en, `He said "6' 2" tall"`, `He said ‘6' 2" tall’`],
+    [es, '"Hola\n  "', "«Hola\n  »"],
+    [es, '"Hola\r\n \t "', "«Hola\r\n \t »"],
+  ]) {
+    assert.equal(instance.text(input), expected, input);
+    assert.equal(
+      visible(instance.html(input)),
+      expected.replaceAll("\r\n", "\n"),
+      input,
+    );
+    assert.equal(
+      visible(renderToString(transformReact(input, { instance }))),
+      expected.replaceAll("\r\n", "\n"),
+      input,
+    );
+    assert.deepEqual(
+      instance.text(expected, { detailed: true }).edits,
+      [],
+      input,
+    );
+  }
+  assert.equal(es.html('"Hola<br>  "'), "«Hola<br>  »");
+});

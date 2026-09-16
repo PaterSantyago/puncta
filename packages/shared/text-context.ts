@@ -214,7 +214,7 @@ export class TextContext {
         contexts.pop();
       } else if (part.boundary === "block") {
         for (const active of contexts) flush(active);
-      } else virtual(context, "\uFFFC");
+      } else virtual(context, part.boundary === "line" ? "\u2028" : "\uFFFC");
     }
     flush(contexts[0]);
   }

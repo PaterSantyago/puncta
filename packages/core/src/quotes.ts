@@ -8,6 +8,7 @@ type Pair = {
   original: string;
   children: Pair[];
   style?: string;
+  candidates?: string[];
 };
 const closing: Record<string, string> = {
   '"': '"',
@@ -80,6 +81,11 @@ export function quotes(
       },
     });
   }
+  const measurementDelimiters = new Set<number>();
+  for (const match of text.matchAll(/\p{N}+'[ \t]*\p{N}+"/gu)) {
+    measurementDelimiters.add(match.index + match[0].indexOf("'"));
+    measurementDelimiters.add(match.index + match[0].length - 1);
+  }
   const roots: Pair[] = [];
   const stack: Pair[] = [];
   function finishParagraph() {
@@ -95,6 +101,10 @@ export function quotes(
       finishParagraph();
       continue;
     }
+    if (measurementDelimiters.has(position)) {
+      warn(position, "typography.ambiguous");
+      continue;
+    }
     const before = text.slice(0, position);
     const after = text.slice(position + 1);
     const top = stack.at(-1);
@@ -104,7 +114,11 @@ export function quotes(
       single && /[\p{L}\p{M}]$/u.test(before) && /^\p{L}/u.test(after);
     const singleQuoteOpen =
       top && (top.original === "'" || top.original === "‘");
-    const laterSingleClose = /^[^\r\n]*['’]/u.test(after);
+    const nextSingle = /['‘’]/u.exec(after);
+    const laterSingleClose =
+      nextSingle !== null &&
+      nextSingle[0] !== "‘" &&
+      !/[\s([{:;¿¡—–"'‘“«\uFFFC]$/u.test(after.slice(0, nextSingle.index));
     const possessive =
       single &&
       /[sS]$/u.test(before) &&
@@ -141,7 +155,27 @@ export function quotes(
     !normalise && pair.original !== '"' && pair.original !== "'";
   const palette =
     settings.locale === "en-gb" ? ["‘’", "“”"] : ["«»", "“”", "‘’"];
-  function choose(pair: Pair, depth: number, parent?: string): boolean {
+  // Propagate preserved-descendant constraints before choosing the preferred style.
+  // A greedy depth-first choice can otherwise reject the only compatible solution.
+  function candidates(pair: Pair, depth: number): string[] {
+    if (pair.end === undefined) return [];
+    const own = fixed(pair)
+      ? [pair.original + closing[pair.original]]
+      : palette.filter((style) => depth === 0 || style !== "«»");
+    const children = pair.children.map((child) => candidates(child, depth + 1));
+    pair.candidates = own.filter((style) =>
+      children.every((styles, index) =>
+        styles.some(
+          (childStyle) =>
+            normalise ||
+            (fixed(pair) && fixed(pair.children[index])) ||
+            childStyle !== style,
+        ),
+      ),
+    );
+    return pair.candidates;
+  }
+  function choose(pair: Pair, depth: number, parent?: Pair): boolean {
     if (pair.end === undefined) return false;
     const preferred =
       settings.locale === "en-gb"
@@ -149,27 +183,23 @@ export function quotes(
         : depth === 0
           ? palette[0]
           : palette[1 + ((depth - 1) % 2)];
-    if (fixed(pair)) pair.style = pair.original + closing[pair.original];
-    else {
-      const neighbours = pair.children
-        .filter(fixed)
-        .map((child) => child.original + closing[child.original]);
-      const candidates = palette.filter(
-        (style) =>
-          (depth === 0 || style !== "«»") &&
-          (normalise || (style !== parent && !neighbours.includes(style))),
-      );
-      pair.style = candidates.includes(preferred)
-        ? preferred
-        : candidates.length === 1
-          ? candidates[0]
-          : undefined;
-      if (!pair.style) {
-        warn(pair.start, "typography.ambiguous");
-        return false;
-      }
+    const available = (pair.candidates ?? []).filter(
+      (style) =>
+        normalise ||
+        !parent ||
+        (fixed(parent) && fixed(pair)) ||
+        style !== parent.style,
+    );
+    pair.style = available.includes(preferred)
+      ? preferred
+      : available.length === 1
+        ? available[0]
+        : undefined;
+    if (!pair.style) {
+      warn(pair.start, "typography.ambiguous");
+      return false;
     }
-    return pair.children.every((child) => choose(child, depth + 1, pair.style));
+    return pair.children.every((child) => choose(child, depth + 1, pair));
   }
   function apply(pair: Pair) {
     if (pair.end === undefined || !pair.style) return;
@@ -186,11 +216,18 @@ export function quotes(
       const trailing = / +$/u.exec(inside);
       if (leading)
         edit(pair.start + 1, pair.start + 1 + leading[0].length, "", "spaces");
-      if (trailing && trailing.index >= (leading?.[0].length ?? 0))
+      if (
+        trailing &&
+        trailing.index >= (leading?.[0].length ?? 0) &&
+        !/[\r\n\u2028][ \t]*$/u.test(inside.slice(0, trailing.index))
+      )
         edit(pair.start + 1 + trailing.index, pair.end, "", "spaces");
     }
     pair.children.forEach(apply);
   }
-  for (const root of roots) if (choose(root, 0)) apply(root);
+  for (const root of roots) {
+    candidates(root, 0);
+    if (choose(root, 0)) apply(root);
+  }
   return { edits, warnings };
 }
