@@ -4,31 +4,9 @@ import {
   type TextOptions,
   type TextResult,
 } from "@use-puncta/core";
-import {
-  cloneElement,
-  Fragment,
-  isValidElement,
-  type ReactElement,
-  type ReactNode,
-  Suspense,
-} from "react";
-import { elementSemantics } from "../../shared/elements.js";
-import { TextContext } from "../../shared/text-context.js";
-
-type ChildProps = { children?: ReactNode; fallback?: ReactNode };
-
-/** Variadic children preserve React's static-sibling key validation. Passing the
- * rebuilt array as one argument would turn valid static siblings into a list. */
-function cloneChildren(
-  node: ReactElement<ChildProps>,
-  children: ReactNode,
-  props?: Partial<ChildProps>,
-): ReactElement<ChildProps> {
-  if (!Array.isArray(children)) return cloneElement(node, props, children);
-  const result = cloneElement(node, props, ...children);
-  // cloneElement collapses zero/one variadic children; retain the input array shape.
-  return children.length > 1 ? result : cloneElement(result, { children });
-}
+import type { ReactNode } from "react";
+import { instanceScope, requireInstance } from "../../shared/scopes.js";
+import { transformTree } from "./tree.js";
 
 export interface ReactTransformOptions extends TextOptions {
   readonly instance: PunctaInstance;
@@ -54,79 +32,14 @@ export function transformReact(
   children: ReactNode,
   options: ReactTransformOptions,
 ): ReactNode | ReactResult {
-  if (!options?.instance)
-    throw new PunctaConfigError(
-      "instance.missing",
-      "A Puncta instance is required.",
-      {},
-      ["instance"],
-    );
+  requireInstance(options?.instance, PunctaConfigError);
   const { instance, ...call } = options;
   // Core validates shared options, including calls with no accessible text.
   instance.text("", call);
-  const context = new TextContext((text) =>
-    instance.text(text, { ...call, detailed: true }),
+  const { detailed: _detailed, ...settings } = call;
+  const report = transformTree(
+    children,
+    instanceScope(instance.with(settings)),
   );
-  function visit(
-    node: ReactNode,
-    path: ReactResult["sources"][number]["path"],
-  ): () => ReactNode {
-    if (
-      typeof node === "string" ||
-      typeof node === "number" ||
-      typeof node === "bigint"
-    ) {
-      const original = String(node);
-      const value = context.append(original, path);
-      return () => (value() === original ? node : value());
-    }
-    if (Array.isArray(node)) {
-      const children = node.map((child, index) =>
-        visit(child, [...path, index]),
-      );
-      return () => children.map((child) => child());
-    }
-    if (node == null || typeof node === "boolean") return () => node;
-    if (!isValidElement<ChildProps>(node)) {
-      context.boundary("opaque");
-      return () => node;
-    }
-    if (node.type === Suspense) {
-      context.boundary("block");
-      const children = visit(node.props.children, [...path, "children"]);
-      context.boundary("block");
-      const fallback = visit(node.props.fallback, [...path, "fallback"]);
-      context.boundary("block");
-      return () => cloneChildren(node, children(), { fallback: fallback() });
-    }
-    if (node.type !== Fragment && typeof node.type !== "string") {
-      context.boundary("opaque");
-      return () => node;
-    }
-    const semantics =
-      node.type === Fragment
-        ? { protected: false }
-        : elementSemantics(node.type as string);
-    if (semantics.boundary) context.boundary(semantics.boundary);
-    const children =
-      !semantics.protected && "children" in node.props
-        ? visit(node.props.children, [...path, "children"])
-        : undefined;
-    if (semantics.boundary) context.boundary(semantics.boundary);
-    return () => (children ? cloneChildren(node, children()) : node);
-  }
-  const resultTree = visit(children, []);
-  context.finish();
-  const { sources, edits, appliedRules } = context;
-  const result = resultTree();
-  return options.detailed
-    ? {
-        result,
-        sources,
-        edits,
-        hasEdits: edits.length > 0,
-        appliedRules,
-        warnings: [],
-      }
-    : result;
+  return options.detailed ? report : report.result;
 }

@@ -7,9 +7,43 @@ export interface Locale {
   readonly [localeBrand]: true;
 }
 
-/** The options implemented by the first ellipsis slice. */
+export interface RuleOptions {
+  readonly enabled?: boolean | null;
+}
+export interface RulesOptions {
+  readonly quotes?:
+    | (RuleOptions & { readonly normalizeExisting?: boolean | null })
+    | null;
+  readonly apostrophes?: RuleOptions | null;
+  readonly spaces?: RuleOptions | null;
+  readonly ellipsis?: RuleOptions | null;
+  readonly dashes?:
+    | (RuleOptions & { readonly normalizeExisting?: boolean | null })
+    | null;
+  readonly ranges?:
+    | (RuleOptions & { readonly standalone?: boolean | null })
+    | null;
+  readonly minus?: RuleOptions | null;
+  readonly units?:
+    | (RuleOptions & { readonly additional?: readonly string[] | null })
+    | null;
+  readonly percentages?:
+    | (RuleOptions & { readonly space?: "none" | "nbsp" | null })
+    | null;
+  readonly currencies?: RuleOptions | null;
+}
+export interface HyphenationOptions {
+  readonly enabled?: boolean | null;
+  readonly minWordLength?: number | null;
+  readonly minLeft?: number | null;
+  readonly minRight?: number | null;
+}
+/** Shared configuration; only ellipsis currently transforms text. */
 export interface PunctaOptions {
   readonly locale?: LocaleId;
+  readonly enabled?: boolean;
+  readonly rules?: RulesOptions;
+  readonly hyphenation?: HyphenationOptions | null;
 }
 export interface TextOptions extends PunctaOptions {
   readonly detailed?: boolean;
@@ -51,6 +85,20 @@ export interface AppliedRule {
   readonly ruleId: RuleId;
   readonly locale: LocaleId;
 }
+export type ConfigLocation =
+  | {
+      readonly kind: "element";
+      readonly path: Source["path"];
+      readonly inputRange?: InputRange;
+    }
+  | {
+      readonly kind: "attribute";
+      readonly path: Source["path"];
+      readonly name: string;
+      readonly inputRange?: InputRange;
+    }
+  | { readonly kind: "input"; readonly start: number; readonly end: number }
+  | { readonly kind: "unavailable"; readonly reason: string };
 export interface PunctaWarning {
   readonly code: string;
   readonly source: "rule" | "markup" | "parser";
@@ -58,9 +106,7 @@ export interface PunctaWarning {
   readonly details: Readonly<Record<string, unknown>>;
   readonly locale: LocaleId | null;
   readonly ruleId: RuleId | null;
-  readonly location:
-    | { readonly kind: "input"; readonly start: number; readonly end: number }
-    | { readonly kind: "unavailable"; readonly reason: string };
+  readonly location: ConfigLocation;
 }
 export interface TextResult {
   readonly result: string;
@@ -75,6 +121,7 @@ export interface HtmlResult extends Omit<TextResult, "edits"> {
   readonly edits: readonly Edit<HtmlRange>[];
 }
 export interface PunctaInstance {
+  with(overrides: PunctaOptions): PunctaInstance;
   text(source: string, options: TextOptions & { detailed: true }): TextResult;
   text(source: string, options?: TextOptions & { detailed?: false }): string;
   text(source: string, options: TextOptions): string | TextResult;

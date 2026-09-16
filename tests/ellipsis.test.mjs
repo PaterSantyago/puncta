@@ -116,6 +116,10 @@ test("React pure and real SSR use the same literal oracle without wrappers or mu
 });
 
 test("required arguments and unavailable locales fail with typed structured errors", async () => {
+  const { createElement } = await import("react");
+  const { renderToString } = await import(
+    "../examples/ssr/node_modules/react-dom/server.node.js"
+  );
   const { transformReact } = await import(
     "../packages/with-react/dist/pure.mjs"
   );
@@ -183,7 +187,12 @@ test("required arguments and unavailable locales fail with typed structured erro
       ["locale"],
       { locale: "es-es" },
     ],
-    [() => Puncta({ children: "..." }), "instance.missing", ["instance"], {}],
+    [
+      () => renderToString(createElement(Puncta, null, "...")),
+      "instance.missing",
+      ["instance"],
+      {},
+    ],
     [
       () => instance.text("...", { detailed: null }),
       "config.invalid-option",

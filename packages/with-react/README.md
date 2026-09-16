@@ -6,11 +6,18 @@ React is a peer dependency, and React DOM is supplied by the application.
 ```tsx
 import { createPuncta } from "@use-puncta/core";
 import { enGb } from "@use-puncta/with-en-gb";
-import { Puncta } from "@use-puncta/with-react";
+import { Puncta, PunctaProvider } from "@use-puncta/with-react";
 import { transformReact } from "@use-puncta/with-react/pure";
 
 const instance = createPuncta({ locales: [enGb], locale: enGb.id });
-const example = <Puncta instance={instance}>Wait...</Puncta>;
+const example = (
+  <PunctaProvider instance={instance}>
+    <Puncta>Wait...</Puncta>
+    <Puncta options={{ rules: { ellipsis: { enabled: false } } }}>
+      Wait...
+    </Puncta>
+  </PunctaProvider>
+);
 const report = transformReact("Wait...", { instance, detailed: true });
 ```
 
@@ -29,9 +36,24 @@ User components, portals, promises and arbitrary iterables remain opaque without
 being called, awaited or iterated. Suspense content, fallback and surrounding text
 have independent recognition contexts. Reports address the original input tree.
 
-An explicit instance is currently required for every component/pure call.
-Provider/Context, full protection propagation and declarative language areas are
-subsequent work. Real `renderToString` checks cover this slice; streaming, hydration
-and RSC integration are not claimed. See the core README for the remaining scope.
+`PunctaProvider` configures children without transforming its immediate text.
+`Puncta` and Provider receive original children from outer scopes. Both support
+`instance?`, `locale?`, `enabled?` and `options?` (rules/hyphenation only). A root
+instance is required at runtime; providing another instance under Context is an
+error. Component arguments are validated even when processing is disabled.
+An independent pure call always needs its own explicit instance, ignores Context,
+and returns no hidden Provider. Components within that result use their normal
+render-time Context.
+
+Accessible host elements support the same declarative markers and lang rules as
+HTML. Full disabling remains inherited protection, whereas individual rules can be
+reset or re-enabled. Context bridges add no DOM elements and preserve direct child
+state through scope changes. Configuration and new children recompute from source.
+
+Real SSR checks and an optional mounted Chromium/hydration check cover this slice
+(see `tests/browser/run-scopes.mjs` in the repository). Full protection propagation,
+three-browser/server-streaming acceptance and RSC integration remain subsequent
+work. Only ellipsis is implemented; accepting other shared settings does not claim
+their transformations are complete. See the core README for remaining scope.
 
 MIT licensed. Public publication is separate work.
