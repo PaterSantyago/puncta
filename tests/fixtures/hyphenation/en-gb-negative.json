@@ -1,0 +1,614 @@
+{
+  "version": 1,
+  "diagnosticEncoding": "Canonical #31 warning codes; ordinary mode has no diagnostic report.",
+  "entries": [
+    {
+      "id": "short",
+      "locale": "en-gb",
+      "source": "short",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "short-word",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "short",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": []
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "caps",
+      "locale": "en-gb",
+      "source": "BACKBONE",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "all-caps",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "BACKBONE",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": []
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "mixed-case",
+      "locale": "en-gb",
+      "source": "backBone",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "mixed-case",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "backBone",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": []
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "digits",
+      "locale": "en-gb",
+      "source": "backbone2",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "digits",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "backbone2",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": []
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "apostrophe-ascii",
+      "locale": "en-gb",
+      "source": "someone's",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "apostrophe",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "someone's",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": []
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "apostrophe-curly",
+      "locale": "en-gb",
+      "source": "someone’s",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "apostrophe",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "someone’s",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": []
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "apostrophe-modifier",
+      "locale": "en-gb",
+      "source": "someoneʼs",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "apostrophe",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "someoneʼs",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": []
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "hyphen-ascii",
+      "locale": "en-gb",
+      "source": "well-known",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "hyphen",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "well-known",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": []
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "hyphen-unicode",
+      "locale": "en-gb",
+      "source": "well‐known",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "hyphen",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "well‐known",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": []
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "hyphen-nonbreaking",
+      "locale": "en-gb",
+      "source": "well‑known",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "hyphen",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "well‑known",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": []
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "existing-shy",
+      "locale": "en-gb",
+      "source": "back­bone",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "existing-shy",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "back­bone",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": []
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "protected-word",
+      "locale": "en-gb",
+      "source": "backbone",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": true,
+      "expectedSkip": true,
+      "reason": "protected",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "backbone",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": []
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "protected-unsupported",
+      "locale": "en-gb",
+      "source": "résumé",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": true,
+      "expectedSkip": true,
+      "reason": "protected",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "résumé",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": []
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "protected-mixed-script",
+      "locale": "en-gb",
+      "source": "manusсript",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": true,
+      "expectedSkip": true,
+      "reason": "protected",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "manusсript",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": []
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "unsupported-nfc",
+      "locale": "en-gb",
+      "source": "résumé",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "unsupported-characters",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "résumé",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": ["hyphenation.unsupported-characters"]
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "unsupported-nfd",
+      "locale": "en-gb",
+      "source": "résumé",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "unsupported-characters",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "résumé",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": ["hyphenation.unsupported-characters"]
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "unsupported-ligature",
+      "locale": "en-gb",
+      "source": "oﬃcial",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "unsupported-characters",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "oﬃcial",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": ["hyphenation.unsupported-characters"]
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "mixed-script",
+      "locale": "en-gb",
+      "source": "manusсript",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 6,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "mixed-scripts",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "manusсript",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": ["hyphenation.mixed-scripts"]
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    },
+    {
+      "id": "raised-word-minimum",
+      "locale": "en-gb",
+      "source": "backbone",
+      "settings": {
+        "enabled": true,
+        "minWordLength": 9,
+        "minLeft": 2,
+        "minRight": 3
+      },
+      "protected": false,
+      "expectedSkip": true,
+      "reason": "short-word",
+      "expectedAddedPositions": [],
+      "expectedSourceAfterHyphenation": "backbone",
+      "expectedDiagnostics": {
+        "ordinary": [],
+        "detailed": []
+      },
+      "evidence": {
+        "sources": [
+          "https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630",
+          "https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875",
+          "https://github.com/PaterSantyago/puncta/issues/31#issuecomment-5694110824"
+        ],
+        "rationale": "Contractual whole-word skip; this is not a linguistic no-position example."
+      },
+      "agentReview": {
+        "status": "checked",
+        "result": "Skip reason and warning priority checked against #29 and #33."
+      }
+    }
+  ]
+}
