@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "property-based-testing": {
+      "repository": "https://github.com/trailofbits/skills",
+      "revision": "a6d1b234198d95082523645d2fea8745ca7273bd",
+      "path": "plugins/property-based-testing/skills/property-based-testing"
+    },
+    "playwright-cli": {
+      "repository": "https://github.com/microsoft/playwright-cli",
+      "revision": "12228454ed024c9ac89abd59df3b706ed9135fd9",
+      "path": "skills/playwright-cli"
+    },
+    "tsdown": {
+      "repository": "https://github.com/rolldown/tsdown",
+      "revision": "83f0c57178214a19b7f90030a31c4099dd414c51",
+      "path": "skills/tsdown"
+    },
+    "a-philosophy-of-software-design": {
+      "repository": "https://github.com/ciembor/agent-rules-books",
+      "revision": "893a88a6fce3a80c565bf39ac65021b43a8b2990",
+      "path": "a-philosophy-of-software-design"
+    },
+    "refactoring": {
+      "repository": "https://github.com/ciembor/agent-rules-books",
+      "revision": "893a88a6fce3a80c565bf39ac65021b43a8b2990",
+      "path": "refactoring"
+    },
+    "code-complete": {
+      "repository": "https://github.com/ciembor/agent-rules-books",
+      "revision": "893a88a6fce3a80c565bf39ac65021b43a8b2990",
+      "path": "code-complete"
+    }
+  }
+}
