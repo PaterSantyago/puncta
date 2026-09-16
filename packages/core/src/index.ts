@@ -176,10 +176,12 @@ export function createPuncta(
       if (typeof source !== "string")
         invalidOption(["source"], source === undefined ? "required" : "type");
       checkObject(call, [...sharedKeys, "detailed", "mode", "context"]);
-      if (call.mode !== undefined && call.mode !== "fragment")
+      if (
+        call.mode !== undefined &&
+        call.mode !== "fragment" &&
+        call.mode !== "document"
+      )
         invalidOption(["mode"], "value");
-      if (call.context !== undefined && call.context !== "div")
-        invalidOption(["context"], "value");
       // Validate even a fragment without text leaves.
       const { mode: _mode, context: _context, ...textCall } = call;
       text("", textCall);
@@ -188,6 +190,7 @@ export function createPuncta(
         instanceScope(
           makeInstance(mergeSettings(settings, textCall, loaded), operation),
         ),
+        call,
       );
       return call.detailed ? report : report.result;
     }

@@ -312,6 +312,13 @@ try {
               'instance.text("...", {protect: [{start: "0", end: 3}]});',
               'const textUnion: string | TextResult = instance.text("Wait...", {detailed});',
               'const html: string = instance.html("Wait...");',
+              'const htmlDocument: HtmlResult = instance.html("<title>Wait...</title>", {mode: "document", detailed: true});',
+              'const htmlTable: string = instance.html("<tr><td>Wait...</td></tr>", {mode: "fragment", context: "table"});',
+              'const strippedDocument: HtmlResult = instance.stripSoftHyphens("<p>text</p>", {format: "html", mode: "document", detailed: true});',
+              'const strippedTable: string | HtmlResult = instance.stripSoftHyphens("<td>text</td>", {format: "html", context: "tr", detailed});',
+              "// @ts-expect-error Only explicit fragment/document modes are supported.",
+              'instance.html("", {mode: "auto"});',
+
               'const htmlReport: HtmlResult = instance.html("Wait...", {detailed: true});',
               'const htmlUnion: string | HtmlResult = instance.html("Wait...", {detailed});',
               'const tree: ReactNode = transformReact("Wait...", {instance});',

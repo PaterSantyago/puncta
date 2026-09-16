@@ -14,6 +14,7 @@ export function htmlSourceMap(
   input: string,
   text: string,
   location: { startOffset: number; endOffset: number } | null | undefined,
+  decodeEntities = true,
 ): (start: number, end: number) => InputRange {
   const unavailable: InputRange = {
     accuracy: "unavailable",
@@ -30,7 +31,7 @@ export function htmlSourceMap(
   for (let index = 0; index < raw.length; ) {
     let value = raw[index];
     let consumed = 1;
-    if (value === "&") {
+    if (decodeEntities && value === "&") {
       entity = "";
       decoder.startEntity(DecodingMode.Legacy);
       let length = decoder.write(raw, index + 1);
