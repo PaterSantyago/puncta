@@ -84,8 +84,10 @@ export function technicalRanges(source: string): ProtectedRange[] {
       if (accepts(match[0]))
         ranges.push({ start: match.index, end: match.index + match[0].length });
   }
+  // A discretionary break inside a word cannot expose a URL prefix. Look
+  // through SHY only at this boundary; a leading SHY does not hide a real URL.
   collect(
-    /(?<![\p{L}\p{N}_])(?:[a-z][a-z\d+.-]*:[^\s<>"`]+|www\.[^\s<>"`]+)/giu,
+    /(?<![\p{L}\p{N}_]\u00ad*)(?:[a-z][a-z\d+.-]*:[^\s<>"`]+|www\.[^\s<>"`]+)/giu,
   );
   collect(
     /"(?:[^"\\\r\n]|\\[^\r\n])*"@[a-z\d](?:[a-z\d-]*[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]*[a-z\d])?)+(?![\w-])/giu,
@@ -107,10 +109,11 @@ export function technicalRanges(source: string): ProtectedRange[] {
   return mergeRanges(ranges);
 }
 
-/** A typography edit must not create or extend an opaque token which would
- * change the next invocation's recognition context. Compare a multiset so an
- * unchanged neighbouring token does not hide a newly created identical one. */
-export function createsTechnicalToken(
+/** An edit must not create, change or remove a technical token in the word
+ * view used by rule lookahead. Otherwise one group could release another
+ * group's ambiguity guard on the next call. Compare multisets so an unchanged
+ * neighbouring token cannot hide a changed identical one. */
+export function changesTechnicalContext(
   source: string,
   candidate: string,
 ): boolean {
@@ -121,10 +124,11 @@ export function createsTechnicalToken(
   const existing = technicalRanges(source).map((range) =>
     source.slice(range.start, range.end),
   );
-  return technicalRanges(candidate).some((range) => {
+  const changed = technicalRanges(candidate).some((range) => {
     const index = existing.indexOf(candidate.slice(range.start, range.end));
     if (index < 0) return true;
     existing.splice(index, 1);
     return false;
   });
+  return changed || existing.length > 0;
 }

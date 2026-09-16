@@ -2,7 +2,7 @@ import { numericDashes, textualDashes } from "./dashes.js";
 import { numberBonds } from "./number-bonds.js";
 import {
   accessibleParts,
-  createsTechnicalToken,
+  changesTechnicalContext,
   technicalRanges,
 } from "./protection.js";
 import { quotes } from "./quotes.js";
@@ -32,6 +32,11 @@ export function segmentTypography(
       technicalRanges(accessible.text),
     )) {
       const text = part.text;
+      // Actual technical tokens were excluded above. These are only tentative
+      // tokens hidden by discretionary breaks, used by the other rule guards.
+      const discretionaryTokens = text.includes("\u00ad")
+        ? technicalRanges(text.replaceAll("\u00ad", ""))
+        : [];
       const graphemeBoundaries = new Set([text.length]);
       for (const segment of new Intl.Segmenter("und", {
         granularity: "grapheme",
@@ -56,6 +61,25 @@ export function segmentTypography(
           !graphemeBoundaries.has(end)
         )
           return;
+        const wordStart = text.slice(0, start).replaceAll("\u00ad", "").length;
+        const wordEnd = text.slice(0, end).replaceAll("\u00ad", "").length;
+        if (
+          discretionaryTokens.some(
+            (token) => token.start < wordEnd && token.end > wordStart,
+          ) &&
+          changesTechnicalContext(
+            text,
+            text.slice(0, start) + after + text.slice(end),
+          )
+        ) {
+          ambiguous(
+            start,
+            end,
+            "This change would alter ambiguous technical context; the interval was preserved.",
+            ruleId,
+          );
+          return;
+        }
         edits.push({
           kind: !before ? "insert" : !after ? "delete" : "replace",
           before,
@@ -118,7 +142,7 @@ export function segmentTypography(
         for (const match of text.matchAll(/(?<!\.)\.{3}(?!\.)/gu)) {
           const end = match.index + 3;
           if (
-            createsTechnicalToken(
+            changesTechnicalContext(
               text,
               `${text.slice(0, match.index)}…${text.slice(end)}`,
             )
@@ -126,7 +150,7 @@ export function segmentTypography(
             ambiguous(
               match.index,
               end,
-              "Replacing these dots would create an ambiguous technical token.",
+              "Replacing these dots would alter ambiguous technical context.",
               "ellipsis",
             );
           } else edit(match.index, end, "…", "ellipsis");
@@ -179,10 +203,12 @@ export function segmentTypography(
           (initialLineStart && offset === 0 && /^[ \t]*$/u.test(before));
         if (indentation || isPreserved(start, end)) continue;
         const insertsFollowingSpace = /^[,;:!?]+[\p{L}\p{N}¿¡]/u.test(after);
+        const joined = (before + after).replaceAll("\u00ad", "");
+        const join = before.replaceAll("\u00ad", "").length;
         const createsTechnical =
           !insertsFollowingSpace &&
-          technicalRanges(before + after).some(
-            (range) => range.start < start && range.end > start,
+          technicalRanges(joined).some(
+            (range) => range.start < join && range.end > join,
           );
         if (createsTechnical)
           ambiguous(
@@ -220,9 +246,14 @@ export function segmentTypography(
         // Punctuation spacing must not turn ordinary source text into a newly
         // opaque technical token on the next invocation (for example an IPv6
         // suffix ending at this insertion). Preserve that ambiguous interval.
+        const candidate = `${text.slice(0, end)} ${text.slice(end)}`.replaceAll(
+          "\u00ad",
+          "",
+        );
+        const wordEnd = text.slice(0, end).replaceAll("\u00ad", "").length;
         if (
-          technicalRanges(`${text.slice(0, end)} ${text.slice(end)}`).some(
-            (range) => range.end === end || range.start === end + 1,
+          technicalRanges(candidate).some(
+            (range) => range.end === wordEnd || range.start === wordEnd + 1,
           )
         ) {
           ambiguous(
