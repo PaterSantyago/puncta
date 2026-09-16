@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "scope": "Pointwise language holdouts selected before testing the final-no pattern layer; not a full-word oracle.",
+  "sources": [
+    "https://www.rae.es/dpd/guion",
+    "https://cvc.cervantes.es/ENSENANZA/biblioteca_ele/plan_curricular/niveles/03_pronunciacion_inventario_b1-b2.htm"
+  ],
+  "rationale": "DPD 2.1 requires syllable boundaries and explicitly illustrates teléfo-no. Cervantes Plan Curricular B1-B2 §3.1.1 assigns a single intervocalic consonant to the following syllable. In the Spanish intervocalic sequence Vno, the single n begins the following syllable. Check the same boundary in independent final-no words; never split the adjacent vowel sequence or n from its vowel. Edge minima still apply.",
+  "positive": [
+    { "word": "argentino", "position": 7 },
+    { "word": "mexicano", "position": 6 },
+    { "word": "oxígeno", "position": 5 },
+    { "word": "metano", "position": 4 },
+    { "word": "neopreno", "position": 6 },
+    { "word": "vacuno", "position": 4 },
+    { "word": "autóctono", "position": 7 }
+  ],
+  "forbidden": [
+    { "word": "argentino", "position": 8 },
+    { "word": "neopreno", "position": 2 },
+    { "word": "vacuno", "position": 5 }
+  ]
+}

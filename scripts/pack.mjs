@@ -56,17 +56,35 @@ for (const { path: cwd, manifest } of packages) {
       assert.ok((await readFile(join(base, document))).length);
     if (
       packed.name === "@use-puncta/core" ||
-      packed.name === "@use-puncta/with-en-gb"
+      packed.name === "@use-puncta/with-en-gb" ||
+      packed.name === "@use-puncta/with-es-es"
     ) {
       const notice = await readFile(join(base, "NOTICE.md"), "utf8");
       assert.match(
         notice,
         packed.name === "@use-puncta/core"
           ? /Yevhen Tiurin/
-          : /Dominik Wujastyk/,
+          : packed.name === "@use-puncta/with-en-gb"
+            ? /Dominik Wujastyk/
+            : /Javier Bezos/,
       );
       assert.match(notice, /Permission/);
       assert.match(notice, /WARRANT/);
+    }
+    if (packed.name === "@use-puncta/with-es-es") {
+      const notice = await readFile(join(base, "NOTICE.md"), "utf8");
+      assert.match(notice, /Francesc Carmona/);
+      assert.match(notice, /CervanTeX/);
+      const shipped = JSON.parse(
+        await readFile(join(base, "hyphenation-manifest.json"), "utf8"),
+      );
+      const recipe = JSON.parse(
+        await readFile(
+          new URL("../resources/es-es/manifest.json", import.meta.url),
+          "utf8",
+        ),
+      );
+      assert.deepEqual(shipped, recipe);
     }
     const contents = execFileSync("tar", ["-tzf", archive], {
       encoding: "utf8",

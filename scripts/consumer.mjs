@@ -67,6 +67,7 @@ assert.equal(typeof globalThis.document, "undefined");
 const { createElement } = await import("react");
 const { renderToString } = await import("react-dom/server");
 const selected = [];
+const selectedLocales = [];
 for (const [id, exportName] of [
   ["en-gb", "enGb"],
   ["es-es", "esEs"],
@@ -80,6 +81,7 @@ for (const [id, exportName] of [
   verifyVersion(name);
   assert.equal("default" in module, false);
   const locale = module[exportName];
+  selectedLocales.push(locale);
   assert.equal(locale.id, id);
   assert.equal(locale.version, expected[name]);
   const instance = createPuncta({ locales: [locale], locale: locale.id });
@@ -106,6 +108,54 @@ for (const [id, exportName] of [
     assert.equal(
       hyphenated.stripSoftHyphens(hyphenated.text("backbone")),
       "backbone",
+    );
+  }
+  if (id === "es-es") {
+    const hyphenated = instance.with({ hyphenation: { enabled: true } });
+    assert.equal(hyphenated.text("camino"), "ca\u00admi\u00adno");
+    assert.equal(
+      hyphenated.html("cami<em>no</em>"),
+      "ca\u00admi\u00ad<em>no</em>",
+    );
+    assert.equal(
+      transformReact("camino", { instance: hyphenated }),
+      "ca\u00admi\u00adno",
+    );
+    assert.equal(
+      renderToString(
+        createElement(adapter.Puncta, { instance: hyphenated }, "camino"),
+      ),
+      "ca\u00admi\u00adno",
+    );
+    const decomposed = "tele\u0301fono";
+    assert.equal(
+      hyphenated.text(decomposed),
+      "te\u00adle\u0301\u00adfo\u00adno",
+    );
+    assert.equal(
+      hyphenated.text("atlético", { detailed: true }).warnings[0].code,
+      "hyphenation.language-ambiguity",
+    );
+    assert.equal(
+      hyphenated.stripSoftHyphens(hyphenated.text(decomposed)),
+      decomposed,
+    );
+    const { createHash } = await import("node:crypto");
+    const directory = dirname(fileURLToPath(import.meta.resolve(name)));
+    const manifest = JSON.parse(
+      readFileSync(join(directory, "..", "hyphenation-manifest.json")),
+    );
+    assert.equal(
+      createHash("sha256")
+        .update(
+          JSON.stringify(locale[Symbol.for("@use-puncta/hyphenation")].table),
+        )
+        .digest("hex"),
+      manifest.prepared.tableSha256,
+    );
+    assert.match(
+      readFileSync(join(directory, "..", "NOTICE.md"), "utf8"),
+      /Francesc Carmona/,
     );
   }
   const input = "😀 Wait... Wait....";
@@ -145,6 +195,28 @@ for (const [id, exportName] of [
 }
 if (selected.length === 2)
   assert.equal(renderToString(selected), "Wait…<!-- -->Wait…");
+if (selectedLocales.length === 2) {
+  const spanish = createPuncta({
+    locales: selectedLocales,
+    locale: "es-es",
+    hyphenation: { enabled: true },
+  });
+  const english = spanish.with({ locale: "en-gb" });
+  assert.equal(spanish.text("camino"), "ca\u00admi\u00adno");
+  assert.equal(english.text("backbone"), "back\u00adbone");
+  assert.throws(
+    () =>
+      spanish.with({ hyphenation: { minRight: 2 } }).with({ locale: "en-gb" }),
+    { code: "config.invalid-option" },
+  );
+  assert.equal(
+    spanish
+      .with({ hyphenation: { minRight: 2 } })
+      .with({ locale: "en-gb", hyphenation: { minRight: null } })
+      .text("backbone"),
+    "back\u00adbone",
+  );
+}
 const domRequire = createRequire(import.meta.resolve("react-dom/server"));
 assert.equal(
   realpathSync(require.resolve("react")),

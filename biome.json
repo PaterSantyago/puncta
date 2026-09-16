@@ -20,7 +20,10 @@
   },
   "overrides": [
     {
-      "includes": ["packages/with-en-gb/src/hyphenation.json"],
+      "includes": [
+        "packages/with-en-gb/src/hyphenation.json",
+        "packages/with-es-es/src/hyphenation.json"
+      ],
       "formatter": {
         "enabled": false
       }

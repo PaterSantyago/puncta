@@ -30,7 +30,7 @@ test("fixed inputs reproduce the independently hashed baseline and shipped resou
 
 // A separate simple Liang computation over pattern strings is a computational
 // oracle only. The independently frozen linguistic corpus remains the language gate.
-function reference(word, patterns) {
+function reference(word, patterns, minRight = 3) {
   const text = `.${word}.`;
   const levels = Array(text.length + 1).fill(0);
   for (const pattern of patterns) {
@@ -50,7 +50,7 @@ function reference(word, patterns) {
   return [...word]
     .map(
       (letter, index) =>
-        `${index >= 2 && word.length - index >= 3 && levels[index + 1] % 2 ? "\u00ad" : ""}${letter}`,
+        `${index >= 2 && word.length - index >= minRight && levels[index + 1] % 2 ? "\u00ad" : ""}${letter}`,
     )
     .join("");
 }
@@ -113,4 +113,81 @@ test("productive refinement boundaries pass the independently chosen family hold
       );
     }
   }
+});
+
+test("Spanish fixed inputs and max-merged refinement reproduce the installed resource", async () => {
+  execFileSync(process.execPath, [
+    "scripts/hyphenation/prepare-es-es.mjs",
+    "--check",
+  ]);
+  const { esEs } = await import("../packages/with-es-es/dist/index.mjs");
+  const { createHash } = await import("node:crypto");
+  const manifest = JSON.parse(
+    readFileSync(new URL("../resources/es-es/manifest.json", import.meta.url)),
+  );
+  const key = Symbol.for("@use-puncta/hyphenation");
+  assert.equal(
+    createHash("sha256").update(JSON.stringify(esEs[key].table)).digest("hex"),
+    manifest.prepared.tableSha256,
+  );
+  const fixture = JSON.parse(
+    readFileSync(
+      new URL("./fixtures/hyphenation/es-es-refinement.json", import.meta.url),
+    ),
+  );
+  const instance = createPuncta({
+    locales: [esEs],
+    locale: "es-es",
+    hyphenation: { enabled: true },
+  });
+  for (const [kind, entries] of [
+    ["positive", fixture.positive],
+    ["forbidden", fixture.forbidden],
+  ]) {
+    for (const { word, position } of entries) {
+      const actual = instance
+        .text(word, { detailed: true })
+        .edits.map((edit) => edit.ranges[0].start);
+      assert.equal(actual.includes(position), kind === "positive", word);
+    }
+  }
+  const baseline = readFileSync(
+    new URL("../resources/es-es/hyph-es.tex", import.meta.url),
+    "utf8",
+  )
+    .replace(/%[^\n]*/gu, "")
+    .match(/\\patterns\{([^}]*)\}/u)[1]
+    .trim()
+    .split(/\s+/u);
+  const prepared = mergePatterns([
+    ...baseline,
+    ...[..."aeiouáéíóúü"].map((vowel) => `${vowel}3no.`),
+  ]);
+  assert.deepEqual(compilePatterns(prepared), esEs[key].table);
+  // Independent full-pattern computation, including anchors and maximum weights.
+  for (const word of [
+    "camino",
+    "vergüenza",
+    "mañana",
+    "argentino",
+    "óptimo",
+    "pingüino",
+    "teléfono",
+    "reino",
+    "xábcde",
+    "xüñabc",
+  ]) {
+    assert.equal(
+      instance.text(word),
+      word.length >= 6 ? reference(word, prepared, 2) : word,
+      word,
+    );
+  }
+  const synthetic = ["ab2cd", "ab3cd", "abc4d", "abcd3e", ".á1b", "ü1ñ"];
+  assert.deepEqual(mergePatterns(synthetic), [
+    "ab3c4d",
+    "abcd3e",
+    ".á1b",
+    "ü1ñ",
+  ]);
 });

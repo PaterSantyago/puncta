@@ -1,6 +1,10 @@
 import { numericDashes, textualDashes } from "./dashes.js";
 import { numberBonds } from "./number-bonds.js";
-import { accessibleParts, technicalRanges } from "./protection.js";
+import {
+  accessibleParts,
+  createsTechnicalToken,
+  technicalRanges,
+} from "./protection.js";
 import { quotes } from "./quotes.js";
 import type { resolveSettings } from "./settings.js";
 import type { Edit, ProtectedRange, PunctaWarning, RuleId } from "./types.js";
@@ -111,8 +115,22 @@ export function segmentTypography(
         } else edit(bond.start, bond.end, bond.after, bond.ruleId);
       }
       if (settings.rules.ellipsis?.enabled !== false) {
-        for (const match of text.matchAll(/(?<!\.)\.{3}(?!\.)/gu))
-          edit(match.index, match.index + 3, "…", "ellipsis");
+        for (const match of text.matchAll(/(?<!\.)\.{3}(?!\.)/gu)) {
+          const end = match.index + 3;
+          if (
+            createsTechnicalToken(
+              text,
+              `${text.slice(0, match.index)}…${text.slice(end)}`,
+            )
+          ) {
+            ambiguous(
+              match.index,
+              end,
+              "Replacing these dots would create an ambiguous technical token.",
+              "ellipsis",
+            );
+          } else edit(match.index, end, "…", "ellipsis");
+        }
       }
       if (settings.rules.spaces?.enabled === false) continue;
 
