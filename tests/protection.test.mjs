@@ -444,3 +444,21 @@ test("quoted email local parts protect actual ellipses across inline nodes", asy
   assert.equal(report.result[2], " …");
   assert.equal(report.edits.length, 1);
 });
+
+test("protection arguments remain exclusive to plain text at runtime", async () => {
+  const { transformReact } = await import(
+    "../packages/with-react/dist/pure.mjs"
+  );
+  for (const protect of [undefined, [], [{ start: 0, end: 3 }], null]) {
+    for (const invoke of [
+      () => instance.with({ protect }),
+      () => instance.html("...", { protect }),
+      () => transformReact("...", { instance, protect }),
+    ])
+      assert.throws(invoke, {
+        code: "config.invalid-option",
+        optionPath: ["protect"],
+        details: { reason: "unknown" },
+      });
+  }
+});
