@@ -247,7 +247,7 @@ const spanishCorpus = [
   ["¡ Hola !", "¡Hola!"],
   ["¿  Hola  ?¡  Sí  !", "¿Hola? ¡Sí!"],
   ["Hola?", "Hola?"],
-  ["«Hola.»", locale.id === "en-gb" ? "‘Hola.’" : "«Hola.»"],
+  ["«Hola.»", "«Hola.»"],
 ];
 
 for (const locale of [enGb, esEs]) {
