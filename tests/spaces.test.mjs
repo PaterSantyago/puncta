@@ -479,3 +479,49 @@ test("bounded generated inputs are idempotent and whole-input protection is iden
     }
   }
 });
+
+test("interior spaces after protection collapse without treating opaque content as indentation", async () => {
+  const { createElement: h } = await import("react");
+  const { transformReact } = await import(
+    "../packages/with-react/dist/pure.mjs"
+  );
+  const instance = createPuncta({ locales: [enGb], locale: "en-gb" });
+  assert.equal(
+    instance.text("Visit https://example.org  today"),
+    "Visit https://example.org today",
+  );
+  assert.equal(
+    instance.text("word  next", { protect: [{ start: 0, end: 4 }] }),
+    "word next",
+  );
+  assert.equal(
+    instance.text("word\n  next", { protect: [{ start: 0, end: 4 }] }),
+    "word\n  next",
+  );
+  for (const props of [
+    {},
+    { "data-puncta": "off" },
+    { "data-puncta-options": '{"rules":{"spaces":{"enabled":false}}}' },
+  ]) {
+    const tag = Object.keys(props).length ? "span" : "code";
+    const attributes = Object.entries(props)
+      .map(([key, value]) => ` ${key}='${value}'`)
+      .join("");
+    const input = `<${tag}${attributes}>word</${tag}>  next`;
+    assert.ok(instance.html(input).endsWith(`</${tag}> next`), input);
+    const tree = [h(tag, { key: "p", ...props }, "word"), "  next"];
+    assert.equal(transformReact(tree, { instance })[1], " next");
+  }
+  assert.equal(
+    instance.html('<span data-puncta="">  alpha  beta</span>'),
+    '<span data-puncta="">  alpha beta</span>',
+  );
+  assert.equal(
+    instance.html("<code>word</code>\n  next"),
+    "<code>word</code>\n  next",
+  );
+  assert.equal(
+    instance.html("<code>word</code><p>  next  word</p>"),
+    "<code>word</code><p>  next word</p>",
+  );
+});

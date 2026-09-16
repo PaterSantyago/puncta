@@ -118,6 +118,7 @@ export function transformHtml(source: string, scope: Scope): HtmlResult {
           PunctaConfigError,
         );
         if (childScope !== parent) contextText.use(scopeTransform(childScope));
+        if (childScope.protected) contextText.boundary("opaque");
         if (!childScope.protected)
           node.childNodes.forEach((child, index) => {
             visit(child, [...path, index], childScope);

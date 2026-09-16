@@ -8,6 +8,7 @@ export function typography(
   source: string,
   settings: ReturnType<typeof resolveSettings>,
   protection: readonly ProtectedRange[],
+  initialLineStart = true,
 ): { edits: Edit[]; warnings: PunctaWarning[] } {
   const edits: Edit[] = [];
   const warnings: PunctaWarning[] = [];
@@ -94,8 +95,10 @@ export function typography(
         const end = start + match[0].length;
         const before = text.slice(0, start);
         const after = text.slice(end);
-        if (/(?:^|[\r\n])[ \t]*$/u.test(before) || isPreserved(start, end))
-          continue;
+        const indentation =
+          /[\r\n][ \t]*$/u.test(before) ||
+          (initialLineStart && offset === 0 && /^[ \t]*$/u.test(before));
+        if (indentation || isPreserved(start, end)) continue;
         const closes =
           /^[,;:.!?)\]]/u.test(after) &&
           /[\p{L}\p{M}\p{N})\]"'»”’!?]$/u.test(before);

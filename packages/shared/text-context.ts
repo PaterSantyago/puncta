@@ -10,7 +10,7 @@ import type {
  * Words/bonds stop at all three; quotes may span line/opaque but not block. */
 export type Boundary = "line" | "opaque" | "block";
 type Span = { sourceId: number; start: number; end: number };
-type Transform = (text: string) => TextResult;
+type Transform = (text: string, initialLineStart: boolean) => TextResult;
 type Part = { span: Span } | { boundary: Boundary } | { transform: Transform };
 
 /** Collect original leaves, recognise contiguous text, and return edits to their owners.
@@ -23,7 +23,7 @@ export class TextContext {
   private readonly parts: Part[] = [];
   private readonly values: string[] = [];
 
-  constructor(private readonly transform: (text: string) => TextResult) {}
+  constructor(private readonly transform: Transform) {}
 
   append(text: string, path: Source["path"]): () => string {
     const sourceId = this.sources.length;
@@ -44,6 +44,7 @@ export class TextContext {
 
   finish(): void {
     let transform = this.transform;
+    let lineStart = true;
     let spans: Span[] = [];
     const flush = () => {
       if (!spans.length) return;
@@ -52,7 +53,8 @@ export class TextContext {
           this.sources[span.sourceId].text.slice(span.start, span.end),
         )
         .join("");
-      const report = transform(text);
+      const report = transform(text, lineStart);
+      if (/[^ \t]/u.test(text)) lineStart = false;
       for (const edit of report.edits) {
         const ranges: Span[] = [];
         const range = edit.ranges[0];
@@ -90,6 +92,7 @@ export class TextContext {
       else {
         flush();
         if ("transform" in part) transform = part.transform;
+        else lineStart = part.boundary !== "opaque";
       }
     }
     flush();

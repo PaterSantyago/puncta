@@ -68,7 +68,11 @@ export function createPuncta(
   );
   return makeInstance(initial);
   function makeInstance(settings: Settings): PunctaInstance {
-    function text(source: string, call: TextOptions = {}): string | TextResult {
+    function text(
+      source: string,
+      call: TextOptions = {},
+      initialLineStart = true,
+    ): string | TextResult {
       if (typeof source !== "string")
         invalidOption(["source"], source === undefined ? "required" : "type");
       checkObject(call, [...sharedKeys, "detailed", "protect"]);
@@ -77,7 +81,12 @@ export function createPuncta(
         invalidOption(["detailed"], "type");
       const effective = resolveSettings(mergeSettings(settings, call, loaded));
       const { locale } = effective;
-      const { edits, warnings } = typography(source, effective, protection);
+      const { edits, warnings } = typography(
+        source,
+        effective,
+        protection,
+        initialLineStart,
+      );
       let result = source;
       for (const edit of [...edits].reverse()) {
         const range = edit.ranges[0];
@@ -124,6 +133,9 @@ export function createPuncta(
       [Symbol.for("@use-puncta/scope")]: Object.freeze({
         locale: settings.locale,
         enabled: settings.enabled,
+        // Private adapter entry keeps structural line context out of public options.
+        transform: (source: string, initialLineStart: boolean) =>
+          text(source, { detailed: true }, initialLineStart),
       }),
     }) as PunctaInstance;
   }

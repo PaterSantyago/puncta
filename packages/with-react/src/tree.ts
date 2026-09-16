@@ -130,6 +130,7 @@ export function transformTree(
               PunctaConfigError,
             );
     if (childScope !== parent) context.use(scopeTransform(childScope));
+    if (childScope.protected) context.boundary("opaque");
     const children =
       "children" in node.props
         ? childScope.protected
