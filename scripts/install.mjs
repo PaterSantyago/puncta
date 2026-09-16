@@ -1,18 +1,17 @@
 import assert from "node:assert/strict";
-import { spawn, execFileSync } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import {
-  mkdtemp,
-  mkdir,
-  readFile,
-  writeFile,
-  rm,
   copyFile,
+  mkdir,
+  mkdtemp,
+  readFile,
+  rm,
+  writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-
-import { publicPackages } from "./workspace.mjs";
 import { registryFixture } from "./registry-fixture.mjs";
+import { publicPackages } from "./workspace.mjs";
 
 assert.equal(
   process.versions.node.split(".")[0],
@@ -220,7 +219,7 @@ try {
         await writeFile(
           join(cwd, "transitive.tsx"),
           [
-            'import { Puncta } from "@use-puncta/with-react";',
+            'import { Puncta, PunctaProvider } from "@use-puncta/with-react";',
             'import type { ReactTransformOptions } from "@use-puncta/with-react/pure";',
             ...locales.map(
               (id, index) =>
@@ -273,7 +272,7 @@ try {
         await writeFile(
           join(cwd, "consumer.tsx"),
           [
-            'import { Puncta } from "@use-puncta/with-react";',
+            'import { Puncta, PunctaProvider } from "@use-puncta/with-react";',
             'import { createPuncta, type TextResult, type HtmlResult, type Locale } from "@use-puncta/core";',
             'import { transformReact, type ReactResult } from "@use-puncta/with-react/pure";',
             'import type { ReactNode } from "react";',
@@ -308,8 +307,18 @@ try {
               'const fake: Locale = {id: "en-gb", version: "1"};',
               "// @ts-expect-error Pure calls need an instance.",
               'transformReact("...");',
-              "// @ts-expect-error Standalone components need an instance.",
-              "const missing = <Puncta>Wait...</Puncta>;",
+              "const inherited = <PunctaProvider instance={instance}><Puncta options={{rules: {ellipsis: null}, hyphenation: {minRight: null}}}>Wait...</Puncta></PunctaProvider>;",
+              "instance.with({enabled: false, rules: {quotes: {normalizeExisting: null}, units: {additional: ['rpm']}, percentages: {space: 'nbsp'}}, hyphenation: null});",
+              "// @ts-expect-error Registry cannot change through with.",
+              "instance.with({locales: [locale0]});",
+              "// @ts-expect-error Top-level rules do not accept null.",
+              "instance.with({rules: null});",
+              "// @ts-expect-error Component options contain only rules and hyphenation.",
+              "const wrongOptions = <Puncta options={{locale: 'es-es'}}>...</Puncta>;",
+              "// @ts-expect-error Components do not take detailed.",
+              "const wrongDetailed = <Puncta instance={instance} detailed>...</Puncta>;",
+              "// @ts-expect-error Pure calls use flat common options.",
+              "transformReact('...', {instance, options: {rules: {ellipsis: null}}});",
               "// @ts-expect-error React reports have no outputChanged.",
               "treeReport.outputChanged;",
             ],

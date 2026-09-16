@@ -9,7 +9,8 @@ import type {
  * Words/bonds stop at all three; quotes may span line/opaque but not block. */
 export type Boundary = "line" | "opaque" | "block";
 type Span = { sourceId: number; start: number; end: number };
-type Part = { span: Span } | { boundary: Boundary };
+type Transform = (text: string) => TextResult;
+type Part = { span: Span } | { boundary: Boundary } | { transform: Transform };
 
 /** Collect original leaves, recognise contiguous text, and return edits to their owners.
  * Neither structural boundaries nor source addresses become output characters. */
@@ -34,7 +35,13 @@ export class TextContext {
     this.parts.push({ boundary });
   }
 
+  /** A scope owns its original leaves and interrupts recognition on both sides. */
+  use(transform: Transform): void {
+    this.parts.push({ transform });
+  }
+
   finish(): void {
+    let transform = this.transform;
     let spans: Span[] = [];
     const flush = () => {
       if (!spans.length) return;
@@ -43,7 +50,7 @@ export class TextContext {
           this.sources[span.sourceId].text.slice(span.start, span.end),
         )
         .join("");
-      const report = this.transform(text);
+      const report = transform(text);
       for (const edit of report.edits) {
         const ranges: Span[] = [];
         const range = edit.ranges[0];
@@ -62,8 +69,11 @@ export class TextContext {
       spans = [];
     };
     for (const part of splitLines(this.parts, this.sources)) {
-      if ("boundary" in part) flush();
-      else spans.push(part.span);
+      if ("span" in part) spans.push(part.span);
+      else {
+        flush();
+        if ("transform" in part) transform = part.transform;
+      }
     }
     flush();
     // Apply from right to left so every range keeps its original UTF-16 coordinates.

@@ -2,7 +2,7 @@
 
 Synchronous ESM typography, with explicitly installed locales and no React or DOM
 requirement. The current implementation covers unambiguous ellipses, including
-recognition across transparent inline leaves (#39–#40).
+recognition across transparent inline leaves and nested configuration scopes (#39–#41).
 
 ```ts
 import { createPuncta } from "@use-puncta/core";
@@ -24,7 +24,26 @@ conversion creates no new edits. Read a locale identifier from `locale.id`;
 Both the locale modules and the active locale are required. A call can explicitly
 select another loaded locale. Invalid arguments throw `PunctaConfigError` with
 `code`, `details`, `optionPath` and `location`. Instances snapshot their registry
-and selected locale, so changing the input array cannot change an instance.
+and all explicit settings, so changing caller objects or arrays cannot change an
+instance. `with(overrides)` returns an independent instance with the same registry.
+`locale`, `enabled`, `rules` and `hyphenation` are shared settings. Rule groups merge
+by field; omitted/undefined fields inherit, null fields or groups restore the
+current locale defaults. Arrays replace inherited additions. A locale change keeps
+explicit overrides and revalidates language minima, even with hyphenation disabled.
+
+```ts
+const paused = puncta.with({ rules: { ellipsis: { enabled: false } } });
+paused.text("Wait..."); // "Wait..."
+paused.text("Wait...", { rules: { ellipsis: null } }); // "Wait…"
+```
+
+HTML supports `data-puncta=""`, `data-puncta="off"`, `data-puncta-locale` and
+JSON `data-puncta-options` (rules/hyphenation only). Each marker creates an independent
+scope. Explicit locale wins over lang on the same element. `lang` accepts en/en-gb
+and es/es-es without case sensitivity; repeating the current language preserves
+inline context. Unavailable language preserves text with a structured warning;
+a nested supported language resumes processing unless protected. Disabled subtrees
+and protected elements skip declarative configuration parsing.
 
 HTML uses parse5 8.0.0 in fragment mode with explicit div context, without adding a
 wrapper. Serialization can change the HTML string without typographic edits:
@@ -41,10 +60,12 @@ tags. Entity/CRLF decoding and astral characters retain UTF-16 provenance;
 unmappable parser repairs report `accuracy: "unavailable"` with a reason.
 
 This is a narrow implementation, not completion of the first-version contract.
-Full rule settings and `with()`, hyphenation, plain-text protection ranges,
-HTML document/other fragment contexts, language/declarative areas and the full
-warning catalogue remain subsequent work. Special protected elements and unknown
-elements are opaque; attribute-driven protection is not yet implemented. Unsupported
+All accepted shared option forms are validated and retained, but only ellipsis
+currently changes text. Enabling another rule or hyphenation does not implement
+that transformation. Hyphenation resources and their errors, plain-text protection
+ranges, HTML document/other fragment contexts and the full warning catalogue remain
+subsequent work. Special protected elements and unknown
+elements are opaque; other attribute-driven protection remains pending beyond data-puncta=off. Unsupported
 call options are rejected rather than treated as implemented settings. The different
 line/opaque/block boundary kinds are retained for future rules; quote continuation,
 word admission and insertion placement require their own rule-specific acceptance.
