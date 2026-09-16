@@ -1,16 +1,14 @@
 import {
+  type DefaultTreeAdapterMap,
   defaultTreeAdapter,
   html,
   parseFragment,
   serialize,
-  type DefaultTreeAdapterMap,
 } from "parse5";
-import type {
-  HtmlResult,
-  InputRange,
-  PunctaWarning,
-  TextResult,
-} from "./types.js";
+import { elementSemantics } from "../../shared/elements.js";
+import { TextContext } from "../../shared/text-context.js";
+import { htmlSourceMap } from "./html-source.js";
+import type { HtmlResult, PunctaWarning, TextResult } from "./types.js";
 
 /** Parse a div fragment without requiring a browser or adding a wrapper. */
 export function transformHtml(
@@ -36,52 +34,26 @@ export function transformHtml(
       });
     },
   });
-  const sources: HtmlResult["sources"][number][] = [];
-  const edits: HtmlResult["edits"][number][] = [];
-  const appliedRules: HtmlResult["appliedRules"][number][] = [];
+  const contextText = new TextContext(transform);
+  const leaves: DefaultTreeAdapterMap["textNode"][] = [];
+  const updates: (() => void)[] = [];
   function visit(node: DefaultTreeAdapterMap["node"], path: number[]) {
-    if (
-      defaultTreeAdapter.isElementNode(node) &&
-      ["code", "pre", "script", "style"].includes(node.tagName)
-    )
-      return;
     if (defaultTreeAdapter.isTextNode(node)) {
-      const id = sources.length;
-      const text = node.value;
-      sources.push({ id, text, path });
-      const report = transform(text);
-      for (const edit of report.edits) {
-        edits.push({
-          ...edit,
-          ranges: edit.ranges.map((range) => {
-            const location = node.sourceCodeLocation;
-            // Entity/CRLF provenance belongs to the later source-mapping slice.
-            const inputRange: InputRange =
-              location &&
-              source.slice(location.startOffset, location.endOffset) === text
-                ? {
-                    accuracy: "exact",
-                    start: location.startOffset + range.start,
-                    end: location.startOffset + range.end,
-                  }
-                : {
-                    accuracy: "unavailable",
-                    reason:
-                      "Decoded HTML source mapping is not implemented in this slice",
-                  };
-            return { ...range, sourceId: id, inputRange };
-          }),
+      leaves.push(node);
+      const value = contextText.append(node.value, path);
+      updates.push(() => {
+        node.value = value();
+      });
+      return;
+    }
+    if (defaultTreeAdapter.isElementNode(node)) {
+      const semantics = elementSemantics(node.tagName);
+      if (semantics.boundary) contextText.boundary(semantics.boundary);
+      if (!semantics.protected && node.namespaceURI === html.NS.HTML)
+        node.childNodes.forEach((child, index) => {
+          visit(child, [...path, index]);
         });
-      }
-      for (const rule of report.appliedRules)
-        if (
-          !appliedRules.some(
-            (item) =>
-              item.ruleId === rule.ruleId && item.locale === rule.locale,
-          )
-        )
-          appliedRules.push(rule);
-      node.value = report.result;
+      if (semantics.boundary) contextText.boundary(semantics.boundary);
     } else if ("childNodes" in node)
       node.childNodes.forEach((child, index) => {
         visit(child, [...path, index]);
@@ -90,6 +62,19 @@ export function transformHtml(
   fragment.childNodes.forEach((node, index) => {
     visit(node, [index]);
   });
+  contextText.finish();
+  const { sources, appliedRules } = contextText;
+  const mappings = leaves.map((node, index) =>
+    htmlSourceMap(source, sources[index].text, node.sourceCodeLocation),
+  );
+  const edits = contextText.edits.map((edit) => ({
+    ...edit,
+    ranges: edit.ranges.map((range) => ({
+      ...range,
+      inputRange: mappings[range.sourceId](range.start, range.end),
+    })),
+  }));
+  for (const update of updates) update();
   const result = serialize(fragment);
   return {
     result,

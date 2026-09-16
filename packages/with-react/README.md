@@ -18,16 +18,20 @@ const report = transformReact("Wait...", { instance, detailed: true });
 `"use client"`. The `/pure` entry has no client directive, hooks or Context;
 `transformReact` returns a ReactNode by default or `ReactResult` with
 `detailed: true`. Reports use numeric array indices and `"children"` transitions
-for source paths; they have no `outputChanged` field.
+and `"fallback"` transitions for source paths; they have no `outputChanged` field.
 
-This slice covers text, arrays, Fragments and ordinary host children. Original
-children, keys, refs and other props are retained; attributes and
-`dangerouslySetInnerHTML` are not transformed. User components are not called.
+Text, arrays, Fragments and ordinary host children share inline recognition.
+Cross-leaf replacements belong to the first affected leaf; empty elements survive.
+Numbers and bigint contribute their text while retaining their type when unchanged.
+Null, undefined and booleans create no boundary. Original children, keys, refs and
+other props are retained; attributes and `dangerouslySetInnerHTML` are not transformed.
+User components, portals, promises and arbitrary iterables remain opaque without
+being called, awaited or iterated. Suspense content, fallback and surrounding text
+have independent recognition contexts. Reports address the original input tree.
+
 An explicit instance is currently required for every component/pure call.
-
-Provider/Context, Suspense, complex inline boundaries, cross-leaf processing,
-full protection propagation and declarative language areas are subsequent work.
-Only simple `renderToString` behavior is verified here; streaming, hydration and
-RSC integration are not claimed. See the core README for the remaining scope.
+Provider/Context, full protection propagation and declarative language areas are
+subsequent work. Real `renderToString` checks cover this slice; streaming, hydration
+and RSC integration are not claimed. See the core README for the remaining scope.
 
 MIT licensed. Public publication is separate work.

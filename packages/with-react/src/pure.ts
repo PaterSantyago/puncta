@@ -4,7 +4,31 @@ import {
   type TextOptions,
   type TextResult,
 } from "@use-puncta/core";
-import { cloneElement, Fragment, isValidElement, type ReactNode } from "react";
+import {
+  cloneElement,
+  Fragment,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+  Suspense,
+} from "react";
+import { elementSemantics } from "../../shared/elements.js";
+import { TextContext } from "../../shared/text-context.js";
+
+type ChildProps = { children?: ReactNode; fallback?: ReactNode };
+
+/** Variadic children preserve React's static-sibling key validation. Passing the
+ * rebuilt array as one argument would turn valid static siblings into a list. */
+function cloneChildren(
+  node: ReactElement<ChildProps>,
+  children: ReactNode,
+  props?: Partial<ChildProps>,
+): ReactElement<ChildProps> {
+  if (!Array.isArray(children)) return cloneElement(node, props, children);
+  const result = cloneElement(node, props, ...children);
+  // cloneElement collapses zero/one variadic children; retain the input array shape.
+  return children.length > 1 ? result : cloneElement(result, { children });
+}
 
 export interface ReactTransformOptions extends TextOptions {
   readonly instance: PunctaInstance;
@@ -40,54 +64,61 @@ export function transformReact(
   const { instance, ...call } = options;
   // Core validates shared options, including calls with no accessible text.
   instance.text("", call);
-  const sources: ReactResult["sources"][number][] = [];
-  const edits: ReactResult["edits"][number][] = [];
-  const appliedRules: ReactResult["appliedRules"][number][] = [];
+  const context = new TextContext((text) =>
+    instance.text(text, { ...call, detailed: true }),
+  );
   function visit(
     node: ReactNode,
     path: ReactResult["sources"][number]["path"],
-  ): ReactNode {
+  ): () => ReactNode {
     if (
       typeof node === "string" ||
       typeof node === "number" ||
       typeof node === "bigint"
     ) {
-      const id = sources.length;
-      const text = String(node);
-      sources.push({ id, text, path });
-      const report = instance.text(text, { ...call, detailed: true });
-      for (const edit of report.edits)
-        edits.push({
-          ...edit,
-          ranges: edit.ranges.map((range) => ({ ...range, sourceId: id })),
-        });
-      for (const rule of report.appliedRules)
-        if (
-          !appliedRules.some(
-            (item) =>
-              item.ruleId === rule.ruleId && item.locale === rule.locale,
-          )
-        )
-          appliedRules.push(rule);
-      return report.hasEdits ? report.result : node;
+      const original = String(node);
+      const value = context.append(original, path);
+      return () => (value() === original ? node : value());
     }
-    if (Array.isArray(node))
-      return node.map((child, index) => visit(child, [...path, index]));
-    if (!isValidElement<{ children?: ReactNode }>(node)) return node;
-    if (node.type !== Fragment && typeof node.type !== "string") return node;
-    if (
-      typeof node.type === "string" &&
-      ["code", "pre", "script", "style"].includes(node.type)
-    )
-      return node;
-    if (!("children" in node.props)) return node;
-    return cloneElement(
-      node,
-      undefined,
-      visit(node.props.children, [...path, "children"]),
-    );
+    if (Array.isArray(node)) {
+      const children = node.map((child, index) =>
+        visit(child, [...path, index]),
+      );
+      return () => children.map((child) => child());
+    }
+    if (node == null || typeof node === "boolean") return () => node;
+    if (!isValidElement<ChildProps>(node)) {
+      context.boundary("opaque");
+      return () => node;
+    }
+    if (node.type === Suspense) {
+      context.boundary("block");
+      const children = visit(node.props.children, [...path, "children"]);
+      context.boundary("block");
+      const fallback = visit(node.props.fallback, [...path, "fallback"]);
+      context.boundary("block");
+      return () => cloneChildren(node, children(), { fallback: fallback() });
+    }
+    if (node.type !== Fragment && typeof node.type !== "string") {
+      context.boundary("opaque");
+      return () => node;
+    }
+    const semantics =
+      node.type === Fragment
+        ? { protected: false }
+        : elementSemantics(node.type as string);
+    if (semantics.boundary) context.boundary(semantics.boundary);
+    const children =
+      !semantics.protected && "children" in node.props
+        ? visit(node.props.children, [...path, "children"])
+        : undefined;
+    if (semantics.boundary) context.boundary(semantics.boundary);
+    return () => (children ? cloneChildren(node, children()) : node);
   }
-  const result = visit(children, []);
+  const resultTree = visit(children, []);
+  context.finish();
+  const { sources, edits, appliedRules } = context;
+  const result = resultTree();
   return options.detailed
     ? {
         result,
