@@ -471,6 +471,13 @@ test("generated number contexts preserve original provenance, protection and ide
         const second = instance.text(first.result, { rules, detailed: true });
         assert.equal(second.result, first.result, input);
         assert.deepEqual(second.edits, [], input);
+        let replay = input;
+        for (const edit of [...first.edits].reverse()) {
+          const range = edit.ranges[0];
+          replay =
+            replay.slice(0, range.start) + edit.after + replay.slice(range.end);
+        }
+        assert.equal(replay, first.result, input);
         let end = 0;
         for (const edit of first.edits) {
           assert.equal(
@@ -522,4 +529,28 @@ test("adjacent number roles are recognised together before punctuation and spaci
   assert.equal(ambiguous.result, "20  GBP  30");
   assert.equal(ambiguous.warnings[0].code, "typography.ambiguous");
   assert.equal(ambiguous.warnings[0].ruleId, "currencies");
+});
+
+test("unknown multiplicative units stay whole and explicit additions opt them in", () => {
+  for (const input of ["24 kg·m", "24kg⋅m", "24kg×m", "24kg*m"])
+    assert.equal(en.text(input), input);
+  assert.equal(
+    en.text("24kg·m", { rules: { units: { additional: ["kg·m"] } } }),
+    "24 kg·m",
+  );
+});
+
+test("leading-point decimals retain their full notation in currency bonds", () => {
+  for (const [instance, input, expected] of [
+    [en, "GBP .5", "GBP .5"],
+    [en, "£ .5", "£.5"],
+    [en, "USD -.5", "USD -.5"],
+    [es, "EUR ,5", "EUR ,5"],
+    [es, ".5 €", ".5 €"],
+    [en, ".5kg", ".5 kg"],
+  ]) {
+    assert.equal(instance.text(input), expected);
+    assert.deepEqual(instance.text(expected, { detailed: true }).edits, []);
+    assert.equal(visible(instance.html(input)), expected);
+  }
 });

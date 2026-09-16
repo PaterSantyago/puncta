@@ -47,27 +47,31 @@ const baseUnits = [
   "kJ",
   "N",
 ];
-const continuation = /^[\p{L}\p{M}\p{N}_/°^]/u;
+const currencyCodes = ["GBP", "EUR", "USD"];
+const currencySymbols = ["£", "€", "$"];
+const currencyPattern = new RegExp(
+  `${currencyCodes.join("|")}|[${currencySymbols.join("")}]`,
+  "gu",
+);
+const reservedUnits = new Set([...currencyCodes, ...currencySymbols, "%", "°"]);
+const continuation = /^[\p{L}\p{M}\p{N}_/°^*·⋅×]/u;
 
 /** Original numeric spans, without interpreting separators or rewriting notation.
  * A code immediately before a number is a recognised boundary, not a word tail. */
 function numbers(text: string): ProtectedRange[] {
   const result: ProtectedRange[] = [];
   for (const match of text.matchAll(
-    /[+−-]?\d+(?:[.,]\d+)*(?:[-–]\d+(?:[.,]\d+)*)?/gu,
+    /[+−-]?(?:\d+(?:[.,]\d+)*|[.,]\d+)(?:[-–](?:\d+(?:[.,]\d+)*|[.,]\d+))?/gu,
   )) {
     const start = match.index;
     const end = start + match[0].length;
     const before = text.slice(0, start);
-    if (
-      /[\p{L}\p{M}\p{N}_/]$/u.test(before) &&
-      !/(?:^|[^\p{L}\p{M}\p{N}_])(?:GBP|EUR|USD)$/u.test(before) &&
-      !(
-        /(?:GBP|EUR|USD)$/u.test(before) &&
-        result.some((span) => span.end === start - 3)
-      )
-    )
-      continue;
+    const code = currencyCodes.find((candidate) => before.endsWith(candidate));
+    const codeBoundary =
+      code &&
+      (!/[\p{L}\p{M}\p{N}_]$/u.test(before.slice(0, -code.length)) ||
+        result.some((span) => span.end === start - code.length));
+    if (/[\p{L}\p{M}\p{N}_/]$/u.test(before) && !codeBoundary) continue;
     result.push({ start, end });
   }
   return result;
@@ -93,9 +97,7 @@ export function numberBonds(text: string, settings: Settings): NumberBond[] {
     ]),
   ]
     // Additions cannot replace the separately specified currency/percent/angle roles.
-    .filter(
-      (unit) => !["GBP", "EUR", "USD", "£", "€", "$", "%", "°"].includes(unit),
-    )
+    .filter((unit) => !reservedUnits.has(unit))
     .sort((a, b) => b.length - a.length);
   const bonds: NumberBond[] = [];
   const spans = numbers(text);
@@ -141,7 +143,7 @@ export function numberBonds(text: string, settings: Settings): NumberBond[] {
       );
     }
   }
-  for (const match of text.matchAll(/GBP|EUR|USD|[£€$]/gu)) {
+  for (const match of text.matchAll(currencyPattern)) {
     const start = match.index;
     const end = start + match[0].length;
     const left = spans.find(
@@ -162,8 +164,10 @@ export function numberBonds(text: string, settings: Settings): NumberBond[] {
     const validRight =
       right &&
       (!continuation.test(text.slice(right.end)) ||
-        /^(?:GBP|EUR|USD)(?![\p{L}\p{M}\p{N}_/°^])/u.test(
-          text.slice(right.end),
+        currencyCodes.some(
+          (code) =>
+            text.slice(right.end).startsWith(code) &&
+            !continuation.test(text.slice(right.end + code.length)),
         ) ||
         bonds.some((bond) => bond.construction.start === right.start))
         ? right

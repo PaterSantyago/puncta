@@ -17,7 +17,9 @@ for (const locale of [enGb, esEs]) {
       ["alpha\u00a0\u00a0beta", "alpha\u00a0\u00a0beta"],
       [
         "24\u00a0kg  50\u00a0%  word – word",
-        "24\u00a0kg 50\u00a0% word – word",
+        locale.id === "en-gb"
+          ? "24\u00a0kg 50% word – word"
+          : "24\u00a0kg 50\u00a0% word – word",
       ],
       ["1,234  03/04/2026  1.234,56", "1,234 03/04/2026 1.234,56"],
       ["\t  \r\n   ", "\t  \r\n   "],
@@ -227,10 +229,6 @@ const commonCorpus = [
   ["03/04/2026", "03/04/2026"],
   ["12:30", "12:30"],
   ["1 , 234", "1 , 234"],
-  [
-    "24\u00a0kg  50\u00a0%  £20  20€  word – word",
-    "24\u00a0kg 50\u00a0% £20 20€ word – word",
-  ],
   ["https://example.org/a...b", "https://example.org/a...b"],
   ["www.example.org/a...b", "www.example.org/a...b"],
   ["o'neill@example.org", "o'neill@example.org"],
@@ -264,7 +262,13 @@ for (const locale of [enGb, esEs]) {
     const corpus =
       locale.id === "es-es"
         ? [...commonCorpus, ...spanishCorpus]
-        : commonCorpus;
+        : [...commonCorpus];
+    corpus.push([
+      "24\u00a0kg  50\u00a0%  £20  20€  word – word",
+      locale.id === "en-gb"
+        ? "24\u00a0kg 50% £20 20€ word – word"
+        : "24\u00a0kg 50\u00a0% £20 20\u00a0€ word – word",
+    ]);
     for (const [input, expected] of corpus) {
       assert.equal(instance.text(input), expected, input);
       for (let split = 0; split <= input.length; split++) {
