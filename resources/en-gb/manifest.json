@@ -1,0 +1,29 @@
+{
+  "format": 1,
+  "locale": "en-gb",
+  "refinementVersion": 1,
+  "upstream": {
+    "repository": "https://github.com/hyphenation/tex-hyphen",
+    "commit": "5684c0f51c0b81133db2efbe60a408b4155a3ff5",
+    "file": "hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-en-gb.tex",
+    "sha256": "e95bb4ab350f620c41c231c4785d7bdb4f91949d3e631b30e08b3ead3c340a52"
+  },
+  "engine": {
+    "repository": "https://github.com/ytiurin/hyphen",
+    "commit": "86a09f1c1282dea8708b9b6f6bde7ad58e7d7c17"
+  },
+  "baseline": {
+    "patterns": 8523,
+    "sha256": "7861f3896d2ec2de347b9b8ba8ebde36f9875a42bcb3ce6558ee82d9c72c104b",
+    "tableSha256": "2a8a5208a7bf6076125d32033a97e71551a804e557f9753a6ecdfd6b5f7859f9"
+  },
+  "refinement": {
+    "patterns": 548,
+    "sha256": "e35bc632c3642a858e26afed93f7ed143d12fb74d753aa664570e470cbf3dd50"
+  },
+  "prepared": {
+    "patterns": 8925,
+    "sha256": "e7721c4ef2d32e902880a53602a89527db22af3b2418330b98c5d6e5624cf08c",
+    "tableSha256": "98851d7b609160142e2f06102beae4774b72853246d7a1c292e8d4ec17343422"
+  }
+}

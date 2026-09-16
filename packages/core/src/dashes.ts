@@ -142,9 +142,10 @@ export function numericDashes(
         bond.end === start &&
         bond.construction.end >= end,
     );
-    if (/[\p{L}\p{M}\p{N}_/]$/u.test(before) && !prefixCurrency) continue;
+    if (/[\p{L}\p{M}\p{N}\u00ad_/]$/u.test(before) && !prefixCurrency) continue;
     const suffixBond = bonds.some((bond) => bond.start === end);
-    if (/[\p{L}\p{M}\p{N}_/]/u.test(text[end] ?? "") && !suffixBond) continue;
+    if (/[\p{L}\p{M}\p{N}\u00ad_/]/u.test(text[end] ?? "") && !suffixBond)
+      continue;
     const knownUnit = bonds.some(
       (bond) => bond.ruleId === "units" && bond.start === end,
     );

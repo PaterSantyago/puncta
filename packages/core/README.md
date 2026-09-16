@@ -133,15 +133,19 @@ coordinates. Protection, attributes, disabled and unavailable-language regions
 retain SHY. Disabling insertion does not disable removal.
 
 Removal validates settings and language minima without needing an insertion
-resource, including nested scopes. Current locale packages do not yet include
-insertion resources: enabling insertion in `createPuncta`, `with` or ordinary
-processing throws `hyphenation.resource-unavailable` before processing.
+resource, including nested scopes.
 
-This is a narrow implementation, not completion of the first-version contract.
-All accepted shared option forms are validated and retained, but quotes, apostrophes, spaces, ellipsis, textual dashes, numeric ranges, minus, units, percentages and
-currencies currently change text; separate SHY removal is available.
-Hyphenation resources/insertion, HTML document/other fragment contexts and
-the full warning catalogue remain subsequent work. Unsupported
-call options are rejected rather than treated as implemented settings. Word admission and hyphenation require their own rule-specific acceptance.
+Algorithmic SHY insertion is available with the installed en-gb locale and
+`hyphenation: { enabled: true }`. It runs after typography while retaining
+original source coordinates. Transparent leaves share word admission and seam
+insertions belong to the left leaf. Missing or incompatible resources produce
+`hyphenation.resource-unavailable` or `hyphenation.resource-incompatible` before
+a result is returned. Spanish insertion remains subsequent work; separate SHY
+removal still needs no insertion resource.
 
-MIT licensed. The API remains experimental; public publication is separate work.
+This is not completion of the first-version contract. HTML document/other
+fragment contexts, Spanish insertion and the full warning catalogue remain
+subsequent work. Unsupported call options are rejected.
+
+MIT licensed, with ISC third-party kernel attribution in `NOTICE.md`.
+The API remains experimental; public publication is separate work.

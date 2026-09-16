@@ -13,6 +13,23 @@ puncta.text("Wait..."); // "Wait…"
 The module is immutable, exposes readonly `id` and package `version`, and is ready
 synchronously after import. There is no global registration or runtime loading.
 Quotes, apostrophes, spaces, punctuation intervals, ellipsis, textual dashes, numeric ranges, minus, units, percentages and currencies are implemented; the full locale
-profile and hyphenation resources are subsequent work. Core is a peer dependency.
+profile is implemented. Core is a peer dependency.
+
+Enable algorithmic soft hyphens explicitly with
+`puncta.with({ hyphenation: { enabled: true } })`. The default minimum word length
+is 6, with at least 2 letters before and 3 after each position; these minima can
+be raised. The alphabet is a–z, with lowercase or one initial capital. Existing
+SHY, digits, apostrophes, real hyphens, other case forms and protected text prevent
+automatic insertion in the complete word. Unsupported characters and mixed
+scripts are preserved with warnings only in detailed results.
+
+The packaged immutable resource uses Liang patterns without whole-word
+exceptions. Its conservative refinement can omit valid positions; no universal
+linguistic accuracy or pronunciation inference is claimed. Ordinary words span
+transparent leaves; an opaque or locale boundary conservatively prevents
+insertion in an adjoining partial word. Each new SHY is an original-coordinate
+`hyphenation.insert` edit. Reprocessing does not add more SHY. Use
+`stripSoftHyphens` for a separate clean export. See `NOTICE.md` for code/data
+attribution.
 
 MIT licensed. Public publication is separate work.

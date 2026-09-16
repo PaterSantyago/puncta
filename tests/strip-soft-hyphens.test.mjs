@@ -5,6 +5,7 @@ import { createPuncta } from "../packages/core/dist/index.mjs";
 import { enGb } from "../packages/with-en-gb/dist/index.mjs";
 import { esEs } from "../packages/with-es-es/dist/index.mjs";
 import * as pure from "../packages/with-react/dist/pure.mjs";
+
 const en = createPuncta({ locales: [enGb, esEs], locale: "en-gb" });
 const shy = "\u00ad";
 test("separate removal deletes author SHY without typography and keeps UTF-16 origins", () => {
@@ -65,21 +66,22 @@ test("removal uses HTML and pure React scopes, protection and original sources",
 test("removal validates options without requiring insertion resources in scopes", () => {
   const resourceError = (error) =>
     error.code === "hyphenation.resource-unavailable";
+  const missing = createPuncta({ locales: [esEs], locale: "es-es" });
   assert.throws(
     () =>
       createPuncta({
-        locales: [enGb],
-        locale: "en-gb",
+        locales: [esEs],
+        locale: "es-es",
         hyphenation: { enabled: true },
       }),
     resourceError,
   );
   assert.throws(
-    () => en.with({ hyphenation: { enabled: true } }),
+    () => missing.with({ hyphenation: { enabled: true } }),
     resourceError,
   );
   assert.throws(
-    () => en.text("", { hyphenation: { enabled: true } }),
+    () => missing.text("", { hyphenation: { enabled: true } }),
     resourceError,
   );
   assert.equal(

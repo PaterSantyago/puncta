@@ -1,0 +1,87 @@
+{
+  "status": "independently fixed before evaluating the candidate refinement",
+  "scope": "Only the stated boundary is evaluated; this is not a complete allowed-position corpus and does not modify #48",
+  "authority": "https://rm.coe.int/style-guide-english-1-/1680ac8731 sections 11.2-11.4",
+  "positive": [
+    {
+      "word": "bathhouse",
+      "position": 4,
+      "reason": "bath + house; two monosyllabic constituents"
+    },
+    {
+      "word": "bathwater",
+      "position": 4,
+      "reason": "bath + water; compound boundary"
+    },
+    {
+      "word": "bathmat",
+      "position": 4,
+      "reason": "bath + mat; two monosyllabic constituents"
+    },
+    {
+      "word": "bookish",
+      "position": 4,
+      "reason": "book + ish; morphological boundary, Cambridge UK /bʊk.ɪʃ/"
+    },
+    {
+      "word": "bookkeeper",
+      "position": 4,
+      "reason": "book + keeper; compound boundary"
+    },
+    {
+      "word": "bookshelf",
+      "position": 4,
+      "reason": "book + shelf; two monosyllabic constituents"
+    },
+    {
+      "word": "schoolchild",
+      "position": 6,
+      "reason": "school + child; two monosyllabic constituents"
+    },
+    {
+      "word": "stepchild",
+      "position": 4,
+      "reason": "step + child; two monosyllabic constituents"
+    },
+    {
+      "word": "godchild",
+      "position": 3,
+      "reason": "god + child; two monosyllabic constituents"
+    },
+    {
+      "word": "cornfield",
+      "position": 4,
+      "reason": "corn + field; Cambridge UK /kɔːn.fiːld/"
+    },
+    {
+      "word": "snowfield",
+      "position": 4,
+      "reason": "snow + field; two monosyllabic constituents"
+    },
+    {
+      "word": "infield",
+      "position": 2,
+      "reason": "in + field; two monosyllabic constituents"
+    },
+    {
+      "word": "outfield",
+      "position": 3,
+      "reason": "out + field; two monosyllabic constituents"
+    }
+  ],
+  "forbidden": [
+    {
+      "word": "bathymetry",
+      "position": 4,
+      "reason": "Cambridge UK /bəˈθɪm.ə.tri/; not bath + a new consonant-initial constituent",
+      "source": "https://dictionary.cambridge.org/pronunciation/english/bathymetry"
+    },
+    {
+      "word": "bathetic",
+      "position": 4,
+      "reason": "Collins British /bəˈθɛtɪk/; not bath + a new consonant-initial constituent",
+      "source": "https://www.collinsdictionary.com/dictionary/english/bathetic"
+    }
+  ],
+  "caution": "bathysphere has UK /bæθ.ɪ.sfɪə/ and cannot simply be called a forbidden bath| boundary because it is Greek-derived; abstaining is permitted. Likewise do not infer forbidden bathing boundary merely from its spelling."
+}

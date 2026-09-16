@@ -1,3 +1,4 @@
+import type { WordEdges } from "../core/src/hyphenation.js";
 import type {
   AppliedRule,
   Edit,
@@ -14,6 +15,11 @@ type RecognitionSpan = Span | { virtual: string };
 export interface RecognitionTransform {
   segment(text: string, initialLineStart: boolean): TextResult;
   quotation(text: string): TextResult;
+  insertions?(
+    text: string,
+    edits: readonly Edit[],
+    edges: WordEdges,
+  ): Pick<TextResult, "edits" | "warnings">;
 }
 type Part =
   | { span: Span }
@@ -88,6 +94,7 @@ export class TextContext {
     }
     flush();
     this.finishQuotes();
+    this.finishHyphenation();
     this.edits.sort(
       (a, b) =>
         a.ranges[0].sourceId - b.ranges[0].sourceId ||
@@ -121,6 +128,84 @@ export class TextContext {
           value.slice(range.end);
       }
     }
+  }
+
+  /** Resolve words on the final typographic view, then return inserted SHY to
+   * original leaves. Opaque/scope edges never expose a partial word. */
+  private finishHyphenation(): void {
+    const transforms = [this.transform];
+    let transform = this.transform;
+    let spans: Span[] = [];
+    let leftOpaque = false;
+    const typographyEdits = [...this.edits];
+    const flush = (rightOpaque: boolean) => {
+      if (spans.length && transform.insertions) {
+        const text = spans
+          .map((span) =>
+            this.sources[span.sourceId].text.slice(span.start, span.end),
+          )
+          .join("");
+        const localEdits = typographyEdits.flatMap((edit) => {
+          const local: { start: number; end: number }[] = [];
+          let offset = 0;
+          for (const span of spans) {
+            for (const range of edit.ranges) {
+              if (range.sourceId !== span.sourceId) continue;
+              if (range.start === range.end) {
+                if (range.start >= span.start && range.end <= span.end)
+                  local.push({
+                    start: offset + range.start - span.start,
+                    end: offset + range.end - span.start,
+                  });
+              } else if (range.start < span.end && range.end > span.start)
+                local.push({
+                  start:
+                    offset + Math.max(range.start, span.start) - span.start,
+                  end: offset + Math.min(range.end, span.end) - span.start,
+                });
+            }
+            offset += span.end - span.start;
+          }
+          return local.length
+            ? [
+                {
+                  ...edit,
+                  ranges: [
+                    {
+                      sourceId: 0,
+                      start: local[0].start,
+                      end: local[local.length - 1].end,
+                    },
+                  ],
+                },
+              ]
+            : [];
+        });
+        const report = projectReport(
+          transform.insertions(text, localEdits, { leftOpaque, rightOpaque }),
+          spans,
+        );
+        this.edits.push(...report.edits);
+        this.warnings.push(...report.warnings);
+      }
+      spans = [];
+    };
+    for (const part of splitLines(this.parts, this.sources)) {
+      if ("span" in part) spans.push(part.span);
+      else {
+        const opaque = !("boundary" in part) || part.boundary === "opaque";
+        flush(opaque);
+        if ("transform" in part) {
+          transforms.push(part.transform);
+          transform = part.transform;
+        } else if ("leave" in part) {
+          transforms.pop();
+          transform = transforms[transforms.length - 1];
+        }
+        leftOpaque = opaque;
+      }
+    }
+    flush(false);
   }
 
   /** Quotes span line/opaque positions; child scopes own independent depth. Virtual
@@ -183,7 +268,10 @@ export class TextContext {
 }
 
 /** A single provenance projection serves every recognition context. */
-function projectReport(report: TextResult, spans: readonly RecognitionSpan[]) {
+function projectReport(
+  report: Pick<TextResult, "edits" | "warnings">,
+  spans: readonly RecognitionSpan[],
+) {
   const edits: Edit[] = [];
   const warnings: PunctaWarning[] = [];
   for (const edit of report.edits) {

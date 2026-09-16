@@ -38,7 +38,7 @@ export interface HyphenationOptions {
   readonly minLeft?: number | null;
   readonly minRight?: number | null;
 }
-/** Shared configuration; typography and number bonds currently transform text. */
+/** Shared typography and optional algorithmic hyphenation configuration. */
 export interface PunctaOptions {
   readonly locale?: LocaleId;
   readonly enabled?: boolean;
@@ -61,6 +61,7 @@ export type StripTextOptions = TextOptions & { readonly format?: "text" };
 export type StripHtmlOptions = HtmlOptions & { readonly format: "html" };
 export type StripSoftHyphensOptions = StripTextOptions | StripHtmlOptions;
 export type RuleId =
+  | "hyphenation.insert"
   | "hyphenation.remove"
   | "dashes"
   | "ranges"

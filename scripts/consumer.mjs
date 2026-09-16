@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
+import { readFileSync, realpathSync } from "node:fs";
 import { createRequire } from "node:module";
-import { realpathSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as adapter from "@use-puncta/with-react";
+
 const require = createRequire(import.meta.url);
 const adapterRequire = createRequire(
   import.meta.resolve("@use-puncta/with-react"),
@@ -82,6 +83,31 @@ for (const [id, exportName] of [
   assert.equal(locale.id, id);
   assert.equal(locale.version, expected[name]);
   const instance = createPuncta({ locales: [locale], locale: locale.id });
+  if (id === "en-gb") {
+    const hyphenated = instance.with({ hyphenation: { enabled: true } });
+    assert.equal(
+      hyphenated.text("backbone bookend"),
+      "back\u00adbone book\u00adend",
+    );
+    assert.equal(
+      hyphenated.html("back<em>bone</em>"),
+      "back\u00ad<em>bone</em>",
+    );
+    assert.equal(
+      transformReact("backbone", { instance: hyphenated }),
+      "back\u00adbone",
+    );
+    assert.equal(
+      renderToString(
+        createElement(adapter.Puncta, { instance: hyphenated }, "backbone"),
+      ),
+      "back\u00adbone",
+    );
+    assert.equal(
+      hyphenated.stripSoftHyphens(hyphenated.text("backbone")),
+      "backbone",
+    );
+  }
   const input = "😀 Wait... Wait....";
   const output = "😀 Wait… Wait....";
   assert.equal(instance.text(input), output);
