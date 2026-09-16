@@ -12,6 +12,9 @@ import { hostScope, type Scope, scopeTransform } from "../../shared/scopes.js";
 import { TextContext } from "../../shared/text-context.js";
 import type { ReactResult } from "./pure.js";
 
+// React serializes these children as text, not as an element subtree.
+const textOnlyHosts = new Set(["script", "style", "textarea", "title"]);
+
 type ChildProps = { children?: ReactNode; fallback?: ReactNode };
 
 /** Variadic children preserve React's static-sibling key validation. Passing the
@@ -114,7 +117,9 @@ export function transformTree(
       const result = children();
       return cloneChildren(
         node,
-        wrapScope ? wrapScope(childScope, result) : result,
+        wrapScope && !textOnlyHosts.has(node.type as string)
+          ? wrapScope(childScope, result)
+          : result,
       );
     };
   }

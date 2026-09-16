@@ -473,3 +473,51 @@ test("component own arguments validate inside protection and opaque children inh
     '<span lang="fr">…</span>',
   );
 });
+
+test("Context transport preserves raw-text host children during actual SSR", async () => {
+  const { createElement: h } = await import("react");
+  const { renderToString } = await import(
+    "../examples/ssr/node_modules/react-dom/server.node.js"
+  );
+  const { Puncta, PunctaProvider } = await import(
+    "../packages/with-react/dist/index.mjs"
+  );
+  const instance = make();
+  function render(node) {
+    const errors = [];
+    const originalError = console.error;
+    console.error = (...args) => errors.push(args);
+    try {
+      return { html: renderToString(node), errors };
+    } finally {
+      console.error = originalError;
+    }
+  }
+  for (const tag of ["script", "style", "textarea", "title"]) {
+    const tree = h(tag, null, "hello...");
+    assert.deepEqual(
+      render(h(PunctaProvider, { instance }, h(tag))),
+      render(h(tag)),
+    );
+    assert.deepEqual(render(h(Puncta, { instance }, h(tag))), render(h(tag)));
+    if (tag !== "textarea") {
+      const html = h(tag, {
+        dangerouslySetInnerHTML: { __html: "original..." },
+      });
+      assert.deepEqual(render(h(Puncta, { instance }, html)), render(html));
+      assert.deepEqual(
+        render(h(PunctaProvider, { instance }, html)),
+        render(html),
+      );
+    }
+    assert.deepEqual(
+      render(h(PunctaProvider, { instance }, tree)),
+      render(tree),
+    );
+    // React itself warns for textarea children: preserve its output and warnings.
+    assert.deepEqual(
+      render(h(Puncta, { instance }, tree)),
+      render(h(tag, null, tag === "title" ? "hello…" : "hello...")),
+    );
+  }
+});
