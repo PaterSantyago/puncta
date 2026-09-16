@@ -24,5 +24,8 @@
     "type": "git",
     "url": "git+https://github.com/PaterSantyago/puncta.git",
     "directory": "packages/core"
+  },
+  "dependencies": {
+    "parse5": "8.0.0"
   }
 }
