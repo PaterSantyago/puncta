@@ -312,6 +312,9 @@ test("removal cannot expose a URI suffix through discretionary word boundaries",
       "cami\u00adnopadrinohttps://example.org-cami\u00adno",
       "ñ\u00adhttps://a\u00adb",
       "a\u00adwww.x\u00ady",
+      "é\u00adhttps://ex\u00adample.org",
+      "e\u0301\u00adhttps://ex\u00adample.org",
+      "e\u0301\u00adwww.ex\u00adample.org",
     ]) {
       const expected = input.replaceAll("\u00ad", "");
       assert.equal(instance.stripSoftHyphens(input), expected);

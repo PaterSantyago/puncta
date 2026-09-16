@@ -87,7 +87,7 @@ export function technicalRanges(source: string): ProtectedRange[] {
   // A discretionary break inside a word cannot expose a URL prefix. Look
   // through SHY only at this boundary; a leading SHY does not hide a real URL.
   collect(
-    /(?<![\p{L}\p{N}_]\u00ad*)(?:[a-z][a-z\d+.-]*:[^\s<>"`]+|www\.[^\s<>"`]+)/giu,
+    /(?<![\p{L}\p{M}\p{N}_]\u00ad*)(?:[a-z][a-z\d+.-]*:[^\s<>"`]+|www\.[^\s<>"`]+)/giu,
   );
   collect(
     /"(?:[^"\\\r\n]|\\[^\r\n])*"@[a-z\d](?:[a-z\d-]*[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]*[a-z\d])?)+(?![\w-])/giu,
