@@ -10,15 +10,15 @@ import type {
  * Words/bonds stop at all three; quotes may span line/opaque but not block. */
 export type Boundary = "line" | "opaque" | "block";
 type Span = { sourceId: number; start: number; end: number };
-type Transform = (
-  text: string,
-  initialLineStart: boolean,
-  mode?: "local" | "quotes",
-) => TextResult;
+type RecognitionSpan = Span | { virtual: string };
+export interface RecognitionTransform {
+  segment(text: string, initialLineStart: boolean): TextResult;
+  quotation(text: string): TextResult;
+}
 type Part =
   | { span: Span }
   | { boundary: Boundary }
-  | { transform: Transform }
+  | { transform: RecognitionTransform }
   | { leave: true };
 
 /** Collect original leaves, recognise contiguous text, and return edits to their owners.
@@ -31,7 +31,7 @@ export class TextContext {
   private readonly parts: Part[] = [];
   private readonly values: string[] = [];
 
-  constructor(private readonly transform: Transform) {}
+  constructor(private readonly transform: RecognitionTransform) {}
 
   append(text: string, path: Source["path"]): () => string {
     const sourceId = this.sources.length;
@@ -46,7 +46,7 @@ export class TextContext {
   }
 
   /** A scope owns its original leaves and interrupts recognition on both sides. */
-  enter(transform: Transform): void {
+  enter(transform: RecognitionTransform): void {
     this.parts.push({ transform });
   }
 
@@ -66,38 +66,11 @@ export class TextContext {
           this.sources[span.sourceId].text.slice(span.start, span.end),
         )
         .join("");
-      const report = transform(text, lineStart, "local");
+      const report = transform.segment(text, lineStart);
       if (/[^ \t]/u.test(text)) lineStart = false;
-      for (const edit of report.edits) {
-        const ranges: Span[] = [];
-        const range = edit.ranges[0];
-        ranges.push(...sourceRanges(spans, range.start, range.end));
-        this.edits.push({ ...edit, ranges });
-      }
-      for (const warning of report.warnings) {
-        this.warnings.push(
-          warning.location.kind === "text"
-            ? {
-                ...warning,
-                location: {
-                  kind: "text",
-                  ranges: warning.location.ranges.flatMap((range) =>
-                    sourceRanges(spans, range.start, range.end),
-                  ),
-                },
-              }
-            : warning,
-        );
-      }
-      for (const rule of report.appliedRules) {
-        if (
-          !this.appliedRules.some(
-            (item) =>
-              item.ruleId === rule.ruleId && item.locale === rule.locale,
-          )
-        )
-          this.appliedRules.push(rule);
-      }
+      const projected = projectReport(report, spans);
+      this.edits.push(...projected.edits);
+      this.warnings.push(...projected.warnings);
       spans = [];
     };
     for (const part of splitLines(this.parts, this.sources)) {
@@ -153,17 +126,15 @@ export class TextContext {
    * characters exist only in this recognition view, never in sources or output. */
   private finishQuotes(): void {
     const contexts = [
-      { transform: this.transform, spans: [] as Span[], text: "" },
+      { transform: this.transform, spans: [] as RecognitionSpan[], text: "" },
     ];
     const flush = (context: (typeof contexts)[number]) => {
-      const report = context.transform(context.text, true, "quotes");
+      const report = projectReport(
+        context.transform.quotation(context.text),
+        context.spans,
+      );
       for (const edit of report.edits) {
-        const ranges = sourceRanges(
-          context.spans,
-          edit.ranges[0].start,
-          edit.ranges[0].end,
-        );
-        if (!ranges.length) continue;
+        const ranges = edit.ranges;
         // A quote's final inner-space deletion supersedes ordinary space collapse.
         for (let index = this.edits.length - 1; index >= 0; index--) {
           if (
@@ -180,22 +151,12 @@ export class TextContext {
         }
         this.edits.push({ ...edit, ranges });
       }
-      for (const warning of report.warnings)
-        if (warning.location.kind === "text") {
-          const ranges = warning.location.ranges.flatMap((range) =>
-            sourceRanges(context.spans, range.start, range.end),
-          );
-          if (ranges.length)
-            this.warnings.push({
-              ...warning,
-              location: { kind: "text", ranges },
-            });
-        }
+      this.warnings.push(...report.warnings);
       context.spans = [];
       context.text = "";
     };
     const virtual = (context: (typeof contexts)[number], text: string) => {
-      context.spans.push({ sourceId: -1, start: 0, end: text.length });
+      context.spans.push({ virtual: text });
       context.text += text;
     };
     for (const part of splitLines(this.parts, this.sources)) {
@@ -220,20 +181,47 @@ export class TextContext {
   }
 }
 
+/** A single provenance projection serves every recognition context. */
+function projectReport(report: TextResult, spans: readonly RecognitionSpan[]) {
+  const edits: Edit[] = [];
+  const warnings: PunctaWarning[] = [];
+  for (const edit of report.edits) {
+    const ranges = edit.ranges.flatMap((range) =>
+      sourceRanges(spans, range.start, range.end),
+    );
+    if (ranges.length) edits.push({ ...edit, ranges });
+  }
+  for (const warning of report.warnings) {
+    if (warning.location.kind !== "text") {
+      warnings.push(warning);
+      continue;
+    }
+    const ranges = warning.location.ranges.flatMap((range) =>
+      sourceRanges(spans, range.start, range.end),
+    );
+    if (ranges.length)
+      warnings.push({ ...warning, location: { kind: "text", ranges } });
+  }
+  return { edits, warnings };
+}
+
 /** Convert a position in joined accessible text back to separate original leaves. */
 function sourceRanges(
-  spans: readonly Span[],
+  spans: readonly RecognitionSpan[],
   start: number,
   end: number,
 ): Span[] {
   const ranges: Span[] = [];
   let offset = 0;
   for (const span of spans) {
+    if ("virtual" in span) {
+      offset += span.virtual.length;
+      continue;
+    }
     const length = span.end - span.start;
     // An insertion at a transparent seam belongs to the left nonempty leaf.
     if (
       start === end &&
-      span.sourceId >= 0 &&
       length > 0 &&
       start >= offset &&
       start <= offset + length
@@ -247,7 +235,7 @@ function sourceRanges(
       ];
     const overlapStart = Math.max(start, offset);
     const overlapEnd = Math.min(end, offset + length);
-    if (span.sourceId >= 0 && overlapStart < overlapEnd)
+    if (overlapStart < overlapEnd)
       ranges.push({
         sourceId: span.sourceId,
         start: span.start + overlapStart - offset,
