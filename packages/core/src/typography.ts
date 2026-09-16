@@ -1,10 +1,11 @@
+import { quotes } from "./quotes.js";
 import { accessibleParts, technicalRanges } from "./protection.js";
 import type { resolveSettings } from "./settings.js";
 import type { Edit, ProtectedRange, PunctaWarning, RuleId } from "./types.js";
 
 /** Rules inspect only accessible original text. Disjoint edits keep their original
  * coordinates; role recognition also runs when that role's formatting is disabled. */
-export function typography(
+export function segmentTypography(
   source: string,
   settings: ReturnType<typeof resolveSettings>,
   protection: readonly ProtectedRange[],
@@ -34,6 +35,11 @@ export function typography(
         const before = text.slice(start, end);
         if (
           before === after ||
+          edits.some(
+            (existing) =>
+              existing.ranges[0].start < offset + end &&
+              existing.ranges[0].end > offset + start,
+          ) ||
           !graphemeBoundaries.has(start) ||
           !graphemeBoundaries.has(end)
         )
@@ -99,7 +105,20 @@ export function typography(
           /[\r\n][ \t]*$/u.test(before) ||
           (initialLineStart && offset === 0 && /^[ \t]*$/u.test(before));
         if (indentation || isPreserved(start, end)) continue;
+        const insertsFollowingSpace = /^[,;:!?]+[\p{L}\p{N}¿¡]/u.test(after);
+        const createsTechnical =
+          !insertsFollowingSpace &&
+          technicalRanges(before + after).some(
+            (range) => range.start < start && range.end > start,
+          );
+        if (createsTechnical)
+          ambiguous(
+            start,
+            end,
+            "Removing this interval would create an ambiguous technical token.",
+          );
         const closes =
+          !createsTechnical &&
           /^[,;:.!?)\]]/u.test(after) &&
           /[\p{L}\p{M}\p{N})\]"'»”’!?]$/u.test(before);
         const opens =
@@ -129,11 +148,34 @@ export function typography(
       }
     }
   }
-  edits.sort((a, b) => a.ranges[0].start - b.ranges[0].start);
-  warnings.sort((a, b) =>
-    a.location.kind === "text" && b.location.kind === "text"
-      ? a.location.ranges[0].start - b.location.ranges[0].start
-      : 0,
-  );
   return { edits, warnings };
+}
+
+/** Plain text owns both recognition contexts. Structured adapters supply their
+ * segment and quotation contexts separately through private scope metadata. */
+export function typography(
+  source: string,
+  settings: ReturnType<typeof resolveSettings>,
+  protection: readonly ProtectedRange[],
+  initialLineStart = true,
+) {
+  const quotation = quotes(source, settings, protection);
+  const segment = segmentTypography(
+    source,
+    settings,
+    protection,
+    initialLineStart,
+  );
+  const edits = segment.edits.filter(
+    (edit) =>
+      !quotation.edits.some(
+        (quoteEdit) =>
+          quoteEdit.ranges[0].start < edit.ranges[0].end &&
+          quoteEdit.ranges[0].end > edit.ranges[0].start,
+      ),
+  );
+  return {
+    edits: [...edits, ...quotation.edits],
+    warnings: [...segment.warnings, ...quotation.warnings],
+  };
 }

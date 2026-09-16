@@ -19,7 +19,8 @@ import type {
   TextOptions,
   TextResult,
 } from "./types.js";
-import { typography } from "./typography.js";
+import { quotes } from "./quotes.js";
+import { segmentTypography, typography } from "./typography.js";
 
 export { PunctaConfigError } from "./config.js";
 export type * from "./types.js";
@@ -72,6 +73,7 @@ export function createPuncta(
       source: string,
       call: TextOptions = {},
       initialLineStart = true,
+      recognize: typeof typography = typography,
     ): string | TextResult {
       if (typeof source !== "string")
         invalidOption(["source"], source === undefined ? "required" : "type");
@@ -81,11 +83,17 @@ export function createPuncta(
         invalidOption(["detailed"], "type");
       const effective = resolveSettings(mergeSettings(settings, call, loaded));
       const { locale } = effective;
-      const { edits, warnings } = typography(
+      const { edits, warnings } = recognize(
         source,
         effective,
         protection,
         initialLineStart,
+      );
+      edits.sort((a, b) => a.ranges[0].start - b.ranges[0].start);
+      warnings.sort((a, b) =>
+        a.location.kind === "text" && b.location.kind === "text"
+          ? a.location.ranges[0].start - b.location.ranges[0].start
+          : 0,
       );
       let result = source;
       for (const edit of [...edits].reverse()) {
@@ -134,8 +142,17 @@ export function createPuncta(
         locale: settings.locale,
         enabled: settings.enabled,
         // Private adapter entry keeps structural line context out of public options.
-        transform: (source: string, initialLineStart: boolean) =>
-          text(source, { detailed: true }, initialLineStart),
+        transform: Object.freeze({
+          segment: (source: string, initialLineStart: boolean) =>
+            text(
+              source,
+              { detailed: true },
+              initialLineStart,
+              segmentTypography,
+            ),
+          quotation: (source: string) =>
+            text(source, { detailed: true }, true, quotes),
+        }),
       }),
     }) as PunctaInstance;
   }

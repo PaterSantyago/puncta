@@ -117,13 +117,14 @@ export function transformHtml(source: string, scope: Scope): HtmlResult {
           warnings,
           PunctaConfigError,
         );
-        if (childScope !== parent) contextText.use(scopeTransform(childScope));
+        if (childScope !== parent)
+          contextText.enter(scopeTransform(childScope));
         if (childScope.protected) contextText.boundary("opaque");
         if (!childScope.protected)
           node.childNodes.forEach((child, index) => {
             visit(child, [...path, index], childScope);
           });
-        if (childScope !== parent) contextText.use(scopeTransform(parent));
+        if (childScope !== parent) contextText.leave();
       }
       if (boundary) contextText.boundary(boundary);
     } else if ("childNodes" in node)

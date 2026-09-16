@@ -52,7 +52,7 @@ for (const locale of [enGb, esEs]) {
         "Hello, world! Ready? Yes; indeed: now.",
       ],
       ["( hello ) [ world ]", "(hello) [world]"],
-      ["«Hola.»", "«Hola.»"],
+      ["«Hola.»", locale.id === "en-gb" ? "‘Hola.’" : "«Hola.»"],
       ["1,234 03/04/2026 1.234,56 12:30", "1,234 03/04/2026 1.234,56 12:30"],
       ["1 , 234  1.234,56", "1 , 234 1.234,56"],
       ["  , alpha\t !\n  !", "  , alpha\t !\n  !"],

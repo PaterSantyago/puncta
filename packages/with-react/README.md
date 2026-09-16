@@ -1,6 +1,6 @@
 # @use-puncta/with-react
 
-ESM React 19.3 adapter for spaces, punctuation intervals and ellipses. Core is a regular dependency;
+ESM React 19.3 adapter for quotes, apostrophes, spaces, punctuation intervals and ellipses. Core is a regular dependency;
 React is a peer dependency, and React DOM is supplied by the application.
 
 ```tsx
@@ -66,7 +66,7 @@ does not inspect protected descendants to retain those bridges.
 
 Real SSR checks and an optional mounted Chromium/hydration check cover this slice
 (see `tests/browser/run-scopes.mjs` in the repository). Three-browser/server-streaming
-acceptance and RSC integration remain subsequent work. Only spaces and ellipsis are implemented; accepting other shared settings does not claim
+acceptance and RSC integration remain subsequent work. Quotes, apostrophes, spaces and ellipsis are implemented; accepting other shared settings does not claim
 their transformations are complete. See the core README for remaining scope.
 
 MIT licensed. Public publication is separate work.

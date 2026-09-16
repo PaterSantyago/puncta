@@ -1,3 +1,4 @@
+import type { RecognitionTransform } from "./text-context.js";
 import type { PunctaConfigError } from "../core/src/config.js";
 import type {
   ConfigLocation,
@@ -5,7 +6,6 @@ import type {
   PunctaInstance,
   PunctaOptions,
   PunctaWarning,
-  TextResult,
 } from "../core/src/types.js";
 
 export interface Scope {
@@ -57,7 +57,7 @@ export function scopeTransform(scope: Scope) {
       ? scope.instance.with({ enabled: false })
       : scope.instance;
   const metadata = Reflect.get(instance, Symbol.for("@use-puncta/scope")) as {
-    transform: (text: string, initialLineStart: boolean) => TextResult;
+    transform: RecognitionTransform;
   };
   return metadata.transform;
 }
