@@ -1,0 +1,17 @@
+{
+  "corpusVersion": 1,
+  "reviewedOn": "2026-09-16",
+  "phase": "independently reviewed before validator or engine evaluation",
+  "files": {
+    "es-es.json": "aafa4901d8e672958a91a82a818169b9e2e9cf2596c4683af008e58739e8aaa7",
+    "es-es-negative.json": "99d7ce67f939e24bbb7c4fde137d9b3341d5e7877a240cfeb24e055a1cd037d4"
+  },
+  "review": {
+    "result": "pass after linguistic corrections",
+    "findings": [
+      "subrayar admits sub|rayar and subra|yar, not su|brayar: DPD 2.6b and independent prefix analysis.",
+      "The negative decathlon example is spelled decatlón, as recorded by DLE."
+    ],
+    "reviewers": ["implementation", "root", "independent-spec"]
+  }
+}
