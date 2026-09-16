@@ -10,15 +10,36 @@ const positive = JSON.parse(read("en-gb.json"));
 const negative = JSON.parse(read("en-gb-negative.json"));
 const freeze = JSON.parse(read("en-gb-freeze.json"));
 
-test("en-gb corpus retains the independently frozen data", () => {
-  for (const [name, expected] of Object.entries(freeze.files)) {
+function validateFreeze(manifest) {
+  assert.deepEqual(
+    Object.keys(manifest.files).sort(),
+    ["en-gb-negative.json", "en-gb.json"],
+    "freeze must identify both corpus files",
+  );
+  for (const [name, expected] of Object.entries(manifest.files)) {
     assert.equal(
       createHash("sha256").update(read(name)).digest("hex"),
       expected,
     );
   }
-  assert.equal(freeze.corpusVersion, positive.version);
-  assert.equal(freeze.corpusVersion, negative.version);
+  assert.equal(manifest.corpusVersion, positive.version);
+  assert.equal(manifest.corpusVersion, negative.version);
+}
+
+test("en-gb corpus retains the independently frozen data", () => {
+  validateFreeze(freeze);
+});
+
+test("freeze cannot silently stop checking either corpus file", () => {
+  for (const name of ["en-gb.json", "en-gb-negative.json"]) {
+    const manifest = structuredClone(freeze);
+    delete manifest.files[name];
+    assert.throws(() => validateFreeze(manifest), /both corpus files/);
+  }
+  assert.throws(
+    () => validateFreeze({ ...freeze, files: {} }),
+    /both corpus files/,
+  );
 });
 
 test("en-gb corpus meets the independent acceptance data contract", () => {
