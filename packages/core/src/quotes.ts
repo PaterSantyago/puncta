@@ -28,7 +28,9 @@ export function quotes(
   const edits: Edit[] = [];
   const warnings: PunctaWarning[] = [];
   const quoteRoles = new Map<number, "open" | "close">();
-  if (!settings.enabled) return { edits, warnings, text: "", quoteRoles };
+  const apostrophes: ProtectedRange[] = [];
+  if (!settings.enabled)
+    return { edits, warnings, text: "", quoteRoles, apostrophes };
   let text = "";
   let offset = 0;
   for (const accessible of accessibleParts(source, protection)) {
@@ -132,9 +134,10 @@ export function quotes(
     const possessive =
       single &&
       /[sS]$/u.test(before) &&
-      /^(?:\s|$)/u.test(after) &&
+      /^(?:\s|[,;:.!?…—–]|-{2}|$)/u.test(after) &&
       (!singleQuoteOpen || laterSingleClose);
     if (internal || possessive) {
+      apostrophes.push({ start: position, end: position + 1 });
       if (settings.rules.apostrophes.enabled !== false)
         edit(position, position + 1, "’", "apostrophes");
       continue;
@@ -247,5 +250,5 @@ export function quotes(
     candidates(root, 0);
     if (choose(root, 0)) apply(root);
   }
-  return { edits, warnings, text, quoteRoles };
+  return { edits, warnings, text, quoteRoles, apostrophes };
 }

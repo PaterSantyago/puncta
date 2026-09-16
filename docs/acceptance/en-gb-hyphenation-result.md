@@ -96,6 +96,17 @@ resource availability/compatibility, stable registry snapshots and isolated call
 Typography precedes insertion, with a temporary provenance map back to original
 text. SHY remains part of word-boundary checks in numeric and unit recognition,
 preventing later typography from treating a hyphenated word prefix as a unit.
+Apostrophe roles come from the wider quotation context, including quotations
+across lines and opaque nodes; trailing possessives remain whole-word skips even
+when apostrophe formatting is disabled. Word joiners at protected edges do not
+expose otherwise incomplete fragments. Mixed-script diagnostics compare Unicode
+Script properties using the fixed Unicode 17.0 alias inventory (source and hash
+in `unicode-scripts.ts`, Unicode License V3 in the core notice); Common and
+Inherited characters do not contribute a distinct script. Punctuation spacing
+preserves an ambiguous interval when inserting a space would create a new
+technical token at that boundary, keeping quotation recognition stable on a
+subsequent call. The committed generator uses the full 32-bit random value and
+asserts more than 1,900 distinct inputs among its 2,000 combinations.
 
 An independent direct Liang computation checks maximum weights, duplicate paths,
 odd parity and boundary anchors; it is a computational comparison, not a language

@@ -2,6 +2,7 @@ import type { WordEdges } from "../core/src/hyphenation.js";
 import type {
   AppliedRule,
   Edit,
+  ProtectedRange,
   PunctaWarning,
   Source,
   TextResult,
@@ -12,13 +13,17 @@ import type {
 export type Boundary = "line" | "opaque" | "block";
 type Span = { sourceId: number; start: number; end: number };
 type RecognitionSpan = Span | { virtual: string };
+type RecognitionReport = Pick<TextResult, "edits" | "warnings"> & {
+  readonly apostrophes?: readonly ProtectedRange[];
+};
 export interface RecognitionTransform {
   segment(text: string, initialLineStart: boolean): TextResult;
-  quotation(text: string): TextResult;
+  quotation(text: string): TextResult & RecognitionReport;
   insertions?(
     text: string,
     edits: readonly Edit[],
     edges: WordEdges,
+    apostrophes: readonly ProtectedRange[],
   ): Pick<TextResult, "edits" | "warnings">;
 }
 type Part =
@@ -36,6 +41,7 @@ export class TextContext {
   readonly appliedRules: AppliedRule[] = [];
   private readonly parts: Part[] = [];
   private readonly values: string[] = [];
+  private readonly apostrophes: Span[] = [];
 
   constructor(private readonly transform: RecognitionTransform) {}
 
@@ -181,8 +187,29 @@ export class TextContext {
               ]
             : [];
         });
+        let offset = 0;
+        const localApostrophes: ProtectedRange[] = [];
+        for (const span of spans) {
+          for (const mark of this.apostrophes) {
+            if (
+              span.sourceId === mark.sourceId &&
+              mark.start >= span.start &&
+              mark.end <= span.end
+            )
+              localApostrophes.push({
+                start: offset + mark.start - span.start,
+                end: offset + mark.end - span.start,
+              });
+          }
+          offset += span.end - span.start;
+        }
         const report = projectReport(
-          transform.insertions(text, localEdits, { leftOpaque, rightOpaque }),
+          transform.insertions(
+            text,
+            localEdits,
+            { leftOpaque, rightOpaque },
+            localApostrophes,
+          ),
           spans,
         );
         this.edits.push(...report.edits);
@@ -219,6 +246,7 @@ export class TextContext {
         context.transform.quotation(context.text),
         context.spans,
       );
+      this.apostrophes.push(...report.apostrophes);
       for (const edit of report.edits) {
         const ranges = edit.ranges;
         // A quote's final inner-space deletion supersedes ordinary space collapse.
@@ -269,7 +297,7 @@ export class TextContext {
 
 /** A single provenance projection serves every recognition context. */
 function projectReport(
-  report: Pick<TextResult, "edits" | "warnings">,
+  report: RecognitionReport,
   spans: readonly RecognitionSpan[],
 ) {
   const edits: Edit[] = [];
@@ -291,7 +319,10 @@ function projectReport(
     if (ranges.length)
       warnings.push({ ...warning, location: { kind: "text", ranges } });
   }
-  return { edits, warnings };
+  const apostrophes = (report.apostrophes ?? []).flatMap((range) =>
+    sourceRanges(spans, range.start, range.end),
+  );
+  return { edits, warnings, apostrophes };
 }
 
 /** Convert a position in joined accessible text back to separate original leaves. */

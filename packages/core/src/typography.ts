@@ -1,9 +1,15 @@
 import { numericDashes, textualDashes } from "./dashes.js";
 import { numberBonds } from "./number-bonds.js";
-import { quotes } from "./quotes.js";
 import { accessibleParts, technicalRanges } from "./protection.js";
+import { quotes } from "./quotes.js";
 import type { resolveSettings } from "./settings.js";
 import type { Edit, ProtectedRange, PunctaWarning, RuleId } from "./types.js";
+
+interface TypographyReport {
+  edits: Edit[];
+  warnings: PunctaWarning[];
+  apostrophes?: readonly ProtectedRange[];
+}
 
 /** Rules inspect only accessible original text. Disjoint edits keep their original
  * coordinates; role recognition also runs when that role's formatting is disabled. */
@@ -193,6 +199,21 @@ export function segmentTypography(
           );
           continue;
         }
+        // Punctuation spacing must not turn ordinary source text into a newly
+        // opaque technical token on the next invocation (for example an IPv6
+        // suffix ending at this insertion). Preserve that ambiguous interval.
+        if (
+          technicalRanges(`${text.slice(0, end)} ${text.slice(end)}`).some(
+            (range) => range.end === end || range.start === end + 1,
+          )
+        ) {
+          ambiguous(
+            start,
+            end,
+            "Spacing this interval would create an ambiguous technical token.",
+          );
+          continue;
+        }
         edit(end, end, " ", "spaces");
       }
     }
@@ -205,8 +226,8 @@ export function quotationTypography(
   source: string,
   settings: ReturnType<typeof resolveSettings>,
   protection: readonly ProtectedRange[],
-) {
-  const { edits, warnings, text, quoteRoles } = quotes(
+): TypographyReport {
+  const { edits, warnings, text, quoteRoles, apostrophes } = quotes(
     source,
     settings,
     protection,
@@ -270,7 +291,7 @@ export function quotationTypography(
         },
       });
   }
-  return { edits, warnings };
+  return { edits, warnings, apostrophes };
 }
 
 /** Plain text owns both recognition contexts. Structured adapters supply their
@@ -280,7 +301,7 @@ export function typography(
   settings: ReturnType<typeof resolveSettings>,
   protection: readonly ProtectedRange[],
   initialLineStart = true,
-) {
+): TypographyReport {
   const quotation = quotationTypography(source, settings, protection);
   const segment = segmentTypography(
     source,
@@ -299,5 +320,6 @@ export function typography(
   return {
     edits: [...edits, ...quotation.edits],
     warnings: [...segment.warnings, ...quotation.warnings],
+    apostrophes: quotation.apostrophes,
   };
 }

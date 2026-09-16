@@ -21,6 +21,7 @@ import type {
   HtmlResult,
   Locale,
   LocaleId,
+  ProtectedRange,
   PunctaInstance,
   PunctaOptions,
   RuleId,
@@ -122,7 +123,7 @@ export function createPuncta(
       const effective = resolveSettings(mergeSettings(settings, call, loaded));
       const resource = validateResource(effective);
       const { locale } = effective;
-      const { edits, warnings } = recognize(
+      const { edits, warnings, apostrophes } = recognize(
         source,
         effective,
         protection,
@@ -135,6 +136,8 @@ export function createPuncta(
           protection,
           edits,
           resource,
+          undefined,
+          apostrophes,
         );
         edits.push(...insertion.edits);
         warnings.push(...insertion.warnings);
@@ -157,6 +160,7 @@ export function createPuncta(
       }
       if (!call.detailed) return result;
       return {
+        ...(!includeHyphenation ? { apostrophes } : {}),
         result,
         hasEdits: edits.length > 0,
         outputChanged: result !== source,
@@ -249,6 +253,7 @@ export function createPuncta(
             source: string,
             edits: readonly Edit[],
             edges: WordEdges,
+            apostrophes: readonly ProtectedRange[],
           ) =>
             insertHyphens(
               source,
@@ -257,6 +262,7 @@ export function createPuncta(
               edits,
               validateResource(settings),
               edges,
+              apostrophes,
             ),
         }),
       }),

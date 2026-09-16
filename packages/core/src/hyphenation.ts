@@ -4,6 +4,7 @@ import { type HyphenationResource, liangPositions } from "./liang.js";
 import { accessibleParts, technicalRanges } from "./protection.js";
 import type { Settings } from "./settings.js";
 import type { Edit, Locale, ProtectedRange, PunctaWarning } from "./types.js";
+import { hasMixedScripts } from "./unicode-scripts.js";
 
 export interface WordEdges {
   readonly leftOpaque: boolean;
@@ -123,6 +124,7 @@ export function insertHyphens(
   previous: readonly Edit[],
   resource: HyphenationResource | undefined,
   edges: WordEdges = completeWordEdges,
+  apostrophes: readonly ProtectedRange[] = [],
 ): { edits: Edit[]; warnings: PunctaWarning[] } {
   const edits: Edit[] = [];
   const warnings: PunctaWarning[] = [];
@@ -160,8 +162,24 @@ export function insertHyphens(
         const word = match[0];
         const start = match.index;
         if (
-          (leftOpaque && start === 0) ||
-          (rightOpaque && start + word.length === part.text.length)
+          (leftOpaque &&
+            /^['’ʼ\-\u2010\u2011]*$/u.test(part.text.slice(0, start))) ||
+          (rightOpaque &&
+            /^['’ʼ\-\u2010\u2011]*$/u.test(
+              part.text.slice(start + word.length),
+            ))
+        )
+          continue;
+        const originalWord = view.range(
+          offset + start,
+          offset + start + word.length,
+        );
+        if (
+          apostrophes.some(
+            (mark) =>
+              mark.start >= originalWord.start &&
+              mark.start <= originalWord.end,
+          )
         )
           continue;
         const graphemes = [
@@ -179,16 +197,10 @@ export function insertHyphens(
         if (word !== lower && word !== lower[0].toUpperCase() + lower.slice(1))
           continue;
         if (!/^[a-zA-Z]+$/u.test(word)) {
-          const latin = /\p{Script=Latin}/u.test(word);
-          const other = [...word].some(
-            (character) =>
-              /\p{L}/u.test(character) && !/\p{Script=Latin}/u.test(character),
-          );
           warnings.push({
-            code:
-              latin && other
-                ? "hyphenation.mixed-scripts"
-                : "hyphenation.unsupported-characters",
+            code: hasMixedScripts(word)
+              ? "hyphenation.mixed-scripts"
+              : "hyphenation.unsupported-characters",
             source: "rule",
             message:
               "The word uses characters outside the locale's supported alphabet.",

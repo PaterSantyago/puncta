@@ -300,6 +300,38 @@ test("disabled and raised minima stay isolated and existing SHY remains authorit
   );
 });
 
+test("punctuation spacing does not create a technical mask on the next call", () => {
+  for (const source of ["''24::bookend", "'foo'24::bookend"]) {
+    for (const enabled of [true, false]) {
+      const instance = en.with({ hyphenation: { enabled } });
+      const text = instance.text(source);
+      assert.equal(instance.text(text), text);
+      const html = instance.html(source);
+      assert.equal(instance.html(html), html);
+      const react = transformReact(source, { instance });
+      assert.equal(transformReact(react, { instance }), react);
+    }
+  }
+});
+
+test("word joiners next to technical gaps never expose a word fragment", () => {
+  const source = '"backbone\'skg:"';
+  const first = en.text(source);
+  assert.equal(en.text(first), first);
+  assert.equal(first.includes("\u00ad"), false);
+  for (const word of [
+    "backbone’http://example.com",
+    "backbone-http://example.com",
+  ]) {
+    assert.equal(en.text(word).includes("\u00ad"), false);
+    assert.equal(en.html(word).includes("\u00ad"), false);
+    assert.equal(
+      transformReact(word, { instance: en }).includes("\u00ad"),
+      false,
+    );
+  }
+});
+
 test("missing and incompatible locale resources fail explicitly before any result", () => {
   const key = Symbol.for("@use-puncta/hyphenation");
   for (const [resource, code] of [
@@ -360,16 +392,93 @@ test("generated typography and word-boundary combinations are idempotent with SH
     "'s",
   ];
   let seed = 350;
+  const generated = new Set();
   for (let run = 0; run < 2000; run++) {
     let source = "";
     for (let index = 0; index < 6; index++) {
       seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-      source += atoms[seed % atoms.length];
+      source += atoms[Math.floor((seed / 2 ** 32) * atoms.length)];
     }
+    generated.add(source);
     const first = en.text(source);
     const second = en.text(first, { detailed: true });
     assert.equal(second.result, first, source);
     assert.deepEqual(second.edits, [], source);
-    assert.equal(en.stripSoftHyphens(first).includes("\u00ad"), false);
+    const stripped = en.stripSoftHyphens(first);
+    assert.equal(en.stripSoftHyphens(stripped), stripped, source);
+  }
+  assert(
+    generated.size > 1900,
+    `only ${generated.size} distinct generated inputs`,
+  );
+});
+
+test("different non-Latin scripts receive the specific warning in every input", () => {
+  for (const [word, code] of [
+    ["αβγабв", "hyphenation.mixed-scripts"],
+    ["αβγαβγ", "hyphenation.unsupported-characters"],
+    ["абвабв", "hyphenation.unsupported-characters"],
+    ["α\u0301βγабв", "hyphenation.mixed-scripts"],
+    ["אבגабв", "hyphenation.mixed-scripts"],
+  ]) {
+    for (const report of [
+      en.text(word, { detailed: true }),
+      en.html(word, { detailed: true }),
+      transformReact(word, { instance: en, detailed: true }),
+    ])
+      assert.deepEqual(
+        report.warnings.map((warning) => warning.code),
+        [code],
+        word,
+      );
+  }
+});
+
+test("whole-word possessives follow the shared quotation context across leaves and lines", () => {
+  for (const enabled of [true, false]) {
+    const instance = en.with({ rules: { apostrophes: { enabled } } });
+    for (const marker of ["'", "’", "ʼ", "',", "'--"]) {
+      const word = `bookkeepers${marker}`;
+      for (const report of [
+        instance.text(word, { detailed: true }),
+        instance.html(`bookkeepers<em>${marker}</em>`, { detailed: true }),
+        transformReact(["bookkeepers", h("em", null, marker)], {
+          instance,
+          detailed: true,
+        }),
+      ])
+        assert.equal(
+          report.edits.some((edit) =>
+            edit.ruleIds.includes("hyphenation.insert"),
+          ),
+          false,
+          word,
+        );
+    }
+    assert.equal(
+      instance.text("‘some\nbookkeepers’"),
+      "‘some\nbook\u00adkeepers’",
+    );
+    assert.equal(
+      instance.html("‘some<br>bookkeepers’"),
+      "‘some<br>book\u00adkeepers’",
+    );
+    const tree = transformReact(
+      ["‘some", h("br", { key: "line" }), "bookkeepers’"],
+      {
+        instance,
+      },
+    );
+    assert.equal(tree[2], "book\u00adkeepers’");
+    assert.equal(instance.text("'backbone'"), "‘back\u00adbone’");
+    assert.equal(
+      instance.html("‘some<code>x</code> bookkeepers’"),
+      "‘some<code>x</code> book\u00adkeepers’",
+    );
+    const opaque = transformReact(
+      ["‘some", h("code", { key: "code" }, "x"), " bookkeepers’"],
+      { instance },
+    );
+    assert.equal(opaque[2], " book\u00adkeepers’");
   }
 });
