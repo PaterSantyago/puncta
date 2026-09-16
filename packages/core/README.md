@@ -1,9 +1,9 @@
 # @use-puncta/core
 
 Synchronous ESM typography, with explicitly installed locales and no React or DOM
-requirement. The current implementation covers ordinary spaces, punctuation intervals and
+requirement. The current implementation covers quotes, apostrophes, ordinary spaces, punctuation intervals and
 ellipses, including recognition across transparent inline leaves and nested
-configuration scopes (#39–#43).
+configuration scopes (#39–#44).
 
 ```ts
 import { createPuncta } from "@use-puncta/core";
@@ -25,8 +25,7 @@ conversion creates no new edits. Read a locale identifier from `locale.id`;
 The `spaces` rule collapses repeated U+0020 spaces and fixes unambiguous punctuation
 intervals. It retains line endings, blank lines, indentation, tabs, existing NBSP,
 numeric punctuation and dates. In es-es it removes ordinary inner spaces after
-existing `¿`/`¡` and before `?`/`!`; it does not supply missing signs. Quotes,
-dashes, units, percentages and currencies are not reformatted by this slice.
+existing `¿`/`¡` and before `?`/`!`; it does not supply missing signs. Dashes, units, percentages and currencies are not reformatted by this slice.
 
 Spacing around ambiguous ellipses (including separated dots), spaced numeric
 punctuation and periods directly between text stays conservative. Detailed results
@@ -34,6 +33,21 @@ use `typography.ambiguous`, `ruleId: "spaces"` and original `location.ranges` fo
 those intervals. Recognition of ellipses continues when their conversion is off,
 so general space cleanup cannot destroy their intervals. Warnings may repeat on
 unchanged ambiguous text; disabled rules and protected text produce no rule warnings.
+
+Quotes use `‘…’` then `“…”` in en-gb, and `«…»`, `“…”`, `‘…’` in es-es,
+continuing by alternating single/double pairs. `rules.quotes.normalizeExisting: false`
+retains formatted pairs and selects straight-pair styles compatible with their
+immediate neighbours. Unpaired or ambiguous delimiters are preserved with
+`quotes.unpaired` or `typography.ambiguous` warnings. No missing signs are added,
+and punctuation stays on its original side of each quote. Spanish inner ordinary
+spaces are removed by the independently switchable `spaces` rule.
+
+Punctuation apostrophes become U+2019 under `apostrophes`; turning off that rule
+still recognises their role within a quote. Letter apostrophe U+02BC is retained.
+Feet/inches and unresolved quote roles are not guessed. Quotes can span a single
+line break, br/wbr, or an opaque inline fragment. Blank lines, blocks and Suspense
+end a quote context. A child typography scope has independent depth while the
+outer pair can surround it. Protected content never supplies quote delimiters.
 
 Both the locale modules and the active locale are required. A call can explicitly
 select another loaded locale. Invalid arguments throw `PunctaConfigError` with
@@ -92,12 +106,10 @@ tags. Entity/CRLF decoding and astral characters retain UTF-16 provenance;
 unmappable parser repairs report `accuracy: "unavailable"` with a reason.
 
 This is a narrow implementation, not completion of the first-version contract.
-All accepted shared option forms are validated and retained, but only spaces and ellipsis
+All accepted shared option forms are validated and retained, but quotes, apostrophes, spaces and ellipsis
 currently change text. Enabling another rule or hyphenation does not implement
 that transformation. Hyphenation resources and their errors, HTML document/other fragment contexts and
 the full warning catalogue remain subsequent work. Unsupported
-call options are rejected rather than treated as implemented settings. The different
-line/opaque/block boundary kinds are retained for future rules; quote continuation,
-word admission and future special intervals require their own rule-specific acceptance.
+call options are rejected rather than treated as implemented settings. Word admission and future special intervals require their own rule-specific acceptance.
 
 MIT licensed. The API remains experimental; public publication is separate work.

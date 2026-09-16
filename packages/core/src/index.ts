@@ -72,6 +72,7 @@ export function createPuncta(
       source: string,
       call: TextOptions = {},
       initialLineStart = true,
+      mode?: "local" | "quotes",
     ): string | TextResult {
       if (typeof source !== "string")
         invalidOption(["source"], source === undefined ? "required" : "type");
@@ -86,6 +87,7 @@ export function createPuncta(
         effective,
         protection,
         initialLineStart,
+        mode,
       );
       let result = source;
       for (const edit of [...edits].reverse()) {
@@ -134,8 +136,11 @@ export function createPuncta(
         locale: settings.locale,
         enabled: settings.enabled,
         // Private adapter entry keeps structural line context out of public options.
-        transform: (source: string, initialLineStart: boolean) =>
-          text(source, { detailed: true }, initialLineStart),
+        transform: (
+          source: string,
+          initialLineStart: boolean,
+          mode?: "local" | "quotes",
+        ) => text(source, { detailed: true }, initialLineStart, mode),
       }),
     }) as PunctaInstance;
   }

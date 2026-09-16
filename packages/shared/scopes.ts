@@ -57,7 +57,11 @@ export function scopeTransform(scope: Scope) {
       ? scope.instance.with({ enabled: false })
       : scope.instance;
   const metadata = Reflect.get(instance, Symbol.for("@use-puncta/scope")) as {
-    transform: (text: string, initialLineStart: boolean) => TextResult;
+    transform: (
+      text: string,
+      initialLineStart: boolean,
+      mode?: "local" | "quotes",
+    ) => TextResult;
   };
   return metadata.transform;
 }

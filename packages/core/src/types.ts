@@ -38,7 +38,7 @@ export interface HyphenationOptions {
   readonly minLeft?: number | null;
   readonly minRight?: number | null;
 }
-/** Shared configuration; spaces and ellipsis currently transform text. */
+/** Shared configuration; quotes, apostrophes, spaces and ellipsis currently transform text. */
 export interface PunctaOptions {
   readonly locale?: LocaleId;
   readonly enabled?: boolean;
@@ -57,7 +57,7 @@ export interface HtmlOptions extends Omit<TextOptions, "protect"> {
   readonly mode?: "fragment";
   readonly context?: "div";
 }
-export type RuleId = "spaces" | "ellipsis";
+export type RuleId = "quotes" | "apostrophes" | "spaces" | "ellipsis";
 export interface Source {
   readonly id: number;
   readonly text: string;

@@ -129,7 +129,7 @@ export function transformTree(
               warnings,
               PunctaConfigError,
             );
-    if (childScope !== parent) context.use(scopeTransform(childScope));
+    if (childScope !== parent) context.enter(scopeTransform(childScope));
     if (childScope.protected) context.boundary("opaque");
     const children =
       "children" in node.props
@@ -137,7 +137,7 @@ export function transformTree(
           ? () => node.props.children
           : visit(node.props.children, [...path, "children"], childScope)
         : undefined;
-    if (childScope !== parent) context.use(scopeTransform(parent));
+    if (childScope !== parent) context.leave();
     if (boundary) context.boundary(boundary);
     return () => {
       if (!children) return node;
