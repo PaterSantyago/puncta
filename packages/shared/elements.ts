@@ -1,3 +1,8 @@
+import type {
+  ConfigLocation,
+  LocaleId,
+  PunctaWarning,
+} from "../core/src/types.js";
 import type { Boundary } from "./text-context.js";
 
 const blocks = new Set(
@@ -19,13 +24,49 @@ const inline = new Set(
 export function elementSemantics(tag: string): {
   boundary?: Boundary;
   protected: boolean;
+  unsupported?: boolean;
 } {
   if (tag === "br" || tag === "wbr")
     return { boundary: "line", protected: true };
   if (tag === "hr") return { boundary: "block", protected: true };
   if (blocks.has(tag))
     return { boundary: "block", protected: protectedElements.has(tag) };
-  if (protectedElements.has(tag) || tag === "img" || !inline.has(tag))
+  if (protectedElements.has(tag) || tag === "img")
     return { boundary: "opaque", protected: true };
+  if (!inline.has(tag))
+    return { boundary: "opaque", protected: true, unsupported: true };
   return { protected: false };
+}
+
+/** HTML boolean-attribute presence differs from React's boolean prop value. */
+export function protectsHost(
+  attributes: Readonly<Record<string, unknown>>,
+  format: "html" | "react",
+): boolean {
+  if (format === "html" ? attributes.hidden !== undefined : !!attributes.hidden)
+    return true;
+  const editable =
+    attributes[format === "html" ? "contenteditable" : "contentEditable"];
+  return (
+    editable === true ||
+    (typeof editable === "string" &&
+      ["", "true", "plaintext-only"].includes(editable.toLowerCase()))
+  );
+}
+
+export function unsupportedElement(
+  tagName: string,
+  namespace: string,
+  locale: LocaleId | null,
+  location: ConfigLocation,
+): PunctaWarning {
+  return {
+    code: "markup.element-unsupported",
+    source: "markup",
+    message: "Element is unsupported.",
+    details: { tagName, namespace },
+    locale,
+    ruleId: null,
+    location,
+  };
 }

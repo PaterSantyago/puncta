@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 import { instanceScope, requireInstance } from "../../shared/scopes.js";
 import { transformTree } from "./tree.js";
 
-export interface ReactTransformOptions extends TextOptions {
+export interface ReactTransformOptions extends Omit<TextOptions, "protect"> {
   readonly instance: PunctaInstance;
 }
 export interface ReactResult
@@ -34,12 +34,11 @@ export function transformReact(
 ): ReactNode | ReactResult {
   requireInstance(options?.instance, PunctaConfigError);
   const { instance, ...call } = options;
-  // Core validates shared options, including calls with no accessible text.
-  instance.text("", call);
-  const { detailed: _detailed, ...settings } = call;
-  const report = transformTree(
-    children,
-    instanceScope(instance.with(settings)),
-  );
+  const { detailed, ...settings } = call;
+  // Validate the shared-only settings before invoking the text API, whose
+  // input-specific protect option is deliberately unavailable to React.
+  const scope = instanceScope(instance.with(settings));
+  scope.instance.text("", { detailed });
+  const report = transformTree(children, scope);
   return options.detailed ? report : report.result;
 }

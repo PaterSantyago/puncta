@@ -1,3 +1,4 @@
+import { runProtectionCheck } from "./protection.mjs";
 import { act, createElement as h, StrictMode, useState } from "react";
 import {
   createRoot,
@@ -86,5 +87,10 @@ window.runScopesCheck = async () => {
   check(errors.length, 0);
   await act(() => hydrated.unmount());
   container.remove();
-  return { updates: 6, stateAndNodePreserved: true, hydrationErrors: errors };
+  return {
+    updates: 6,
+    stateAndNodePreserved: true,
+    hydrationErrors: errors,
+    ...(await runProtectionCheck()),
+  };
 };

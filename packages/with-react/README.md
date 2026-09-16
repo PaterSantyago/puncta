@@ -47,13 +47,26 @@ render-time Context.
 
 Accessible host elements support the same declarative markers and lang rules as
 HTML. Full disabling remains inherited protection, whereas individual rules can be
-reset or re-enabled. Context bridges add no DOM elements and preserve direct child
-state through scope changes. Configuration and new children recompute from source.
+reset or re-enabled. Context bridges add no DOM elements. Keyed state and refs survive reordering,
+including behind several hosts within a protected subtree. Configuration and new children recompute from source.
+
+Protection crosses opaque user components through Context: a nested Puncta or
+Provider cannot override an inherited ban with `enabled={true}`. Protected children
+are not traversed. The core protected-element catalog also applies to host elements;
+React `hidden={false}` does not protect, and `contentEditable={false}` cannot undo
+inherited protection. External DOM ancestors are never inspected. Pure transforms
+preserve protection structurally but do not install Context for future components.
+
+Known reconciliation limit: switching protection on an ancestor of several accessible
+hosts can remount deeper stateful children. The eager traversal stops at the newly
+protected host, removing Context bridges previously inserted below it. Direct-child
+marker changes and reordering with unchanged protection are tested; arbitrary deep
+protection toggles do not have a state-preservation guarantee. The implementation
+does not inspect protected descendants to retain those bridges.
 
 Real SSR checks and an optional mounted Chromium/hydration check cover this slice
-(see `tests/browser/run-scopes.mjs` in the repository). Full protection propagation,
-three-browser/server-streaming acceptance and RSC integration remain subsequent
-work. Only ellipsis is implemented; accepting other shared settings does not claim
+(see `tests/browser/run-scopes.mjs` in the repository). Three-browser/server-streaming
+acceptance and RSC integration remain subsequent work. Only ellipsis is implemented; accepting other shared settings does not claim
 their transformations are complete. See the core README for remaining scope.
 
 MIT licensed. Public publication is separate work.

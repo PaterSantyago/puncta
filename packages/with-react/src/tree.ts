@@ -7,7 +7,11 @@ import {
   type ReactNode,
   Suspense,
 } from "react";
-import { elementSemantics } from "../../shared/elements.js";
+import {
+  elementSemantics,
+  protectsHost,
+  unsupportedElement,
+} from "../../shared/elements.js";
 import { hostScope, type Scope, scopeTransform } from "../../shared/scopes.js";
 import { TextContext } from "../../shared/text-context.js";
 import type { ReactResult } from "./pure.js";
@@ -36,6 +40,15 @@ export function transformTree(
   transformText = true,
   wrapScope?: (scope: Scope, children: ReactNode) => ReactNode,
 ): ReactResult {
+  if (scope.protected)
+    return {
+      result: children,
+      sources: [],
+      edits: [],
+      hasEdits: false,
+      appliedRules: [],
+      warnings: [],
+    };
   const context = new TextContext(scopeTransform(scope));
   const warnings: PunctaWarning[] = [];
   function visit(
@@ -90,9 +103,22 @@ export function transformTree(
       node.type === Fragment
         ? { protected: false }
         : elementSemantics(node.type as string);
-    if (semantics.boundary) context.boundary(semantics.boundary);
+    const hostProtected =
+      node.type !== Fragment && protectsHost(node.props, "react");
+    if (semantics.unsupported && !parent.protected && !hostProtected)
+      warnings.push(
+        unsupportedElement(
+          node.type as string,
+          "http://www.w3.org/1999/xhtml",
+          parent.locale,
+          { kind: "element", path },
+        ),
+      );
+    const boundary =
+      semantics.boundary ?? (hostProtected ? "opaque" : undefined);
+    if (boundary) context.boundary(boundary);
     const childScope =
-      semantics.protected || parent.protected
+      semantics.protected || parent.protected || hostProtected
         ? { ...parent, protected: true }
         : node.type === Fragment
           ? parent
@@ -111,7 +137,7 @@ export function transformTree(
           : visit(node.props.children, [...path, "children"], childScope)
         : undefined;
     if (childScope !== parent) context.use(scopeTransform(parent));
-    if (semantics.boundary) context.boundary(semantics.boundary);
+    if (boundary) context.boundary(boundary);
     return () => {
       if (!children) return node;
       const result = children();
