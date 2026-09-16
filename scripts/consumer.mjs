@@ -141,7 +141,7 @@ for (const [id, exportName] of [
       decomposed,
     );
     const { createHash } = await import("node:crypto");
-    const directory = dirname(require.resolve(name));
+    const directory = dirname(fileURLToPath(import.meta.resolve(name)));
     const manifest = JSON.parse(
       readFileSync(join(directory, "..", "hyphenation-manifest.json")),
     );
