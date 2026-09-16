@@ -66,11 +66,15 @@ test("removal uses HTML and pure React scopes, protection and original sources",
 test("removal validates options without requiring insertion resources in scopes", () => {
   const resourceError = (error) =>
     error.code === "hyphenation.resource-unavailable";
-  const missing = createPuncta({ locales: [esEs], locale: "es-es" });
+  const unavailable = {
+    ...esEs,
+    [Symbol.for("@use-puncta/hyphenation")]: undefined,
+  };
+  const missing = createPuncta({ locales: [unavailable], locale: "es-es" });
   assert.throws(
     () =>
       createPuncta({
-        locales: [esEs],
+        locales: [unavailable],
         locale: "es-es",
         hyphenation: { enabled: true },
       }),
