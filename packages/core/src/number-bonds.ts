@@ -54,7 +54,7 @@ const currencyPattern = new RegExp(
   "gu",
 );
 const reservedUnits = new Set([...currencyCodes, ...currencySymbols, "%", "°"]);
-const continuation = /^[\p{L}\p{M}\p{N}_/°^*·⋅×]/u;
+const continuation = /^[\p{L}\p{M}\p{N}\u00ad_/°^*·⋅×]/u;
 
 /** Original numeric spans, without interpreting separators or rewriting notation.
  * A code immediately before a number is a recognised boundary, not a word tail. */
@@ -70,7 +70,7 @@ function numbers(text: string): ProtectedRange[] {
       const head = preceding.replace(/ +$/u, "");
       return (
         head.endsWith(code) &&
-        !/[\p{L}\p{M}\p{N}_]$/u.test(head.slice(0, -code.length))
+        !/[\p{L}\p{M}\p{N}\u00ad_]$/u.test(head.slice(0, -code.length))
       );
     });
     // In prose “word,10” the comma is punctuation, while “GBP ,5” keeps
@@ -85,9 +85,9 @@ function numbers(text: string): ProtectedRange[] {
     const code = currencyCodes.find((candidate) => before.endsWith(candidate));
     const codeBoundary =
       code &&
-      (!/[\p{L}\p{M}\p{N}_]$/u.test(before.slice(0, -code.length)) ||
+      (!/[\p{L}\p{M}\p{N}\u00ad_]$/u.test(before.slice(0, -code.length)) ||
         result.some((span) => span.end === start - code.length));
-    if (/[\p{L}\p{M}\p{N}_/]$/u.test(before) && !codeBoundary) continue;
+    if (/[\p{L}\p{M}\p{N}\u00ad_/]$/u.test(before) && !codeBoundary) continue;
     result.push({ start, end });
   }
   return result;
@@ -173,7 +173,7 @@ export function numberBonds(text: string, settings: Settings): NumberBond[] {
     // A currency code must be a whole designation, including when adjacent to a
     // number. A following known unit is already a recognised numeric boundary.
     if (
-      (!left && /[\p{L}\p{M}\p{N}_]$/u.test(text.slice(0, start))) ||
+      (!left && /[\p{L}\p{M}\p{N}\u00ad_]$/u.test(text.slice(0, start))) ||
       (!right && continuation.test(text.slice(end)))
     )
       continue;

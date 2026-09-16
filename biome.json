@@ -10,6 +10,20 @@
       "!**/artifacts"
     ]
   },
-  "formatter": { "indentStyle": "space" },
-  "linter": { "rules": { "preset": "recommended" } }
+  "formatter": {
+    "indentStyle": "space"
+  },
+  "linter": {
+    "rules": {
+      "preset": "recommended"
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["packages/with-en-gb/src/hyphenation.json"],
+      "formatter": {
+        "enabled": false
+      }
+    }
+  ]
 }

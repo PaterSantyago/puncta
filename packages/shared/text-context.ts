@@ -1,6 +1,8 @@
+import type { WordEdges } from "../core/src/hyphenation.js";
 import type {
   AppliedRule,
   Edit,
+  ProtectedRange,
   PunctaWarning,
   Source,
   TextResult,
@@ -11,9 +13,18 @@ import type {
 export type Boundary = "line" | "opaque" | "block";
 type Span = { sourceId: number; start: number; end: number };
 type RecognitionSpan = Span | { virtual: string };
+type RecognitionReport = Pick<TextResult, "edits" | "warnings"> & {
+  readonly apostrophes?: readonly ProtectedRange[];
+};
 export interface RecognitionTransform {
   segment(text: string, initialLineStart: boolean): TextResult;
-  quotation(text: string): TextResult;
+  quotation(text: string): TextResult & RecognitionReport;
+  insertions?(
+    text: string,
+    edits: readonly Edit[],
+    edges: WordEdges,
+    apostrophes: readonly ProtectedRange[],
+  ): Pick<TextResult, "edits" | "warnings">;
 }
 type Part =
   | { span: Span }
@@ -30,6 +41,7 @@ export class TextContext {
   readonly appliedRules: AppliedRule[] = [];
   private readonly parts: Part[] = [];
   private readonly values: string[] = [];
+  private readonly apostrophes: Span[] = [];
 
   constructor(private readonly transform: RecognitionTransform) {}
 
@@ -88,6 +100,7 @@ export class TextContext {
     }
     flush();
     this.finishQuotes();
+    this.finishHyphenation();
     this.edits.sort(
       (a, b) =>
         a.ranges[0].sourceId - b.ranges[0].sourceId ||
@@ -123,6 +136,105 @@ export class TextContext {
     }
   }
 
+  /** Resolve words on the final typographic view, then return inserted SHY to
+   * original leaves. Opaque/scope edges never expose a partial word. */
+  private finishHyphenation(): void {
+    const transforms = [this.transform];
+    let transform = this.transform;
+    let spans: Span[] = [];
+    let leftOpaque = false;
+    const typographyEdits = [...this.edits];
+    const flush = (rightOpaque: boolean) => {
+      if (spans.length && transform.insertions) {
+        const text = spans
+          .map((span) =>
+            this.sources[span.sourceId].text.slice(span.start, span.end),
+          )
+          .join("");
+        const localEdits = typographyEdits.flatMap((edit) => {
+          const local: { start: number; end: number }[] = [];
+          let offset = 0;
+          for (const span of spans) {
+            for (const range of edit.ranges) {
+              if (range.sourceId !== span.sourceId) continue;
+              if (range.start === range.end) {
+                if (range.start >= span.start && range.end <= span.end)
+                  local.push({
+                    start: offset + range.start - span.start,
+                    end: offset + range.end - span.start,
+                  });
+              } else if (range.start < span.end && range.end > span.start)
+                local.push({
+                  start:
+                    offset + Math.max(range.start, span.start) - span.start,
+                  end: offset + Math.min(range.end, span.end) - span.start,
+                });
+            }
+            offset += span.end - span.start;
+          }
+          return local.length
+            ? [
+                {
+                  ...edit,
+                  ranges: [
+                    {
+                      sourceId: 0,
+                      start: local[0].start,
+                      end: local[local.length - 1].end,
+                    },
+                  ],
+                },
+              ]
+            : [];
+        });
+        let offset = 0;
+        const localApostrophes: ProtectedRange[] = [];
+        for (const span of spans) {
+          for (const mark of this.apostrophes) {
+            if (
+              span.sourceId === mark.sourceId &&
+              mark.start >= span.start &&
+              mark.end <= span.end
+            )
+              localApostrophes.push({
+                start: offset + mark.start - span.start,
+                end: offset + mark.end - span.start,
+              });
+          }
+          offset += span.end - span.start;
+        }
+        const report = projectReport(
+          transform.insertions(
+            text,
+            localEdits,
+            { leftOpaque, rightOpaque },
+            localApostrophes,
+          ),
+          spans,
+        );
+        this.edits.push(...report.edits);
+        this.warnings.push(...report.warnings);
+      }
+      spans = [];
+    };
+    for (const part of splitLines(this.parts, this.sources)) {
+      if ("span" in part) spans.push(part.span);
+      else {
+        const opaque = !("boundary" in part) || part.boundary === "opaque";
+        flush(opaque);
+        if ("transform" in part) {
+          transforms.push(part.transform);
+          transform = part.transform;
+        } else if ("leave" in part) {
+          transforms.pop();
+          transform = transforms[transforms.length - 1];
+        }
+        leftOpaque = opaque;
+      }
+    }
+    flush(false);
+  }
+
   /** Quotes span line/opaque positions; child scopes own independent depth. Virtual
    * characters exist only in this recognition view, never in sources or output. */
   private finishQuotes(): void {
@@ -134,6 +246,7 @@ export class TextContext {
         context.transform.quotation(context.text),
         context.spans,
       );
+      this.apostrophes.push(...report.apostrophes);
       for (const edit of report.edits) {
         const ranges = edit.ranges;
         // A quote's final inner-space deletion supersedes ordinary space collapse.
@@ -183,7 +296,10 @@ export class TextContext {
 }
 
 /** A single provenance projection serves every recognition context. */
-function projectReport(report: TextResult, spans: readonly RecognitionSpan[]) {
+function projectReport(
+  report: RecognitionReport,
+  spans: readonly RecognitionSpan[],
+) {
   const edits: Edit[] = [];
   const warnings: PunctaWarning[] = [];
   for (const edit of report.edits) {
@@ -203,7 +319,10 @@ function projectReport(report: TextResult, spans: readonly RecognitionSpan[]) {
     if (ranges.length)
       warnings.push({ ...warning, location: { kind: "text", ranges } });
   }
-  return { edits, warnings };
+  const apostrophes = (report.apostrophes ?? []).flatMap((range) =>
+    sourceRanges(spans, range.start, range.end),
+  );
+  return { edits, warnings, apostrophes };
 }
 
 /** Convert a position in joined accessible text back to separate original leaves. */

@@ -1,7 +1,12 @@
 import { instanceScope } from "../../shared/scopes.js";
 import { checkObject, invalidOption, PunctaConfigError } from "./config.js";
 import { transformHtml } from "./html.js";
-import { removeSoftHyphens } from "./strip-soft-hyphens.js";
+import {
+  insertHyphens,
+  requireResource,
+  snapshotResource,
+  type WordEdges,
+} from "./hyphenation.js";
 import { protectedRanges } from "./protection.js";
 import {
   mergeSettings,
@@ -9,11 +14,14 @@ import {
   type Settings,
   sharedKeys,
 } from "./settings.js";
+import { removeSoftHyphens } from "./strip-soft-hyphens.js";
 import type {
+  Edit,
   HtmlOptions,
   HtmlResult,
   Locale,
   LocaleId,
+  ProtectedRange,
   PunctaInstance,
   PunctaOptions,
   RuleId,
@@ -43,6 +51,7 @@ export function createPuncta(
       options.locales === undefined ? "required" : "type",
     );
   const loaded = new Set<LocaleId>();
+  const resources = new Map<LocaleId, ReturnType<typeof snapshotResource>>();
   for (const [index, locale] of options.locales.entries()) {
     if (
       !locale ||
@@ -65,6 +74,7 @@ export function createPuncta(
         ["locales", index],
       );
     loaded.add(locale.id);
+    resources.set(locale.id, snapshotResource(locale));
   }
   if (options.locale === undefined) invalidOption(["locale"], "required");
   const initial = mergeSettings(
@@ -92,17 +102,9 @@ export function createPuncta(
             requiresResource: true,
           };
     function validateResource(effective: Settings) {
-      // Language resources land with insertion; removal never needs one.
-      if (
-        recognition.requiresResource &&
-        effective.hyphenation.enabled === true
-      )
-        throw new PunctaConfigError(
-          "hyphenation.resource-unavailable",
-          "Hyphenation resource is unavailable.",
-          { locale: effective.locale },
-          ["hyphenation", "enabled"],
-        );
+      return recognition.requiresResource
+        ? requireResource(resources.get(effective.locale), effective)
+        : undefined;
     }
     validateResource(settings);
     function text(
@@ -110,6 +112,7 @@ export function createPuncta(
       call: TextOptions = {},
       initialLineStart = true,
       recognize: typeof typography = recognition.text,
+      includeHyphenation = true,
     ): string | TextResult {
       if (typeof source !== "string")
         invalidOption(["source"], source === undefined ? "required" : "type");
@@ -118,14 +121,27 @@ export function createPuncta(
       if (call.detailed !== undefined && typeof call.detailed !== "boolean")
         invalidOption(["detailed"], "type");
       const effective = resolveSettings(mergeSettings(settings, call, loaded));
-      validateResource(effective);
+      const resource = validateResource(effective);
       const { locale } = effective;
-      const { edits, warnings } = recognize(
+      const { edits, warnings, apostrophes } = recognize(
         source,
         effective,
         protection,
         initialLineStart,
       );
+      if (includeHyphenation && recognition.requiresResource) {
+        const insertion = insertHyphens(
+          source,
+          effective,
+          protection,
+          edits,
+          resource,
+          undefined,
+          apostrophes,
+        );
+        edits.push(...insertion.edits);
+        warnings.push(...insertion.warnings);
+      }
       edits.sort(
         (a, b) =>
           a.ranges[0].start - b.ranges[0].start ||
@@ -144,6 +160,7 @@ export function createPuncta(
       }
       if (!call.detailed) return result;
       return {
+        ...(!includeHyphenation ? { apostrophes } : {}),
         result,
         hasEdits: edits.length > 0,
         outputChanged: result !== source,
@@ -222,9 +239,31 @@ export function createPuncta(
               { detailed: true },
               initialLineStart,
               recognition.segment,
+              false,
             ),
           quotation: (source: string) =>
-            text(source, { detailed: true }, true, recognition.quotation),
+            text(
+              source,
+              { detailed: true },
+              true,
+              recognition.quotation,
+              false,
+            ),
+          insertions: (
+            source: string,
+            edits: readonly Edit[],
+            edges: WordEdges,
+            apostrophes: readonly ProtectedRange[],
+          ) =>
+            insertHyphens(
+              source,
+              resolveSettings(settings),
+              [],
+              edits,
+              validateResource(settings),
+              edges,
+              apostrophes,
+            ),
         }),
       }),
     }) as PunctaInstance;

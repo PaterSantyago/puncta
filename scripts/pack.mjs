@@ -54,6 +54,20 @@ for (const { path: cwd, manifest } of packages) {
     }
     for (const document of ["LICENSE", "README.md"])
       assert.ok((await readFile(join(base, document))).length);
+    if (
+      packed.name === "@use-puncta/core" ||
+      packed.name === "@use-puncta/with-en-gb"
+    ) {
+      const notice = await readFile(join(base, "NOTICE.md"), "utf8");
+      assert.match(
+        notice,
+        packed.name === "@use-puncta/core"
+          ? /Yevhen Tiurin/
+          : /Dominik Wujastyk/,
+      );
+      assert.match(notice, /Permission/);
+      assert.match(notice, /WARRANT/);
+    }
     const contents = execFileSync("tar", ["-tzf", archive], {
       encoding: "utf8",
     });

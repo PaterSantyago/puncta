@@ -1,4 +1,5 @@
 import type { NumberBond } from "./number-bonds.js";
+import { createsTechnicalToken } from "./protection.js";
 import type { Settings } from "./settings.js";
 import type { ProtectedRange, RuleId } from "./types.js";
 
@@ -81,6 +82,8 @@ export function textualDashes(
     });
   }
   for (let index = 0; index < markers.length; index++) {
+    const changesStart = changes.length;
+    const rolesStart = roles.length;
     const marker = markers[index];
     const next = markers[index + 1];
     const middle = next
@@ -106,6 +109,21 @@ export function textualDashes(
       const right = /^[ \u00a0]*/u.exec(text.slice(span.end))?.[0].length ?? 0;
       preserved.push({ start: span.start - left, end: span.end + right });
       if (settings.rules.dashes.enabled) ambiguous.push(span);
+    }
+    // Formatting a group of prose markers must not create a technical token
+    // which would hide a different subset of those markers on a later call.
+    let candidate = text;
+    for (const change of changes
+      .slice(changesStart)
+      .sort((a, b) => b.start - a.start || b.end - a.end))
+      candidate =
+        candidate.slice(0, change.start) +
+        change.after +
+        candidate.slice(change.end);
+    if (createsTechnicalToken(text, candidate)) {
+      changes.length = changesStart;
+      if (settings.rules.dashes.enabled)
+        ambiguous.push(...roles.slice(rolesStart));
     }
   }
   return { changes, preserved, ambiguous, roles };
@@ -142,9 +160,10 @@ export function numericDashes(
         bond.end === start &&
         bond.construction.end >= end,
     );
-    if (/[\p{L}\p{M}\p{N}_/]$/u.test(before) && !prefixCurrency) continue;
+    if (/[\p{L}\p{M}\p{N}\u00ad_/]$/u.test(before) && !prefixCurrency) continue;
     const suffixBond = bonds.some((bond) => bond.start === end);
-    if (/[\p{L}\p{M}\p{N}_/]/u.test(text[end] ?? "") && !suffixBond) continue;
+    if (/[\p{L}\p{M}\p{N}\u00ad_/]/u.test(text[end] ?? "") && !suffixBond)
+      continue;
     const knownUnit = bonds.some(
       (bond) => bond.ruleId === "units" && bond.start === end,
     );
