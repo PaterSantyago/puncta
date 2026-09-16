@@ -92,6 +92,13 @@ and uses source aliases for development. The isolated consumers above verify the
 published declarations independently. The example and root are private and are
 excluded from the public package set.
 
+## Private RSC example
+
+[examples/rsc](examples/rsc/README.md) demonstrates synchronous server string
+processing and a separate client-owned Puncta Provider on Next.js 16.3.5.
+`pnpm build && pnpm test:rsc` checks real Flight, initial HTML and client updates
+in Chromium, Firefox and WebKit; CI runs it alongside the browser matrix.
+
 ## Adding a locale
 
 1. Copy `packages/with-en-gb` without its `dist` or `node_modules`. Name the new

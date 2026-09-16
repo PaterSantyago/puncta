@@ -21,7 +21,8 @@
     "test:publish": "node --test scripts/publish.test.mjs",
     "release:publish": "node scripts/publish.mjs",
     "test:functional": "node --test tests/*.test.mjs",
-    "test:browser": "node tests/browser/run.mjs"
+    "test:browser": "node tests/browser/run.mjs",
+    "test:rsc": "node tests/rsc/run.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.13",
