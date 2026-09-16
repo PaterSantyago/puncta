@@ -82,7 +82,14 @@ export function documentTree(children) {
   return h(
     "html",
     null,
-    h("head", null, h("title", null, "Puncta hydration")),
+    h(
+      "head",
+      null,
+      h("title", null, "Puncta hydration"),
+      // Linux WebKit buffers a small pending HTTP document before committing it.
+      // Keep enough transport bytes outside the Puncta root to observe its shell.
+      h("meta", { name: "stream-fixture-padding", content: ".".repeat(4096) }),
+    ),
     h(
       "body",
       null,

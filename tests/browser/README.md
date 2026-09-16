@@ -60,7 +60,10 @@ HTTP fixture uses the real Node server entry point. Its document-owned synchrono
 client script follows the root: this starts hydration before the pending stream
 finishes, including WebKit, which can defer an async bootstrap script during
 parsing. Numeric polling observes the shell effect without relying on animation
-frames during a pending document. No browser script injection is required. Bundling disables root
+frames during a pending document. A 4 KiB metadata value in the document head
+exceeds Linux WebKit’s initial response buffering threshold; it is outside the
+Puncta root and does not change its text or structure. No browser script injection
+is required. Bundling disables root
 TypeScript path aliases so package imports resolve to built artifacts throughout.
 The corpus freeze/resource preparation validators and Node-only stream isolation
 tests remain in `pnpm check`; filesystem hashes, subprocess resource generation
