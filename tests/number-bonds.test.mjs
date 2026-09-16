@@ -516,6 +516,9 @@ test("adjacent number roles are recognised together before punctuation and spaci
   for (const [input, expected] of [
     ["...1kg", "…1 kg"],
     ["word,10kg", "word, 10 kg"],
+    ["word  ,10kg", "word, 10 kg"],
+    ["word,1USD", "word, 1 USD"],
+    ["word  ,10EUR2kg", "word, 10EUR2 kg"],
     ["GBP1kg", "GBP 1 kg"],
     ["1GBP 2", "1 GBP 2"],
     ["1 GBP2", "1 GBP 2"],

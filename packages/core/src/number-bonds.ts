@@ -63,8 +63,24 @@ function numbers(text: string): ProtectedRange[] {
   for (const match of text.matchAll(
     /[+−-]?(?:\d+(?:[.,]\d+)*|[.,]\d+)(?:[-–](?:\d+(?:[.,]\d+)*|[.,]\d+))?/gu,
   )) {
-    const start = match.index;
+    let start = match.index;
     const end = start + match[0].length;
+    const preceding = text.slice(0, start);
+    const precedingCode = currencyCodes.some((code) => {
+      const head = preceding.replace(/ +$/u, "");
+      return (
+        head.endsWith(code) &&
+        !/[\p{L}\p{M}\p{N}_]$/u.test(head.slice(0, -code.length))
+      );
+    });
+    // In prose “word,10” the comma is punctuation, while “GBP ,5” keeps
+    // its leading decimal. Decide on the original text before spaces run.
+    if (
+      /^[.,]/u.test(match[0]) &&
+      !precedingCode &&
+      /[\p{L}\p{M}\p{N})\]"'»”’,;:!?.] *$/u.test(preceding)
+    )
+      start++;
     const before = text.slice(0, start);
     const code = currencyCodes.find((candidate) => before.endsWith(candidate));
     const codeBoundary =
