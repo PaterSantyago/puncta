@@ -208,6 +208,7 @@ test("HTML and React place insertion on the left and preserve per-leaf diagnosti
 // rules. Enumeration varies leaf layout and protects a span; it never derives the
 // expected typography from the implementation or another typography engine.
 const commonCorpus = [
+  ["a cat", "a cat"],
   ["alpha  beta", "alpha beta"],
   ["  alpha  beta\n\n  gamma\tdelta", "  alpha beta\n\n  gamma\tdelta"],
   ["alpha\u00a0beta", "alpha\u00a0beta"],
