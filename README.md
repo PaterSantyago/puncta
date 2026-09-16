@@ -56,7 +56,10 @@ The process has startup and command timeouts and removes temporary resources on
 success, failure, SIGINT and SIGTERM.
 
 Both npm and pnpm consumers live outside the workspace, have fresh lockfiles and
-isolated caches/stores, and install packages by name and exact version. The
+isolated caches/stores, and install packages by name and exact version. Each
+consumer has its own npm cache, pnpm metadata cache (`XDG_CACHE_HOME`) and pnpm
+store; npm's cache setting alone does not isolate pnpm metadata. A regression
+queries both package managers' effective cache paths. The
 initial application supplies React and React DOM, with core only transitive. The check publishes the
 adapter first and proves installation fails without core, then publishes the
 remaining archives and runs this matrix independently with each package manager:
@@ -72,8 +75,14 @@ Every row checks public ESM imports, the installed dependency graph and shared
 React/core resolution. Locale rows compile a separate TypeScript application
 against installed declarations without source aliases. A second type-check phase
 explicitly installs core for consumers importing `createPuncta`; both phases keep
-strict package resolution. Runtime checks render with
-`react-dom/server` on Node 24 without browser globals. Missing input archives fail
+strict package resolution. Exact inferred types are checked for ordinary,
+`detailed: false`, `detailed: true` and boolean calls across text, HTML, React and
+SHY removal. Runtime checks cover combined typography and hyphenation, reports,
+HTML document/context, options/reset, errors, protection and SHY removal, with
+`react-dom/server` on Node 24 without browser globals. Both installed locale
+resources match the manifests reproduced from their fixed inputs; archives
+allow only distribution modules and required documents, including notices.
+Missing input archives fail
 before starting the registry.
 
 ## Private SSR example

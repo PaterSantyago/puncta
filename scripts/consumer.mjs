@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFileSync, realpathSync } from "node:fs";
 import { createRequire } from "node:module";
-import { dirname, join } from "node:path";
+import { dirname, join, relative, isAbsolute } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as adapter from "@use-puncta/with-react";
 
@@ -20,7 +21,9 @@ const core = import.meta.resolve(
   import.meta.resolve("@use-puncta/with-react"),
 );
 const { createPuncta, PunctaConfigError } = await import(core);
-const { transformReact } = await import("@use-puncta/with-react/pure");
+const { transformReact, stripSoftHyphensReact } = await import(
+  "@use-puncta/with-react/pure"
+);
 assert.equal(typeof createPuncta, "function");
 assert.equal("localeId" in (await import(core)), false);
 assert.throws(() => createPuncta(), { code: "config.invalid-option" });
@@ -35,6 +38,14 @@ const expected = JSON.parse(
   readFileSync(new URL("./expected-versions.json", import.meta.url)),
 );
 function verifyVersion(name, entry = import.meta.resolve(name)) {
+  const installedPath = relative(
+    realpathSync(new URL("./node_modules/", import.meta.url)),
+    realpathSync(new URL(entry)),
+  );
+  assert.ok(
+    !installedPath.startsWith("..") && !isAbsolute(installedPath),
+    `Package resolves outside the installed consumer: ${name}`,
+  );
   let directory = dirname(fileURLToPath(entry));
   while (true) {
     let manifest;
@@ -140,24 +151,140 @@ for (const [id, exportName] of [
       hyphenated.stripSoftHyphens(hyphenated.text(decomposed)),
       decomposed,
     );
-    const { createHash } = await import("node:crypto");
-    const directory = dirname(fileURLToPath(import.meta.resolve(name)));
-    const manifest = JSON.parse(
-      readFileSync(join(directory, "..", "hyphenation-manifest.json")),
-    );
-    assert.equal(
-      createHash("sha256")
-        .update(
-          JSON.stringify(locale[Symbol.for("@use-puncta/hyphenation")].table),
-        )
-        .digest("hex"),
-      manifest.prepared.tableSha256,
-    );
-    assert.match(
-      readFileSync(join(directory, "..", "NOTICE.md"), "utf8"),
-      /Francesc Carmona/,
-    );
   }
+  const directory = dirname(fileURLToPath(import.meta.resolve(name)));
+  const manifest = JSON.parse(
+    readFileSync(join(directory, "..", "hyphenation-manifest.json")),
+  );
+  const resource = locale[Symbol.for("@use-puncta/hyphenation")];
+  assert.deepEqual(Object.keys(resource).sort(), [
+    "format",
+    "locale",
+    "localeVersion",
+    "revision",
+    "table",
+  ]);
+  assert.equal(resource.locale, id);
+  assert.equal(resource.localeVersion, expected[name]);
+  assert.equal(
+    createHash("sha256").update(JSON.stringify(resource.table)).digest("hex"),
+    manifest.prepared.tableSha256,
+  );
+  assert.match(
+    readFileSync(join(directory, "..", "NOTICE.md"), "utf8"),
+    id === "en-gb" ? /Dominik Wujastyk/ : /Francesc Carmona/,
+  );
+
+  // Independent combined language literals, exercised through installed entry points.
+  const english = id === "en-gb";
+  const fullInput = english
+    ? `😀 "backbone -- 10-12  kg -- don't..."; -5 kg; 50 %; GBP 20`
+    : `😀 "camino -- 10-12  kg -- don't..."; -5 kg; 50 %; EUR 20`;
+  const fullExpected = english
+    ? `😀 ‘back\u00adbone – 10–12\u00a0kg – don’t…’; −5\u00a0kg; 50%; GBP\u00a020`
+    : `😀 «ca\u00admi\u00adno —10–12\u00a0kg— don’t…»; −5\u00a0kg; 50\u00a0%; EUR\u00a020`;
+  const full = instance.with({ hyphenation: { enabled: true } });
+  const textReport = full.text(fullInput, { detailed: true });
+  assert.equal(textReport.result, fullExpected);
+  assert.equal(full.text(fullExpected, { detailed: true }).hasEdits, false);
+  const htmlReport = full.html(`<p>${fullInput}</p>`, { detailed: true });
+  assert.equal(
+    htmlReport.result,
+    `<p>${fullExpected.replaceAll("\u00a0", "&nbsp;")}</p>`,
+  );
+  assert.equal(htmlReport.hasEdits, true);
+  const reactReport = transformReact(fullInput, {
+    instance: full,
+    detailed: true,
+  });
+  assert.equal(reactReport.result, fullExpected);
+  assert.equal("outputChanged" in reactReport, false);
+  assert.equal(
+    renderToString(
+      createElement(
+        adapter.PunctaProvider,
+        { instance: full },
+        createElement(adapter.Puncta, null, fullInput),
+      ),
+    ),
+    fullExpected,
+  );
+  const stripped = fullExpected.replaceAll("\u00ad", "");
+  assert.equal(
+    full.stripSoftHyphens(fullExpected, { detailed: true }).result,
+    stripped,
+  );
+  assert.equal(
+    full.stripSoftHyphens(`<p>${fullExpected}</p>`, {
+      format: "html",
+      detailed: true,
+    }).result,
+    `<p>${stripped.replaceAll("\u00a0", "&nbsp;")}</p>`,
+  );
+  assert.equal(
+    stripSoftHyphensReact(fullExpected, { instance: full, detailed: true })
+      .result,
+    stripped,
+  );
+  const authorShy = "a\u00adb";
+  assert.equal(full.stripSoftHyphens(`Wait... ${authorShy}`), "Wait... ab");
+  assert.equal(
+    full.stripSoftHyphens(authorShy, { protect: [{ start: 0, end: 3 }] }),
+    authorShy,
+  );
+  assert.equal(
+    full.stripSoftHyphens(
+      `<span title="${authorShy}">${authorShy}<code>${authorShy}</code></span>`,
+      { format: "html" },
+    ),
+    `<span title="${authorShy}">ab<code>${authorShy}</code></span>`,
+  );
+  const protectedTree = createElement(
+    "span",
+    { title: authorShy },
+    authorShy,
+    createElement("code", null, authorShy),
+  );
+  const cleanTree = stripSoftHyphensReact(protectedTree, { instance: full });
+  assert.equal(cleanTree.props.title, authorShy);
+  assert.equal(cleanTree.props.children[0], "ab");
+  assert.equal(cleanTree.props.children[1], protectedTree.props.children[1]);
+  assert.equal(
+    full.html(`<code>${fullInput}</code>`),
+    `<code>${fullInput}</code>`,
+  );
+  assert.equal(
+    full.text(fullInput, { protect: [{ start: 0, end: fullInput.length }] }),
+    fullInput,
+  );
+  const paused = full.with({ enabled: false });
+  assert.equal(paused.text(fullInput), fullInput);
+  assert.equal(paused.text(fullInput, { enabled: true }), fullExpected);
+  assert.equal(
+    full.with({ rules: { ellipsis: { enabled: false } } }).text("Wait..."),
+    "Wait...",
+  );
+  assert.equal(
+    full
+      .with({ rules: { ellipsis: { enabled: false } } })
+      .with({ rules: { ellipsis: null } })
+      .text("Wait..."),
+    "Wait…",
+  );
+  assert.equal(
+    full.html("<tr><td>Wait...</td></tr>", { context: "table" }),
+    "<tbody><tr><td>Wait…</td></tr></tbody>",
+  );
+  assert.equal(
+    full.html("<!doctype html><title>Wait...</title>", { mode: "document" }),
+    "<!DOCTYPE html><html><head><title>Wait…</title></head><body></body></html>",
+  );
+  assert.throws(() => full.with({ hyphenation: { minLeft: 1 } }), {
+    code: "config.invalid-option",
+  });
+  assert.throws(() => createPuncta({ locales: [locale, locale], locale: id }), {
+    code: "locale.duplicate",
+  });
   const input = "😀 Wait... Wait....";
   const output = "😀 Wait… Wait....";
   assert.equal(instance.text(input), output);

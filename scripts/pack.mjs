@@ -71,25 +71,48 @@ for (const { path: cwd, manifest } of packages) {
       assert.match(notice, /Permission/);
       assert.match(notice, /WARRANT/);
     }
-    if (packed.name === "@use-puncta/with-es-es") {
-      const notice = await readFile(join(base, "NOTICE.md"), "utf8");
-      assert.match(notice, /Francesc Carmona/);
-      assert.match(notice, /CervanTeX/);
+    const localeId = packed.name.match(
+      /^@use-puncta\/with-(en-gb|es-es)$/,
+    )?.[1];
+    if (localeId) {
+      // Verify the recipe itself, then compare the archive's provenance with it.
+      execFileSync(process.execPath, [
+        `scripts/hyphenation/prepare-${localeId}.mjs`,
+        "--check",
+      ]);
       const shipped = JSON.parse(
         await readFile(join(base, "hyphenation-manifest.json"), "utf8"),
       );
       const recipe = JSON.parse(
         await readFile(
-          new URL("../resources/es-es/manifest.json", import.meta.url),
+          new URL(`../resources/${localeId}/manifest.json`, import.meta.url),
           "utf8",
         ),
       );
       assert.deepEqual(shipped, recipe);
+      if (localeId === "es-es") {
+        const notice = await readFile(join(base, "NOTICE.md"), "utf8");
+        assert.match(notice, /Francesc Carmona/);
+        assert.match(notice, /CervanTeX/);
+      }
     }
     const contents = execFileSync("tar", ["-tzf", archive], {
       encoding: "utf8",
     });
-    assert.ok(!contents.includes("package/src/"));
+    const documents = new Set([
+      "package.json",
+      "LICENSE",
+      "README.md",
+      "NOTICE.md",
+      ...(localeId ? ["hyphenation-manifest.json"] : []),
+    ]);
+    for (const entry of contents.trim().split("\n")) {
+      const path = entry.replace(/^package\//, "");
+      assert.ok(
+        documents.has(path) || /^dist\/[^/]+\.(?:mjs|d\.mts)$/.test(path),
+        `Unexpected archive content: ${entry}`,
+      );
+    }
     for (const section of [
       "dependencies",
       "peerDependencies",

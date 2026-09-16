@@ -80,6 +80,7 @@ const manifest = {
 };
 const outputs = {
   "resources/en-gb/manifest.json": `${JSON.stringify(manifest, null, 2)}\n`,
+  "packages/with-en-gb/hyphenation-manifest.json": `${JSON.stringify(manifest, null, 2)}\n`,
   "packages/with-en-gb/src/hyphenation.json": `${table}\n`,
 };
 for (const [path, bytes] of Object.entries(outputs)) {
