@@ -1,4 +1,3 @@
-import { textualDashes } from "./dashes.js";
 import { accessibleParts, technicalRanges } from "./protection.js";
 import type { Settings } from "./settings.js";
 import type { Edit, ProtectedRange, PunctaWarning, RuleId } from "./types.js";
@@ -25,10 +24,11 @@ export function quotes(
   source: string,
   settings: Settings,
   protection: readonly ProtectedRange[] = [],
-): { edits: Edit[]; warnings: PunctaWarning[] } {
+) {
   const edits: Edit[] = [];
   const warnings: PunctaWarning[] = [];
-  if (!settings.enabled) return { edits, warnings };
+  const quoteRoles = new Map<number, "open" | "close">();
+  if (!settings.enabled) return { edits, warnings, text: "", quoteRoles };
   let text = "";
   let offset = 0;
   for (const accessible of accessibleParts(source, protection)) {
@@ -89,7 +89,6 @@ export function quotes(
     measurementDelimiters.add(match.index + match[0].indexOf("'"));
     measurementDelimiters.add(match.index + match[0].length - 1);
   }
-  const quoteRoles = new Map<number, "open" | "close">();
   const roots: Pair[] = [];
   const stack: Pair[] = [];
   function finishParagraph() {
@@ -248,55 +247,5 @@ export function quotes(
     candidates(root, 0);
     if (choose(root, 0)) apply(root);
   }
-  // Dash pairing is segment-local, but its outside intervals use quote roles
-  // from this wider context (a quotation may span a line or opaque fragment).
-  for (const part of text.matchAll(/[^\r\n\u2028\uFFFC]+/gu)) {
-    const localRoles = new Map<number, "open" | "close">();
-    for (const [position, role] of quoteRoles) {
-      if (position >= part.index && position < part.index + part[0].length)
-        localRoles.set(position - part.index, role);
-    }
-    const dashes = textualDashes(part[0], settings, localRoles);
-    for (const change of dashes.changes) {
-      const start = part.index + change.start;
-      const end = part.index + change.end;
-      if (
-        edits.some(
-          (existing) =>
-            existing.ranges[0].start < end && existing.ranges[0].end > start,
-        )
-      )
-        continue;
-      if (start === end && change.after) {
-        edits.push({
-          kind: "insert",
-          before: "",
-          after: change.after,
-          locale: settings.locale,
-          ruleIds: ["dashes"],
-          ranges: [{ sourceId: 0, start, end }],
-        });
-      } else edit(start, end, change.after, "dashes");
-    }
-    for (const span of dashes.ambiguous)
-      warnings.push({
-        code: "typography.ambiguous",
-        source: "rule",
-        message: "Textual dash is ambiguous; the marker was preserved.",
-        details: {},
-        locale: settings.locale,
-        ruleId: "dashes",
-        location: {
-          kind: "text",
-          ranges: [
-            {
-              sourceId: 0,
-              start: part.index + span.start,
-              end: part.index + span.end,
-            },
-          ],
-        },
-      });
-  }
-  return { edits, warnings };
+  return { edits, warnings, text, quoteRoles };
 }

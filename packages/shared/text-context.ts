@@ -91,7 +91,8 @@ export class TextContext {
     this.edits.sort(
       (a, b) =>
         a.ranges[0].sourceId - b.ranges[0].sourceId ||
-        a.ranges[0].start - b.ranges[0].start,
+        a.ranges[0].start - b.ranges[0].start ||
+        a.ranges[0].end - b.ranges[0].end,
     );
     this.warnings.sort((a, b) =>
       a.location.kind === "text" && b.location.kind === "text"

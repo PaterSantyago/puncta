@@ -19,8 +19,11 @@ import type {
   TextOptions,
   TextResult,
 } from "./types.js";
-import { quotes } from "./quotes.js";
-import { segmentTypography, typography } from "./typography.js";
+import {
+  quotationTypography,
+  segmentTypography,
+  typography,
+} from "./typography.js";
 
 export { PunctaConfigError } from "./config.js";
 export type * from "./types.js";
@@ -155,7 +158,7 @@ export function createPuncta(
               segmentTypography,
             ),
           quotation: (source: string) =>
-            text(source, { detailed: true }, true, quotes),
+            text(source, { detailed: true }, true, quotationTypography),
         }),
       }),
     }) as PunctaInstance;

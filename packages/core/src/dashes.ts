@@ -1,5 +1,16 @@
+import type { NumberBond } from "./number-bonds.js";
 import type { Settings } from "./settings.js";
 import type { ProtectedRange, RuleId } from "./types.js";
+
+const unsignedNumber = String.raw`(?:\d+(?:[.,]\d+)*|[.,]\d+(?:[.,]\d+)*)`;
+const numericExpression = new RegExp(
+  String.raw`[-+−]?${unsignedNumber}(?:[ \u00a0]*[-–−+*/=×÷][ \u00a0]*[-+−]?${unsignedNumber})*`,
+  "gu",
+);
+const simpleNumberOrRange = new RegExp(
+  String.raw`^[-+−]?${unsignedNumber}(?:[-–]${unsignedNumber})?$`,
+  "u",
+);
 
 export interface DashChange extends ProtectedRange {
   after: string;
@@ -41,32 +52,31 @@ export function textualDashes(
     const english = settings.locale === "en-gb";
     const before = text.slice(0, start - left.length);
     const after = text.slice(end + right.length);
+    const followsOpeningQuote =
+      !english && quoteRoles.get(start - left.length - 1) === "open";
+    const precedesClosingQuote =
+      !english && quoteRoles.get(end + right.length) === "close";
+    const lineStart = !before || /[\r\n]$/u.test(before);
+    const lineEnd = !after || /^[\r\n]/u.test(after);
+    const needsLeftSpace = (english || opening) && !/[([{¿¡]$/u.test(before);
+    const needsRightSpace =
+      (english || !opening) && !/^(?:[,;:!?)}\]]|\.(?!\.\.))/u.test(after);
+    let leftInterval = needsLeftSpace ? " " : "";
+    if (lineStart) leftInterval = left;
+    if (followsOpeningQuote) leftInterval = "";
+    const rightInterval =
+      !lineEnd && !precedesClosingQuote && needsRightSpace ? " " : "";
     changes.push({ start, end, after: english ? "–" : "—", ruleId: "dashes" });
     changes.push({
       start: start - left.length,
       end: start,
-      after:
-        !english && quoteRoles.get(start - left.length - 1) === "open"
-          ? ""
-          : /[\r\n]$/u.test(before)
-            ? left
-            : (english || opening) && before && !/[([{¿¡]$/u.test(before)
-              ? " "
-              : "",
+      after: leftInterval,
       ruleId: "dashes",
     });
     changes.push({
       start: end,
       end: end + right.length,
-      after:
-        (!english && quoteRoles.get(end + right.length) === "close") ||
-        /^[\r\n]/u.test(after)
-          ? ""
-          : (english || !opening) &&
-              after &&
-              !/^(?:[,;:!?)}\]]|\.(?!\.\.))/u.test(after)
-            ? " "
-            : "",
+      after: rightInterval,
       ruleId: "dashes",
     });
   }
@@ -105,7 +115,7 @@ export function textualDashes(
 export function numericDashes(
   text: string,
   settings: Settings,
-  bonds: readonly import("./number-bonds.js").NumberBond[],
+  bonds: readonly NumberBond[],
   textualRoles: readonly ProtectedRange[],
 ) {
   const changes: DashChange[] = [];
@@ -117,9 +127,7 @@ export function numericDashes(
       numericText.slice(0, role.start) +
       "\uFFFC".repeat(role.end - role.start) +
       numericText.slice(role.end);
-  for (const match of numericText.matchAll(
-    /[-+−]?(?:\d+(?:[.,]\d+)*|[.,]\d+(?:[.,]\d+)*)(?:[ \u00a0]*[-–+*/=][ \u00a0]*[-+−]?(?:\d+(?:[.,]\d+)*|[.,]\d+(?:[.,]\d+)*))*/gu,
-  )) {
+  for (const match of numericText.matchAll(numericExpression)) {
     let start = match.index;
     const end = start + match[0].length;
     if (
@@ -141,11 +149,7 @@ export function numericDashes(
       (bond) => bond.ruleId === "units" && bond.start === end,
     );
     const value = text.slice(start, end);
-    const simple =
-      !/[-+]$/u.test(before) &&
-      /^[-+−]?(?:\d+(?:[.,]\d+)*|[.,]\d+(?:[.,]\d+)*)(?:[-–](?:\d+(?:[.,]\d+)*|[.,]\d+(?:[.,]\d+)*))?$/u.test(
-        value,
-      );
+    const simple = !/[-+]$/u.test(before) && simpleNumberOrRange.test(value);
     if (!simple && /[-–]/u.test(value)) {
       const ruleId = value.startsWith("-") ? "minus" : "ranges";
       preserved.push({ start, end });

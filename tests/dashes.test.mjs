@@ -328,3 +328,19 @@ test("generated dash contexts preserve idempotence, protection and original edit
       }
     }
 });
+test("indentation survives dash formatting and arithmetic operators do not expose partial ranges", () => {
+  for (const instance of [en, es]) {
+    const expected = instance === en ? "x\n  – word –" : "x\n  —word—";
+    assert.equal(instance.text("x\n  --word--"), expected);
+    assert.equal(visible(instance.html("x\n  <em>--word--</em>")), expected);
+    for (const input of ["5×3-2 kg", "5÷3-2 kg", "5−3-2 kg"]) {
+      const report = instance.text(input, { detailed: true });
+      assert.equal(
+        report.result,
+        input.includes("−") ? input : input.replace(" kg", " kg"),
+      );
+      assert.equal(report.warnings[0]?.code, "typography.ambiguous");
+      assert.equal(report.warnings[0]?.ruleId, "ranges");
+    }
+  }
+});

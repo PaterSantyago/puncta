@@ -200,6 +200,79 @@ export function segmentTypography(
   return { edits, warnings };
 }
 
+/** Coordinate quote roles and segment-local dash intervals on the original view. */
+export function quotationTypography(
+  source: string,
+  settings: ReturnType<typeof resolveSettings>,
+  protection: readonly ProtectedRange[],
+) {
+  const { edits, warnings, text, quoteRoles } = quotes(
+    source,
+    settings,
+    protection,
+  );
+  const boundaries = new Set([text.length]);
+  for (const segment of new Intl.Segmenter("und", {
+    granularity: "grapheme",
+  }).segment(text))
+    boundaries.add(segment.index);
+  function edit(start: number, end: number, after: string, ruleId: RuleId) {
+    const before = text.slice(start, end);
+    if (before === after || !boundaries.has(start) || !boundaries.has(end))
+      return;
+    edits.push({
+      kind: !before ? "insert" : !after ? "delete" : "replace",
+      before,
+      after,
+      locale: settings.locale,
+      ruleIds: [ruleId],
+      ranges: [{ sourceId: 0, start, end }],
+    });
+  }
+  // Dash pairing is segment-local, but its outside intervals use quote roles
+  // from this wider context (a quotation may span a line or opaque fragment).
+  for (const part of text.matchAll(/[^\r\n\u2028\uFFFC]+/gu)) {
+    const localRoles = new Map<number, "open" | "close">();
+    for (const [position, role] of quoteRoles) {
+      if (position >= part.index && position < part.index + part[0].length)
+        localRoles.set(position - part.index, role);
+    }
+    const dashes = textualDashes(part[0], settings, localRoles);
+    for (const change of dashes.changes) {
+      const start = part.index + change.start;
+      const end = part.index + change.end;
+      if (
+        edits.some(
+          (existing) =>
+            existing.ranges[0].start < end && existing.ranges[0].end > start,
+        )
+      )
+        continue;
+      edit(start, end, change.after, "dashes");
+    }
+    for (const span of dashes.ambiguous)
+      warnings.push({
+        code: "typography.ambiguous",
+        source: "rule",
+        message: "Textual dash is ambiguous; the marker was preserved.",
+        details: {},
+        locale: settings.locale,
+        ruleId: "dashes",
+        location: {
+          kind: "text",
+          ranges: [
+            {
+              sourceId: 0,
+              start: part.index + span.start,
+              end: part.index + span.end,
+            },
+          ],
+        },
+      });
+  }
+  return { edits, warnings };
+}
+
 /** Plain text owns both recognition contexts. Structured adapters supply their
  * segment and quotation contexts separately through private scope metadata. */
 export function typography(
@@ -208,7 +281,7 @@ export function typography(
   protection: readonly ProtectedRange[],
   initialLineStart = true,
 ) {
-  const quotation = quotes(source, settings, protection);
+  const quotation = quotationTypography(source, settings, protection);
   const segment = segmentTypography(
     source,
     settings,
