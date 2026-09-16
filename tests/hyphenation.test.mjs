@@ -300,6 +300,146 @@ test("disabled and raised minima stay isolated and existing SHY remains authorit
   );
 });
 
+test("quotation and dash roles stay stable at technical boundaries", () => {
+  assert.equal(
+    en.text("x -- good -- y --t@e.m--e--"),
+    "x – good – y --t@e.m--e--",
+  );
+  assert.equal(en.text('"’t@e.e\'\'" and "hello"'), "\"’t@e.e''\" and ‘hello’");
+  const cases = [
+    { source: "–t@e.m--‍b–", rules: {} },
+    { source: "\"’t@e.e''\"", rules: {} },
+    { source: "'--okpers’--’", rules: {} },
+    { source: "–‘s’--''", rules: { dashes: { normalizeExisting: false } } },
+    { source: "‘s’--d--''", rules: { dashes: { normalizeExisting: false } } },
+    {
+      source: "--t@e.m--e--",
+      rules: {
+        units: { enabled: false, additional: ["rpm"] },
+        ranges: { standalone: true },
+      },
+    },
+    {
+      source: '"s",okkers’',
+      rules: {
+        units: { enabled: false, additional: ["rpm"] },
+        ranges: { standalone: true },
+      },
+    },
+  ];
+  for (const { source, rules } of cases) {
+    const instance = en.with({ rules });
+    const first = instance.text(source);
+    assert.equal(instance.text(first), first, source);
+    const html = instance.html(source);
+    assert.equal(instance.html(html), html, source);
+    const react = transformReact(source, { instance });
+    assert.equal(transformReact(react, { instance }), react, source);
+  }
+});
+
+test("technical URI bytes survive quotation ambiguity without narrowing protection", () => {
+  for (const uri of [
+    "https://example.org/O’Neill",
+    "urn:author's...work",
+    "https://example.org/‘path’",
+    "https://example.org/path’",
+  ]) {
+    for (const source of [uri, `"${uri}"`, `‘${uri}’`, `«${uri}»`]) {
+      const text = en.text(source);
+      assert(text.includes(uri), source);
+      assert.equal(en.text(text), text, source);
+      assert(en.html(source).includes(uri), source);
+      assert(transformReact(source, { instance: en }).includes(uri), source);
+    }
+  }
+  assert.equal(en.text('"s:" and "hello"'), '"s:" and ‘hello’');
+});
+
+test("normalised punctuation keeps quotation and possessive roles", () => {
+  const cases = [
+    { input: "‘’''.okkers'", rules: {} },
+    { rules: {}, input: "‘booers’ ,'", one: "‘booers’,'", two: "‘boo­ers’,'" },
+    { rules: {}, input: "‘s'--s’--", one: "‘s' – s’ –", two: "‘s’ – s’ –" },
+    {
+      rules: {},
+      input: "--'booers' .’",
+      one: "--'booers’.’",
+      two: "--'boo­ers’.’",
+    },
+    { rules: {}, input: "‘booers’ ,’", one: "‘booers’,’", two: "‘boo­ers’,’" },
+    { rules: {}, input: "''...booers’", one: "‘’…booers’", two: "‘’…boo­ers’" },
+    {
+      rules: { dashes: { normalizeExisting: false } },
+      input: "''...booers’",
+      one: "‘’…booers’",
+      two: "‘’…boo­ers’",
+    },
+    {
+      rules: { dashes: { normalizeExisting: false } },
+      input: "‘’...booers’",
+      one: "‘’…booers’",
+      two: "‘’…boo­ers’",
+    },
+    {
+      rules: {
+        units: { enabled: false, additional: ["rpm"] },
+        ranges: { standalone: true },
+      },
+      input: "''...kgpers'--",
+      one: "‘’…kgpers’--",
+      two: "‘’…kg­pers’--",
+    },
+    {
+      rules: {
+        units: { enabled: false, additional: ["rpm"] },
+        ranges: { standalone: true },
+      },
+      input: "—‘s'—s'",
+      one: "– ‘s' – s'",
+      two: "– ‘s’ – s'",
+    },
+    {
+      rules: {
+        units: { enabled: false, additional: ["rpm"] },
+        ranges: { standalone: true },
+      },
+      input: "''''s'",
+      one: "‘’''s'",
+      two: "‘’'‘s’",
+    },
+    {
+      rules: {
+        units: { enabled: false, additional: ["rpm"] },
+        ranges: { standalone: true },
+      },
+      input: '"s:",okkers’',
+      one: "‘s:’, okkers’",
+      two: "‘s:’, ok­kers’",
+    },
+    {
+      rules: {
+        units: { enabled: false, additional: ["rpm"] },
+        ranges: { standalone: true },
+      },
+      input: "‘s’—booers’—",
+      one: "‘s’ – booers’ –",
+      two: "‘s’ – boo­ers’ –",
+    },
+  ];
+  for (const { input, rules } of cases) {
+    const instance = en.with({ rules });
+    for (const method of [
+      (text) => instance.text(text),
+      (text) => instance.html(text),
+      (text) => transformReact(text, { instance }),
+    ]) {
+      const first = method(input);
+      assert.equal(method(first), first, input);
+    }
+  }
+});
+
 test("punctuation spacing does not create a technical mask on the next call", () => {
   for (const source of ["''24::bookend", "'foo'24::bookend"]) {
     for (const enabled of [true, false]) {

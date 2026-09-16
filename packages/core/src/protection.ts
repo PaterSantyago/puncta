@@ -106,3 +106,21 @@ export function technicalRanges(source: string): ProtectedRange[] {
   collect(/(?<![\w.])v\d+(?:\.\d+){2,}(?:[-+][a-z\d.-]+)?(?![\w.])/giu);
   return mergeRanges(ranges);
 }
+
+/** A typography edit must not create or extend an opaque token which would
+ * change the next invocation's recognition context. Compare a multiset so an
+ * unchanged neighbouring token does not hide a newly created identical one. */
+export function createsTechnicalToken(
+  source: string,
+  candidate: string,
+): boolean {
+  const existing = technicalRanges(source).map((range) =>
+    source.slice(range.start, range.end),
+  );
+  return technicalRanges(candidate).some((range) => {
+    const index = existing.indexOf(candidate.slice(range.start, range.end));
+    if (index < 0) return true;
+    existing.splice(index, 1);
+    return false;
+  });
+}

@@ -105,7 +105,11 @@ in `unicode-scripts.ts`, Unicode License V3 in the core notice); Common and
 Inherited characters do not contribute a distinct script. Punctuation spacing
 preserves an ambiguous interval when inserting a space would create a new
 technical token at that boundary, keeping quotation recognition stable on a
-subsequent call. The committed generator uses the full 32-bit random value and
+subsequent call. The same guard applies to each connected textual-dash group;
+unrelated groups still format. Quotation normalisation uses the same conservative
+check without narrowing URI protection. Quotation trees containing an unmatched delimiter
+remain ambiguous rather than creating a new delimiter pairing after normalisation.
+The committed generator uses the full 32-bit random value and
 asserts more than 1,900 distinct inputs among its 2,000 combinations.
 
 An independent direct Liang computation checks maximum weights, duplicate paths,

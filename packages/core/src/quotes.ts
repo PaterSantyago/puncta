@@ -1,4 +1,8 @@
-import { accessibleParts, technicalRanges } from "./protection.js";
+import {
+  accessibleParts,
+  createsTechnicalToken,
+  technicalRanges,
+} from "./protection.js";
 import type { Settings } from "./settings.js";
 import type { Edit, ProtectedRange, PunctaWarning, RuleId } from "./types.js";
 
@@ -9,6 +13,7 @@ type Pair = {
   children: Pair[];
   style?: string;
   candidates?: string[];
+  ambiguous?: boolean;
 };
 const closing: Record<string, string> = {
   '"': '"',
@@ -17,6 +22,16 @@ const closing: Record<string, string> = {
   "“": "”",
   "«": "»",
 };
+
+/** Shared by delimiter recognition and apostrophe lookahead, including ASCII
+ * prose markers before they are normalised to a spaced typographic dash. */
+function openingBoundary(before: string): boolean {
+  return (
+    !before ||
+    /[\s([{:;¿¡—–"'‘’“”«»\uFFFC]$/u.test(before) ||
+    /--$/u.test(before)
+  );
+}
 
 /** Recognition uses only accessible original text. Opaque positions occupy space,
  * but never supply a delimiter or join the words on either side. */
@@ -32,9 +47,12 @@ export function quotes(
   if (!settings.enabled)
     return { edits, warnings, text: "", quoteRoles, apostrophes };
   let text = "";
+  let technicalSource = "";
   let offset = 0;
   for (const accessible of accessibleParts(source, protection)) {
     text += "\uFFFC".repeat(accessible.start - offset);
+    technicalSource +=
+      "\uFFFC".repeat(accessible.start - offset) + accessible.text;
     let innerOffset = 0;
     for (const part of accessibleParts(
       accessible.text,
@@ -47,6 +65,7 @@ export function quotes(
     offset = accessible.start + accessible.text.length;
   }
   text += "\uFFFC".repeat(source.length - offset);
+  technicalSource += "\uFFFC".repeat(source.length - offset);
   const boundaries = new Set([text.length]);
   for (const segment of new Intl.Segmenter("und", {
     granularity: "grapheme",
@@ -130,12 +149,15 @@ export function quotes(
     const laterSingleClose =
       nextSingle !== undefined &&
       nextSingle[0] !== "‘" &&
-      !/[\s([{:;¿¡—–"'‘“«\uFFFC]$/u.test(after.slice(0, nextSingle.index));
+      !openingBoundary(after.slice(0, nextSingle.index));
     const possessive =
       single &&
       /[sS]$/u.test(before) &&
       /^(?:\s|[,;:.!?…—–]|-{2}|$)/u.test(after) &&
-      (!singleQuoteOpen || laterSingleClose);
+      (!singleQuoteOpen ||
+        (/^\s/u.test(after) &&
+          !/^[,;:.!?…—–-]/u.test(after.trimStart()) &&
+          laterSingleClose));
     if (internal || possessive) {
       apostrophes.push({ start: position, end: position + 1 });
       if (settings.rules.apostrophes.enabled !== false)
@@ -150,13 +172,10 @@ export function quotes(
       warn(position, "typography.ambiguous");
       continue;
     }
-    const canOpen =
-      !before ||
-      /[\s([{:;¿¡—–"'‘“«\uFFFC]$/u.test(before) ||
-      /--$/u.test(before);
+    const canOpen = openingBoundary(before);
     const canClose =
       !after ||
-      /^[\s.,;:!?\])}"'’”»—–\uFFFC]/u.test(after) ||
+      /^[\s.…,;:!?\])}"'‘’“”«»—–\uFFFC]/u.test(after) ||
       /^--/u.test(after);
     if (top && closing[top.original] === char && canClose) {
       quoteRoles.set(position, "close");
@@ -167,8 +186,10 @@ export function quotes(
       const pair: Pair = { start: position, original: char, children: [] };
       (top ? top.children : roots).push(pair);
       stack.push(pair);
-    } else
+    } else {
+      if (top) top.ambiguous = true;
       warn(position, canClose ? "quotes.unpaired" : "typography.ambiguous");
+    }
   }
   finishParagraph();
   const normalise = settings.rules.quotes.normalizeExisting !== false;
@@ -179,7 +200,7 @@ export function quotes(
   // Propagate preserved-descendant constraints before choosing the preferred style.
   // A greedy depth-first choice can otherwise reject the only compatible solution.
   function candidates(pair: Pair, depth: number): string[] {
-    if (pair.end === undefined) return [];
+    if (pair.end === undefined || pair.ambiguous) return [];
     const own = fixed(pair)
       ? [pair.original + closing[pair.original]]
       : palette.filter((style) => depth === 0 || style !== "«»");
@@ -248,7 +269,23 @@ export function quotes(
   }
   for (const root of roots) {
     candidates(root, 0);
-    if (choose(root, 0)) apply(root);
+    if (!choose(root, 0)) continue;
+    const editsStart = edits.length;
+    apply(root);
+    let candidate = technicalSource;
+    for (const change of edits
+      .slice(editsStart)
+      .sort((a, b) => b.ranges[0].start - a.ranges[0].start)) {
+      const range = change.ranges[0];
+      candidate =
+        candidate.slice(0, range.start) +
+        change.after +
+        candidate.slice(range.end);
+    }
+    if (createsTechnicalToken(technicalSource, candidate)) {
+      edits.length = editsStart;
+      warn(root.start, "typography.ambiguous");
+    }
   }
   return { edits, warnings, text, quoteRoles, apostrophes };
 }

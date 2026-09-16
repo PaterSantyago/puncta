@@ -147,5 +147,5 @@ This is not completion of the first-version contract. HTML document/other
 fragment contexts, Spanish insertion and the full warning catalogue remain
 subsequent work. Unsupported call options are rejected.
 
-MIT licensed, with ISC third-party kernel attribution in `NOTICE.md`.
+MIT licensed, with ISC kernel attribution and Unicode data licensing in `NOTICE.md`.
 The API remains experimental; public publication is separate work.
