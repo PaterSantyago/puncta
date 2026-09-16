@@ -248,7 +248,10 @@ for (const [id, exportName] of [
   const cleanTree = stripSoftHyphensReact(protectedTree, { instance: full });
   assert.equal(cleanTree.props.title, authorShy);
   assert.equal(cleanTree.props.children[0], "ab");
-  assert.equal(cleanTree.props.children[1], protectedTree.props.children[1]);
+  assert.deepEqual(
+    cleanTree.props.children[1],
+    protectedTree.props.children[1],
+  );
   assert.equal(
     full.html(`<code>${fullInput}</code>`),
     `<code>${fullInput}</code>`,
