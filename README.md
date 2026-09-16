@@ -56,7 +56,7 @@ success, failure, SIGINT and SIGTERM.
 
 Both npm and pnpm consumers live outside the workspace, have fresh lockfiles and
 isolated caches/stores, and install packages by name and exact version. The
-application supplies React and React DOM, never core. The check publishes the
+initial application supplies React and React DOM, with core only transitive. The check publishes the
 adapter first and proves installation fails without core, then publishes the
 remaining archives and runs this matrix independently with each package manager:
 
@@ -69,7 +69,9 @@ remaining archives and runs this matrix independently with each package manager:
 
 Every row checks public ESM imports, the installed dependency graph and shared
 React/core resolution. Locale rows compile a separate TypeScript application
-against installed declarations without source aliases, then render with
+against installed declarations without source aliases. A second type-check phase
+explicitly installs core for consumers importing `createPuncta`; both phases keep
+strict package resolution. Runtime checks render with
 `react-dom/server` on Node 24 without browser globals. Missing input archives fail
 before starting the registry.
 

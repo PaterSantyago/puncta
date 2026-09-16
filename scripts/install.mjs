@@ -197,7 +197,79 @@ try {
           env,
         ),
       );
+      const graph = await run(
+        manager,
+        ["list", "--depth", "100", "--json"],
+        cwd,
+        env,
+      );
+      assert.ok(graph.includes("@use-puncta/core"));
+      for (const id of ["en-gb", "es-es"])
+        assert.equal(
+          graph.includes(`@use-puncta/with-${id}`),
+          locales.includes(id),
+        );
+      await readFile(
+        join(cwd, manager === "npm" ? "package-lock.json" : "pnpm-lock.yaml"),
+      );
+      console.log(
+        `${manager} ${locales.join(", ") || "react-only"}: clean ${externalRegistry ? "@next" : "named"} installation and dependency graph verified`,
+      );
       if (locales.length) {
+        // First compile adapter/locale types with only the original dependencies.
+        await writeFile(
+          join(cwd, "transitive.tsx"),
+          [
+            'import { Puncta } from "@use-puncta/with-react";',
+            'import type { ReactTransformOptions } from "@use-puncta/with-react/pure";',
+            ...locales.map(
+              (id, index) =>
+                `import { ${id === "en-gb" ? "enGb" : "esEs"} as locale${index} } from "@use-puncta/with-${id}";`,
+            ),
+            'declare const instance: ReactTransformOptions["instance"];',
+            ...locales.map(
+              (_, index) =>
+                `export const example${index} = <Puncta instance={instance} locale={locale${index}.id}>Wait...</Puncta>;`,
+            ),
+          ].join("\n"),
+        );
+        await run(
+          join(cwd, "node_modules/.bin/tsc"),
+          [
+            "--strict",
+            "--noEmit",
+            "--module",
+            "NodeNext",
+            "--target",
+            "ES2022",
+            "--jsx",
+            "react-jsx",
+            "transitive.tsx",
+          ],
+          cwd,
+          env,
+        );
+        // An application importing createPuncta declares core itself. Keep this
+        // separate from the transitive installation and type checks above.
+        await run(
+          manager,
+          [
+            manager === "pnpm" ? "add" : "install",
+            `@use-puncta/core@${externalRegistry ? "next" : core.version}`,
+            "--ignore-scripts",
+            "--registry",
+            registry,
+            ...(manager === "pnpm"
+              ? [
+                  "--store-dir",
+                  join(cwd, "store"),
+                  "--strict-peer-dependencies",
+                ]
+              : []),
+          ],
+          cwd,
+          env,
+        );
         await writeFile(
           join(cwd, "consumer.tsx"),
           [
@@ -263,25 +335,10 @@ try {
           cwd,
           env,
         );
-      }
-      const graph = await run(
-        manager,
-        ["list", "--depth", "100", "--json"],
-        cwd,
-        env,
-      );
-      assert.ok(graph.includes("@use-puncta/core"));
-      for (const id of ["en-gb", "es-es"])
-        assert.equal(
-          graph.includes(`@use-puncta/with-${id}`),
-          locales.includes(id),
+        console.log(
+          `${manager} ${locales.join(", ")}: public API declarations verified with explicitly installed core`,
         );
-      await readFile(
-        join(cwd, manager === "npm" ? "package-lock.json" : "pnpm-lock.yaml"),
-      );
-      console.log(
-        `${manager} ${locales.join(", ") || "react-only"}: clean ${externalRegistry ? "@next" : "named"} installation and dependency graph verified`,
-      );
+      }
     }
   }
 } finally {
