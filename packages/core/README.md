@@ -124,10 +124,23 @@ inserted by the parser. Multi-leaf edits have separate ranges without intervenin
 tags. Entity/CRLF decoding and astral characters retain UTF-16 provenance;
 unmappable parser repairs report `accuracy: "unavailable"` with a reason.
 
+`stripSoftHyphens(source, options?)` removes author and previously inserted U+00AD
+without typography. `format` defaults to `"text"`; explicit `"html"` uses the same
+fragment/div parser mode as `html()`. Text accepts `protect`; HTML accepts
+`mode`/`context`; options from the other format are rejected. Shared options and
+`detailed` work as usual, with `hyphenation.remove` deletions in original UTF-16
+coordinates. Protection, attributes, disabled and unavailable-language regions
+retain SHY. Disabling insertion does not disable removal.
+
+Removal validates settings and language minima without needing an insertion
+resource, including nested scopes. Current locale packages do not yet include
+insertion resources: enabling insertion in `createPuncta`, `with` or ordinary
+processing throws `hyphenation.resource-unavailable` before processing.
+
 This is a narrow implementation, not completion of the first-version contract.
 All accepted shared option forms are validated and retained, but quotes, apostrophes, spaces, ellipsis, textual dashes, numeric ranges, minus, units, percentages and
-currencies currently change text. Enabling another rule or hyphenation does not implement
-that transformation. Hyphenation resources and their errors, HTML document/other fragment contexts and
+currencies currently change text; separate SHY removal is available.
+Hyphenation resources/insertion, HTML document/other fragment contexts and
 the full warning catalogue remain subsequent work. Unsupported
 call options are rejected rather than treated as implemented settings. Word admission and hyphenation require their own rule-specific acceptance.
 

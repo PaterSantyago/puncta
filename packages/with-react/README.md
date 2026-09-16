@@ -27,6 +27,13 @@ const report = transformReact("Wait...", { instance, detailed: true });
 `detailed: true`. Reports use numeric array indices and `"children"` transitions
 and `"fallback"` transitions for source paths; they have no `outputChanged` field.
 
+`stripSoftHyphensReact(children, { instance, ...options })` from `/pure` removes
+all accessible U+00AD without running typography. It has the same options and
+ordinary/detailed result forms as `transformReact`; `format`, `mode`, `context`
+and `protect` are rejected. Protection, unavailable language, disabled scopes,
+attributes and opaque content retain SHY. Removal needs no insertion resource;
+its options and language minima are still validated.
+
 Text, arrays, Fragments and ordinary host children share inline recognition.
 Cross-leaf replacements belong to the first affected leaf; empty elements survive.
 Numbers and bigint contribute their text while retaining their type when unchanged.

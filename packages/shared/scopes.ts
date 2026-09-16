@@ -51,6 +51,17 @@ export function instanceScope(instance: PunctaInstance): Scope {
   return { instance, locale: metadata.locale, protected: !metadata.enabled };
 }
 
+/** Select removal before resolving call/host settings, which need no insertion resource. */
+export function removalScope(
+  instance: PunctaInstance,
+  overrides: PunctaOptions,
+): Scope {
+  const metadata = Reflect.get(instance, Symbol.for("@use-puncta/scope")) as {
+    removal(overrides: PunctaOptions): PunctaInstance;
+  };
+  return instanceScope(metadata.removal(overrides));
+}
+
 export function scopeTransform(scope: Scope) {
   const instance =
     scope.locale === null || scope.protected
