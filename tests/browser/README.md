@@ -61,8 +61,9 @@ client script follows the root: this starts hydration before the pending stream
 finishes, including WebKit, which can defer an async bootstrap script during
 parsing. Numeric polling observes the shell effect without relying on animation
 frames during a pending document. A 4 KiB metadata value in the document head
-exceeds Linux WebKit’s initial response buffering threshold; it is outside the
-Puncta root and does not change its text or structure. No browser script injection
+makes the initial response larger to exercise pending-document delivery on Linux
+WebKit. It is outside the Puncta root and does not change its text or structure;
+this fixture does not establish a universal buffering threshold. No browser script injection
 is required. Bundling disables root
 TypeScript path aliases so package imports resolve to built artifacts throughout.
 The corpus freeze/resource preparation validators and Node-only stream isolation
