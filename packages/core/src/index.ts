@@ -19,8 +19,11 @@ import type {
   TextOptions,
   TextResult,
 } from "./types.js";
-import { quotes } from "./quotes.js";
-import { segmentTypography, typography } from "./typography.js";
+import {
+  quotationTypography,
+  segmentTypography,
+  typography,
+} from "./typography.js";
 
 export { PunctaConfigError } from "./config.js";
 export type * from "./types.js";
@@ -89,7 +92,11 @@ export function createPuncta(
         protection,
         initialLineStart,
       );
-      edits.sort((a, b) => a.ranges[0].start - b.ranges[0].start);
+      edits.sort(
+        (a, b) =>
+          a.ranges[0].start - b.ranges[0].start ||
+          a.ranges[0].end - b.ranges[0].end,
+      );
       warnings.sort((a, b) =>
         a.location.kind === "text" && b.location.kind === "text"
           ? a.location.ranges[0].start - b.location.ranges[0].start
@@ -151,7 +158,7 @@ export function createPuncta(
               segmentTypography,
             ),
           quotation: (source: string) =>
-            text(source, { detailed: true }, true, quotes),
+            text(source, { detailed: true }, true, quotationTypography),
         }),
       }),
     }) as PunctaInstance;

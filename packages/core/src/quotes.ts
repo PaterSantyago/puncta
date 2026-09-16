@@ -24,10 +24,11 @@ export function quotes(
   source: string,
   settings: Settings,
   protection: readonly ProtectedRange[] = [],
-): { edits: Edit[]; warnings: PunctaWarning[] } {
+) {
   const edits: Edit[] = [];
   const warnings: PunctaWarning[] = [];
-  if (!settings.enabled) return { edits, warnings };
+  const quoteRoles = new Map<number, "open" | "close">();
+  if (!settings.enabled) return { edits, warnings, text: "", quoteRoles };
   let text = "";
   let offset = 0;
   for (const accessible of accessibleParts(source, protection)) {
@@ -146,12 +147,20 @@ export function quotes(
       warn(position, "typography.ambiguous");
       continue;
     }
-    const canOpen = !before || /[\s([{:;¿¡—–"'‘“«\uFFFC]$/u.test(before);
-    const canClose = !after || /^[\s.,;:!?\])}"'’”»\uFFFC]/u.test(after);
+    const canOpen =
+      !before ||
+      /[\s([{:;¿¡—–"'‘“«\uFFFC]$/u.test(before) ||
+      /--$/u.test(before);
+    const canClose =
+      !after ||
+      /^[\s.,;:!?\])}"'’”»—–\uFFFC]/u.test(after) ||
+      /^--/u.test(after);
     if (top && closing[top.original] === char && canClose) {
+      quoteRoles.set(position, "close");
       top.end = position;
       stack.pop();
     } else if (closing[char] && canOpen) {
+      quoteRoles.set(position, "open");
       const pair: Pair = { start: position, original: char, children: [] };
       (top ? top.children : roots).push(pair);
       stack.push(pair);
@@ -238,5 +247,5 @@ export function quotes(
     candidates(root, 0);
     if (choose(root, 0)) apply(root);
   }
-  return { edits, warnings };
+  return { edits, warnings, text, quoteRoles };
 }

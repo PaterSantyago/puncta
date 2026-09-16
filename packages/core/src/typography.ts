@@ -1,3 +1,4 @@
+import { numericDashes, textualDashes } from "./dashes.js";
 import { numberBonds } from "./number-bonds.js";
 import { quotes } from "./quotes.js";
 import { accessibleParts, technicalRanges } from "./protection.js";
@@ -54,18 +55,35 @@ export function segmentTypography(
           ranges: [range(start, end)],
         });
       }
-      function ambiguous(start: number, end: number, message: string) {
+      function ambiguous(
+        start: number,
+        end: number,
+        message: string,
+        ruleId: RuleId = "spaces",
+      ) {
         warnings.push({
           code: "typography.ambiguous",
           source: "rule",
           message,
           details: {},
           locale: settings.locale,
-          ruleId: "spaces",
+          ruleId,
           location: { kind: "text", ranges: [range(start, end)] },
         });
       }
+      const dashes = textualDashes(text, settings);
       const bonds = numberBonds(text, settings);
+      const numeric = numericDashes(text, settings, bonds, dashes.roles);
+      for (const change of numeric.changes)
+        edit(change.start, change.end, change.after, change.ruleId);
+      for (const span of numeric.ambiguous) {
+        ambiguous(
+          span.start,
+          span.end,
+          "Numeric dash is ambiguous; the construction was preserved.",
+          span.ruleId,
+        );
+      }
       for (const bond of bonds) {
         if (!bond.enabled) continue;
         if (bond.warning) {
@@ -93,9 +111,11 @@ export function segmentTypography(
       if (settings.rules.spaces?.enabled === false) continue;
 
       // These intervals have a role general whitespace cleanup must not override.
-      const preserved: ProtectedRange[] = bonds.map(
-        (bond) => bond.construction,
-      );
+      const preserved: ProtectedRange[] = [
+        ...dashes.preserved,
+        ...numeric.preserved,
+        ...bonds.map((bond) => bond.construction),
+      ];
       for (const match of text.matchAll(/ *(?:[.…](?:[. …]*[.…])|…) */gu)) {
         const start = match.index;
         const end = start + match[0].length;
@@ -111,7 +131,12 @@ export function segmentTypography(
         const start = match.index;
         const end = start + match[0].length;
         preserved.push({ start, end });
-        if (match[0].includes(" "))
+        if (
+          match[0].includes(" ") &&
+          !numeric.preserved.some(
+            (span) => start < span.end && end > span.start,
+          )
+        )
           ambiguous(
             start,
             end,
@@ -175,6 +200,79 @@ export function segmentTypography(
   return { edits, warnings };
 }
 
+/** Coordinate quote roles and segment-local dash intervals on the original view. */
+export function quotationTypography(
+  source: string,
+  settings: ReturnType<typeof resolveSettings>,
+  protection: readonly ProtectedRange[],
+) {
+  const { edits, warnings, text, quoteRoles } = quotes(
+    source,
+    settings,
+    protection,
+  );
+  const boundaries = new Set([text.length]);
+  for (const segment of new Intl.Segmenter("und", {
+    granularity: "grapheme",
+  }).segment(text))
+    boundaries.add(segment.index);
+  function edit(start: number, end: number, after: string, ruleId: RuleId) {
+    const before = text.slice(start, end);
+    if (before === after || !boundaries.has(start) || !boundaries.has(end))
+      return;
+    edits.push({
+      kind: !before ? "insert" : !after ? "delete" : "replace",
+      before,
+      after,
+      locale: settings.locale,
+      ruleIds: [ruleId],
+      ranges: [{ sourceId: 0, start, end }],
+    });
+  }
+  // Dash pairing is segment-local, but its outside intervals use quote roles
+  // from this wider context (a quotation may span a line or opaque fragment).
+  for (const part of text.matchAll(/[^\r\n\u2028\uFFFC]+/gu)) {
+    const localRoles = new Map<number, "open" | "close">();
+    for (const [position, role] of quoteRoles) {
+      if (position >= part.index && position < part.index + part[0].length)
+        localRoles.set(position - part.index, role);
+    }
+    const dashes = textualDashes(part[0], settings, localRoles);
+    for (const change of dashes.changes) {
+      const start = part.index + change.start;
+      const end = part.index + change.end;
+      if (
+        edits.some(
+          (existing) =>
+            existing.ranges[0].start < end && existing.ranges[0].end > start,
+        )
+      )
+        continue;
+      edit(start, end, change.after, "dashes");
+    }
+    for (const span of dashes.ambiguous)
+      warnings.push({
+        code: "typography.ambiguous",
+        source: "rule",
+        message: "Textual dash is ambiguous; the marker was preserved.",
+        details: {},
+        locale: settings.locale,
+        ruleId: "dashes",
+        location: {
+          kind: "text",
+          ranges: [
+            {
+              sourceId: 0,
+              start: part.index + span.start,
+              end: part.index + span.end,
+            },
+          ],
+        },
+      });
+  }
+  return { edits, warnings };
+}
+
 /** Plain text owns both recognition contexts. Structured adapters supply their
  * segment and quotation contexts separately through private scope metadata. */
 export function typography(
@@ -183,7 +281,7 @@ export function typography(
   protection: readonly ProtectedRange[],
   initialLineStart = true,
 ) {
-  const quotation = quotes(source, settings, protection);
+  const quotation = quotationTypography(source, settings, protection);
   const segment = segmentTypography(
     source,
     settings,

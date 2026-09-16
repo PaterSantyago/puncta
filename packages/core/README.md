@@ -125,10 +125,10 @@ tags. Entity/CRLF decoding and astral characters retain UTF-16 provenance;
 unmappable parser repairs report `accuracy: "unavailable"` with a reason.
 
 This is a narrow implementation, not completion of the first-version contract.
-All accepted shared option forms are validated and retained, but quotes, apostrophes, spaces, ellipsis, units, percentages and
+All accepted shared option forms are validated and retained, but quotes, apostrophes, spaces, ellipsis, textual dashes, numeric ranges, minus, units, percentages and
 currencies currently change text. Enabling another rule or hyphenation does not implement
 that transformation. Hyphenation resources and their errors, HTML document/other fragment contexts and
 the full warning catalogue remain subsequent work. Unsupported
-call options are rejected rather than treated as implemented settings. Word admission and future special intervals require their own rule-specific acceptance.
+call options are rejected rather than treated as implemented settings. Word admission and hyphenation require their own rule-specific acceptance.
 
 MIT licensed. The API remains experimental; public publication is separate work.

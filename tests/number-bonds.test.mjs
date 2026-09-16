@@ -88,7 +88,7 @@ test("all currencies retain number notation and atypical order diagnostics", () 
     );
     assert.equal(
       instance.text("GBP 1,234.50; 1.234,50 EUR; -5 kg; 10-12 kg"),
-      "GBP 1,234.50; 1.234,50 EUR; -5 kg; 10-12 kg",
+      "GBP 1,234.50; 1.234,50 EUR; −5 kg; 10–12 kg",
     );
     const input =
       instance === en ? "20  £; 20  €; 20  $" : "£  20; €  20; $  20";
