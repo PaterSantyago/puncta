@@ -1,0 +1,14 @@
+{
+  "corpusVersion": 1,
+  "reviewedOn": "2026-09-16",
+  "phase": "independently reviewed before validator or engine evaluation",
+  "files": {
+    "en-gb.json": "8c1f7c69e01d09336cbc1b6ac7dac8a4a7f2b98edc3ea2da98b2f9ddd8c89893",
+    "en-gb-negative.json": "d066a85844175388c22435ee69496a8f31c944cd2fa78eb9ab47248396508a7b"
+  },
+  "review": {
+    "result": "pass after linguistic correction",
+    "finding": "Include optional morphological position 7 in university and universities; do not exclude morphology merely because it crosses an IPA dot.",
+    "reviewers": ["implementation", "root", "independent-spec"]
+  }
+}
