@@ -842,3 +842,15 @@ test("list punctuation takes priority over a following missing-integer form", ()
     }
   }
 });
+
+test("a prose label colon does not swallow a standalone number", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    const instance = base.with({
+      locale,
+      rules: { digitGrouping: { enabled: true } },
+    });
+    const result = instance.text("ID : 12345");
+    assert.equal(result, "ID: 12\u202f345");
+    assert.deepEqual(instance.text(result, { detailed: true }).edits, []);
+  }
+});

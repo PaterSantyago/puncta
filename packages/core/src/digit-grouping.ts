@@ -33,6 +33,9 @@ export function digitGrouping(
   const tokens = [...text.matchAll(/[^\s;!?¿¡()[\]{}"'“”‘’«»\uFFFC]+/gu)];
   for (let index = 0; index < tokens.length; index++) {
     const token = tokens[index];
+    // A bare colon only belongs to a construction consumed from its left
+    // number. Starting from it would swallow the number after a prose label.
+    if (token[0] === ":") continue;
     let last = token;
     while (index + 1 < tokens.length) {
       const next = tokens[index + 1];
