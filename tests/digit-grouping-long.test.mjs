@@ -137,7 +137,7 @@ function verify(model) {
   assert.equal(reports[0].result, expected);
   assert.equal(textOf(reports[1].result), expected);
   assert.equal(textOf(renderToString(reports[2].result)), expected);
-  reports.forEach((report, index) =>
+  reports.forEach((report, index) => {
     assertReport(
       report,
       expected,
@@ -145,8 +145,8 @@ function verify(model) {
       model.locale,
       candidate,
       index === 1 ? htmlSource : undefined,
-    ),
-  );
+    );
+  });
   const second = [
     instance.text(expected, { detailed: true }),
     instance.html(reports[1].result, { detailed: true }),
@@ -184,7 +184,7 @@ for (const locale of ["en-gb", "es-es"]) {
     for (const kind of ["digits", "groups", "invalid", "leading-zero"])
       for (const decimal of [
         "",
-        "." + "6700".repeat(300),
+        `.${"6700".repeat(300)}`,
         ".670000",
         ...(locale === "es-es" ? [",670000"] : []),
       ])
