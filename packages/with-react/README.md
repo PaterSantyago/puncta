@@ -130,7 +130,8 @@ leaves, including arrays and Fragment. Insertions at a leaf boundary belong to t
 left leaf; a replaced group separator remains in its original leaf. Invalid
 candidates retain their text and detailed reports locate the whole candidate
 across its source leaves. Protection and opaque components stop recognition; the
-original children are not mutated. Ranges and number-bond constructions remain
-deferred. Component `renderToString` coverage includes normalization; new grouping
+original children are not mutated. Known number bonds and eligible two-endpoint
+ranges share that transparent context, including disabled exterior formatting.
+Component `renderToString` coverage includes grouping, normalization and bonds; new grouping
 streaming/hydration fixtures belong to later acceptance slices. See
 [core settings and current limits](../core/README.md#opt-in-standalone-digit-grouping).

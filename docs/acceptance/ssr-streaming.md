@@ -75,3 +75,12 @@ three-browser hydration matrix (#55) or RSC integration (#56), promise guarantee
 for arbitrary opaque component internals, or expand the documented state-remount
 limitation for deep protection toggles in the React README. No public npm release
 is part of this check.
+
+## Grouping interaction regression (#89)
+
+The new `tests/digit-grouping-bonds.test.mjs` suite checks number bonds and ranges
+through component `renderToString`, including every transparent split and seeded
+multi-leaf inputs. This adds synchronous component evidence only. The existing
+streaming fixtures remain a regression gate; new grouping-specific streaming and
+hydration acceptance belongs to #91. Current commands and results are recorded in
+[digit grouping, slice #89](digit-grouping.md#number-bonds-and-ranges-slice-89).

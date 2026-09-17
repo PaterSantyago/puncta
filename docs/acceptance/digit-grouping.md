@@ -162,3 +162,39 @@ new public text/HTML/pure React/component SSR tests. Generated browser/RSC
 artifacts remain in `artifacts/browser/acceptance.json` and
 `artifacts/rsc/report.json`; CI checks and uploads artifacts for the exact PR head.
 No manual verification, release or public publication was performed.
+
+## Number bonds and ranges: slice #89
+
+[#89](https://github.com/PaterSantyago/puncta/issues/89) extends #88 with known
+number designations and atomic range eligibility. Historical results above are
+not evidence for this slice. The public suite is
+`tests/digit-grouping-bonds.test.mjs`; existing standalone regressions remain in
+`tests/digit-grouping.test.mjs`.
+
+| #89 criterion                                   | Executable evidence                                                                                                                                                                                                                                                                                        |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Existing catalogues and complete designations   | Both locale literal unit/composite/addition/currency/percentage/angle examples; unknown tails, Unicode, technical and leading-zero exclusions                                                                                                                                                              |
+| Full notation and exterior bonds                | Existing four group spaces and en-gb commas, both normalization modes, whole-number minus, currency-order diagnostics, separate internal U+202F and external U+00A0                                                                                                                                        |
+| Range context                                   | En dash, ASCII with known unit/standalone enabled, disabled ranges formatting, U+2212 arithmetic, three-segment dates                                                                                                                                                                                      |
+| Atomic eligibility and endpoint settings        | Both valid endpoints; leading zero, technical and unsupported endpoints; malformed groups/conflicts with one full-range diagnostic even at MAX_SAFE_INTEGER and normalization disabled; independent thresholds and normalization                                                                           |
+| Independent formatting                          | All 16 combinations of units/ranges/percentages/currencies switches in both locales; explicit percentage spacing; existing atypical currency warnings                                                                                                                                                      |
+| Public representations and reports              | Every two-leaf transparent split of compact literals through HTML/comments, Fragment/pure React and component renderToString; warning ranges, appliedRules, replay, repeat-pass empty edits; non-BMP original coordinates and entities                                                                     |
+| Generated properties and disabled compatibility | Seed 8901, 120 cases with both locales, valid/excluded/ambiguous endpoints, separators, switches and custom units; literal endpoint oracles, digit/fraction preservation, replay, repeated processing, per-character HTML/React/SSR splits and mandatory coverage counts; full disabled-report comparisons |
+
+Implementation follows red/green slices: the initial known-unit test and then
+range-eligibility test failed before their implementation. A non-BMP preceding
+context exposed operator coalescing swallowing signed numbers; the original
+UTF-16 report regression now covers the fix. The generator assembles expected
+results from independently selected literal endpoints, without calling a numeric
+formatter or coercing values to JavaScript numbers. Failure messages include
+initial seed, sample, state and complete source.
+
+The previous conservative exclusions for supported bonds/ranges were removed
+from the historical standalone test, because #89 now supplies their positive
+and negative oracles. No existing structural exclusion was weakened.
+
+New grouping streaming/hydration fixtures, expanded inheritance/coordinate
+acceptance and grouping-specific scaling remain later slices (#90–92).
+This slice uses component renderToString for new interaction coverage and runs
+existing streaming, browser, RSC and scaling fixtures as regression gates.
+Execution evidence will be recorded below after independent reviews and checks.
