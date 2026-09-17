@@ -76,6 +76,18 @@ for (const locale of ["en-gb", "es-es"]) {
       [options({ enabled: null }), "1234; 12 345; 12345"],
     ]) {
       const input = "1234; 12 345; 12345";
+      assert.equal(
+        textOf(
+          renderToString(
+            h(
+              PunctaProvider,
+              { instance, options: patch },
+              h(Puncta, null, input),
+            ),
+          ),
+        ),
+        expected,
+      );
       assert.equal(instance.with(patch).text(input), expected);
       assert.equal(instance.text(input, patch), expected);
       assert.equal(textOf(instance.html(input, patch)), expected);
@@ -106,6 +118,11 @@ for (const locale of ["en-gb", "es-es"]) {
         expected,
       );
     }
+    const reset = instance.with(options(null));
+    assert.equal(
+      reset.text("1234; 12 345", options({ enabled: true })),
+      "1234; 12\u202f345",
+    );
     const paused = instance.with(options({ enabled: false }));
     assert.equal(
       paused
@@ -156,6 +173,33 @@ for (const locale of ["en-gb", "es-es"]) {
         h(Puncta, { options: reset }, literal),
       ),
     );
+    const resetThenResume = markup(reset, markup(resume, literal));
+    assert.equal(textOf(instance.html(resetThenResume)), "1234; 12\u202f345");
+    assert.equal(
+      textOf(
+        renderToString(
+          transformReact(
+            h("span", attrs(reset), h("i", attrs(resume), literal)),
+            { instance },
+          ),
+        ),
+      ),
+      "1234; 12\u202f345",
+    );
+    for (const wrapper of [PunctaProvider, Puncta]) {
+      assert.equal(
+        textOf(
+          renderToString(
+            h(
+              wrapper,
+              { instance, options: reset },
+              h(Puncta, { options: resume }, literal),
+            ),
+          ),
+        ),
+        "1234; 12\u202f345",
+      );
+    }
     const expected = "1234; 12 345|1\u202f234; 12 345|1234; 12 345";
     assert.equal(textOf(instance.html(html)), expected);
     assert.equal(
@@ -548,6 +592,19 @@ for (const locale of ["en-gb", "es-es"]) {
           }
           assert.equal(report.hasEdits, separators.length > 0);
         }
+        const htmlLeaves = replay(html);
+        assert.equal(
+          html.result,
+          `${htmlLeaves[0]}<!-- transparent --><em>${htmlLeaves[1]}</em>`,
+          label,
+        );
+        const reactLeaves = replay(react);
+        assert.equal(react.result[0], reactLeaves[0], label);
+        assert.equal(
+          react.result[1].props.children[0].props.children,
+          reactLeaves[1],
+          label,
+        );
         assert.equal("outputChanged" in react, false);
         assert.equal(
           textOf(renderToString(h(Puncta, { instance }, children))),
@@ -848,9 +905,11 @@ test("seed 9001: generated multi-leaf scoped trees preserve oracles, protection,
         );
       }
       assert.equal(report.hasEdits, entry.source !== entry.expected, label);
+      const rendered =
+        report === html ? report.result : renderToString(report.result);
       assert.equal(
-        entry.expected.replace(/\D/gu, ""),
-        entry.source.replace(/\D/gu, ""),
+        textOf(rendered).replace(/\D/gu, ""),
+        `12${entry.source}345`.replace(/\D/gu, ""),
         label,
       );
     }
