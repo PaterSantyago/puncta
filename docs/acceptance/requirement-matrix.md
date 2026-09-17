@@ -135,3 +135,15 @@ range eligibility and independent neighboring formatting switches through
 text/HTML/pure React/component SSR. See the criterion-to-test mapping and
 execution evidence in [digit grouping #89](digit-grouping.md#number-bonds-and-ranges-slice-89).
 This does not certify deferred #90–93 acceptance.
+
+## Grouping React runtime (#91)
+
+Following the [#90 scopes/report acceptance](digit-grouping.md#nested-scopes-markup-and-source-reports-slice-90),
+[#91 runtime acceptance](digit-grouping.md#react-runtime-slice-91) verifies numeric
+String(value) leaves, unchanged types, transparent ownership and pure/Context
+boundaries; three server APIs with pre-resolution shell/fallback, concurrent
+configuration/report isolation and abort/retry; three-browser hydration with
+original DOM identity and source/settings/locale updates; and the production RSC
+boundary. The linked matrix records executable checks and revision-specific
+results. Existing key/ref/protection limits remain. Grouping-specific scaling and
+final combined parent #86 acceptance remain #92; this entry does not certify them.

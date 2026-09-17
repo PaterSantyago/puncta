@@ -220,6 +220,15 @@ try {
           ),
           true,
         );
+        assert.equal(
+          await page.evaluate(() =>
+            window.shellChildrenBeforeHydration.every(
+              (node, index) =>
+                document.getElementById("shell").childNodes[index] === node,
+            ),
+          ),
+          true,
+        );
         assert.equal(await page.locator("#root > p").count(), 3);
         assert.equal(await page.locator("#root p p").count(), 0);
         hydrationChecks.push({

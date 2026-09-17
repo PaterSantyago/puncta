@@ -84,3 +84,24 @@ multi-leaf inputs. This adds synchronous component evidence only. The existing
 streaming fixtures remain a regression gate; new grouping-specific streaming and
 hydration acceptance belongs to #91. Current commands and results are recorded in
 [digit grouping, slice #89](digit-grouping.md#number-bonds-and-ranges-slice-89).
+
+## Grouping runtime (#91)
+
+`tests/ssr-streaming.test.mjs` adds grouping-specific assertions to the existing
+controlled delivery harness. Both stream APIs deliver numeric shell leaves and a
+normalized comma group, plus an independent grouped fallback while content is
+still suspended. Digits on opposite sides of Suspense remain separate. Aborting
+at that point and retrying the same source tree after resolution produces exact
+grouped content. Turning the rule off recomputes raw numbers and source commas.
+
+Five simultaneous requests mix both APIs, en-gb/es-es, thresholds, normalization
+and a disabled rule. Reverse-order resolution checks exact output, stable issued
+bytes, original source reports, locale-specific warnings and caller-mutation
+isolation. No DOM, warning publication or production hook is introduced.
+
+The browser HTTP fixture includes grouping in shell, fallback and content (with
+an exact large bigint); all three renderers hydrate in all three engines. Existing
+NBSP/SHY checks remain. The shell's original text/element child nodes are retained
+as well as shell/content element identity. Runtime update checks cover source,
+locale, threshold, normalization, disabling/re-enabling and keyed state/ref identity.
+See [the execution matrix](digit-grouping.md#react-runtime-slice-91).

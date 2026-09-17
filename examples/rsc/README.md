@@ -98,3 +98,11 @@ actual framework React versions, Playwright browser revisions and executable
 paths. The existing CI browser job builds this example and runs the check on
 Linux alongside `pnpm test:browser`. The example remains outside release archives;
 archive installation/exports checks are independently covered by `pnpm check`.
+
+Grouping acceptance (#91) also distinguishes client `1,234` under en-gb/es-es
+from independently configured Spanish server text. Client number/bigint leaves
+are already grouped in no-JavaScript HTML. Toggling digit grouping restores the
+original numeric children, and text/locale updates recompute under the client
+Provider while server-owned output remains unchanged. These literal U+202F
+expectations and node identity checks run in all three browsers; see
+[the runtime matrix](../../docs/acceptance/digit-grouping.md#react-runtime-slice-91).

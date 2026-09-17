@@ -132,8 +132,12 @@ candidates retain their text and detailed reports locate the whole candidate
 across its source leaves. Protection and opaque components stop recognition; the
 original children are not mutated. Known number bonds and eligible two-endpoint
 ranges share that transparent context, including disabled exterior formatting.
-Component `renderToString` coverage includes grouping, normalization and bonds; new grouping
-streaming/hydration fixtures belong to later acceptance slices. See
+Grouping and normalization are delivered by `renderToString`,
+`renderToPipeableStream` and `renderToReadableStream`, including shell/fallback
+before suspended content resolves. Concurrent requests isolate grouping options,
+locales and reports; abort/retry starts again from original children.
+Chromium, Firefox and WebKit checks cover hydration and updates without DOM repair,
+extra wrappers or replacement of the original shell/content nodes. See
 [core settings and current limits](../core/README.md#opt-in-standalone-digit-grouping).
 
 ### Inheritance and grouping reports
@@ -173,3 +177,26 @@ belong to the left nonempty leaf; digits remain in their original children.
 React reports have `hasEdits` and no `outputChanged`. Original children are not
 mutated. `stripSoftHyphensReact` validates these shared options while only
 removing SHY, without grouping or its warnings.
+
+### Numeric children and runtime updates
+
+A number or bigint contributes `String(value)`. Changed leaves become strings;
+unchanged leaves keep their original number/bigint type, including when grouping
+is disabled. Bigints retain their exact decimal digits. Exponential number
+representations such as `1e21` are excluded from grouping. Precision already lost
+before calling Puncta cannot be recovered. Transparent seams between numeric and
+string/host leaves use the same left-leaf insertion ownership as ordinary text.
+
+Changing locale, grouping settings or children recomputes from original children.
+Disabling grouping removes automatically inserted separators; source separators
+remain subject to the ordinary rules and normalization contract. It does not strip
+explicit U+202F or restore source commas from a previously transformed string
+passed back as new input. Keys, refs and state follow the existing reconciliation
+contract above, including its protection-toggle limitation.
+
+The RSC consumer exercises explicit server-owned grouping separately from the
+client Provider, numeric client children and Flight children slots. Client locale
+or grouping updates do not change server-owned text. Pure transforms still require
+an explicit instance and do not read Context. See
+[digit grouping runtime acceptance](../../docs/acceptance/digit-grouping.md#react-runtime-slice-91)
+for the test matrix and execution evidence.

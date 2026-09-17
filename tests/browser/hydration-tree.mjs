@@ -8,10 +8,11 @@ import {
 } from "../../packages/with-react/dist/index.mjs";
 
 export const expected = {
-  shell: "‘back\u00adbone 24\u00a0kg…’",
-  fallback: "«Ya…»",
-  content: "«ca\u00admi\u00adno 50\u00a0%…»",
-  protected: '"backbone 24kg..."',
+  shell: "‘back\u00adbone 24\u00a0kg…’ 12\u202f345; 12\u202f345",
+  fallback: "«Ya…» 67\u202f890",
+  content:
+    "«ca\u00admi\u00adno 50\u00a0%…» 12,345; 123\u202f456\u202f789\u202f012\u202f345\u202f678\u202f901\u202f234\u202f567\u202f890",
+  protected: '"backbone 24kg..." 12345',
 };
 export function createGate(ready = false) {
   let release;
@@ -37,6 +38,7 @@ export function tree(gate, onHydrated = () => {}, onShellHydrated = () => {}) {
     locales: [enGb, esEs],
     locale: "en-gb",
     hyphenation: { enabled: true },
+    rules: { digitGrouping: { enabled: true } },
   });
   function Content() {
     gate.read();
@@ -44,7 +46,12 @@ export function tree(gate, onHydrated = () => {}, onShellHydrated = () => {}) {
     return h(
       Puncta,
       { locale: "es-es" },
-      h("p", { id: "content" }, '"camino 50%..."'),
+      h(
+        "p",
+        { id: "content" },
+        '"camino 50%..." 12,345; ',
+        123456789012345678901234567890n,
+      ),
     );
   }
   return h(
@@ -54,14 +61,22 @@ export function tree(gate, onHydrated = () => {}, onShellHydrated = () => {}) {
     h(
       Puncta,
       null,
-      h("p", { id: "shell" }, '"back', h("em", null, "bone"), ' 24kg..."'),
+      h(
+        "p",
+        { id: "shell" },
+        '"back',
+        h("em", null, "bone"),
+        ' 24kg..." ',
+        12345,
+        "; 12,345",
+      ),
       h(
         Suspense,
         {
           fallback: h(
             Puncta,
             { locale: "es-es" },
-            h("p", { id: "fallback" }, '"Ya..."'),
+            h("p", { id: "fallback" }, '"Ya..." ', 67890),
           ),
         },
         h(Content),
@@ -72,7 +87,7 @@ export function tree(gate, onHydrated = () => {}, onShellHydrated = () => {}) {
         h(
           Puncta,
           { enabled: true, options: { hyphenation: { enabled: true } } },
-          '"backbone 24kg..."',
+          '"backbone 24kg..." 12345',
         ),
       ),
     ),
