@@ -132,3 +132,108 @@ export function changesTechnicalContext(
   });
   return changed || existing.length > 0;
 }
+
+interface TechnicalChange extends ProtectedRange {
+  after: string;
+}
+
+/** Hypothetical edits use original UTF-16 coordinates. The word view and its
+ * whitespace boundaries are indexed once, rather than rebuilding the complete
+ * text for every interval. Except for quoted email local parts, recognised
+ * technical forms cannot cross whitespace. Keep a delimiter on each side of a
+ * local window so lookarounds see the same boundary as in the complete source.
+ * Quoted email remains a conservative full-context check, including its spaces. */
+export function technicalContext(source: string) {
+  const hasShy = source.includes("\u00ad");
+  const text = hasShy ? source.replaceAll("\u00ad", "") : source;
+  const positions = hasShy ? new Uint32Array(source.length + 1) : undefined;
+  if (positions) {
+    for (let index = 0; index < source.length; index++)
+      positions[index + 1] =
+        positions[index] + (source[index] === "\u00ad" ? 0 : 1);
+  }
+  const position = (offset: number) => positions?.[offset] ?? offset;
+  const whitespace = [...text.matchAll(/\s/gu)].map((match) => match.index);
+  const quotedEmail = text.includes('"') && text.includes("@");
+  let hidden: ProtectedRange[] | undefined;
+
+  function boundaryIndex(offset: number) {
+    let low = 0;
+    let high = whitespace.length;
+    while (low < high) {
+      const middle = (low + high) >>> 1;
+      if (whitespace[middle] < offset) low = middle + 1;
+      else high = middle;
+    }
+    return low;
+  }
+
+  function window(start: number, end: number, full = quotedEmail) {
+    return full
+      ? { start: 0, end: text.length }
+      : {
+          start: whitespace[boundaryIndex(start) - 1] ?? 0,
+          end: Math.min(
+            text.length,
+            (whitespace[boundaryIndex(end)] ?? text.length) + 1,
+          ),
+        };
+  }
+
+  return {
+    touchesHiddenToken(start: number, end: number): boolean {
+      if (!hasShy) return false;
+      hidden ??= technicalRanges(text);
+      const left = position(start);
+      const right = position(end);
+      return hidden.some((token) => token.start < right && token.end > left);
+    },
+    joinsToken(start: number, end: number): boolean {
+      const left = position(start);
+      const right = position(end);
+      const span = window(left, right);
+      const candidate =
+        text.slice(span.start, left) + text.slice(right, span.end);
+      const join = left - span.start;
+      return technicalRanges(candidate).some(
+        (token) => token.start < join && token.end > join,
+      );
+    },
+    splitsToken(offset: number): boolean {
+      const at = position(offset);
+      const span = window(at, at);
+      const candidate = `${text.slice(span.start, at)} ${text.slice(at, span.end)}`;
+      const split = at - span.start;
+      return technicalRanges(candidate).some(
+        (token) => token.end === split || token.start === split + 1,
+      );
+    },
+    changesTokens(changes: readonly TechnicalChange[]): boolean {
+      if (changes.length === 0) return false;
+      const ordered = [...changes].sort(
+        (a, b) => b.start - a.start || b.end - a.end,
+      );
+      const start = position(ordered[ordered.length - 1].start);
+      const end = ordered.reduce(
+        (right, change) => Math.max(right, position(change.end)),
+        start,
+      );
+      const span = window(
+        start,
+        end,
+        quotedEmail || ordered.some((change) => /["@]/u.test(change.after)),
+      );
+      const original = text.slice(span.start, span.end);
+      let candidate = original;
+      for (const change of ordered) {
+        const left = position(change.start) - span.start;
+        const right = position(change.end) - span.start;
+        candidate =
+          candidate.slice(0, left) +
+          change.after.replaceAll("\u00ad", "") +
+          candidate.slice(right);
+      }
+      return changesTechnicalContext(original, candidate);
+    },
+  };
+}

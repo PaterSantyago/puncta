@@ -1,5 +1,6 @@
+import { precedingSpaceStart } from "./spaces.js";
 import type { NumberBond } from "./number-bonds.js";
-import { changesTechnicalContext } from "./protection.js";
+import { technicalContext } from "./protection.js";
 import type { Settings } from "./settings.js";
 import type { ProtectedRange, RuleId } from "./types.js";
 
@@ -29,6 +30,7 @@ export function textualDashes(
   const preserved: ProtectedRange[] = [];
   const ambiguous: ProtectedRange[] = [];
   const roles: ProtectedRange[] = [];
+  const technical = technicalContext(text);
   const markers = [
     ...text.matchAll(
       /(?<![-–—])--(?![-–—])|(?<![-–—])[–—](?![–—]|-(?![.,]?\d))/gu,
@@ -42,7 +44,7 @@ export function textualDashes(
     const start = marker.index;
     const end = start + marker[0].length;
     roles.push({ start, end });
-    const left = /[ \u00a0]*$/u.exec(text.slice(0, start))?.[0] ?? "";
+    const left = text.slice(precedingSpaceStart(text, start, " \u00a0"), start);
     const right = /^[ \u00a0]*/u.exec(text.slice(end))?.[0] ?? "";
     preserved.push({ start: start - left.length, end: end + right.length });
     if (
@@ -85,6 +87,7 @@ export function textualDashes(
     const changesStart = changes.length;
     const rolesStart = roles.length;
     const marker = markers[index];
+    const leftStart = precedingSpaceStart(text, marker.index, " \u00a0");
     const next = markers[index + 1];
     const middle = next
       ? text.slice(marker.index + marker[0].length, next.index)
@@ -95,7 +98,8 @@ export function textualDashes(
       index++;
     } else if (
       settings.locale === "en-gb" &&
-      /\S[ \u00a0]+$/u.test(text.slice(0, marker.index)) &&
+      leftStart < marker.index &&
+      /\S/u.test(text[leftStart - 1] ?? "") &&
       /^[ \u00a0]+\S/u.test(text.slice(marker.index + marker[0].length))
     ) {
       format(marker, true);
@@ -104,23 +108,14 @@ export function textualDashes(
         start: marker.index,
         end: marker.index + marker[0].length,
       };
-      const left =
-        /[ \u00a0]*$/u.exec(text.slice(0, span.start))?.[0].length ?? 0;
+      const left = span.start - leftStart;
       const right = /^[ \u00a0]*/u.exec(text.slice(span.end))?.[0].length ?? 0;
       preserved.push({ start: span.start - left, end: span.end + right });
       if (settings.rules.dashes.enabled) ambiguous.push(span);
     }
     // Formatting a group of prose markers must not create a technical token
     // which would hide a different subset of those markers on a later call.
-    let candidate = text;
-    for (const change of changes
-      .slice(changesStart)
-      .sort((a, b) => b.start - a.start || b.end - a.end))
-      candidate =
-        candidate.slice(0, change.start) +
-        change.after +
-        candidate.slice(change.end);
-    if (changesTechnicalContext(text, candidate)) {
+    if (technical.changesTokens(changes.slice(changesStart))) {
       changes.length = changesStart;
       if (settings.rules.dashes.enabled)
         ambiguous.push(...roles.slice(rolesStart));
@@ -139,6 +134,17 @@ export function numericDashes(
   const changes: DashChange[] = [];
   const ambiguous: (ProtectedRange & { ruleId: RuleId })[] = [];
   const preserved: ProtectedRange[] = [];
+  const suffixes = new Set(bonds.map((bond) => bond.start));
+  const units = new Set(
+    bonds.filter((bond) => bond.ruleId === "units").map((bond) => bond.start),
+  );
+  const currencyEnds = new Map<number, number>();
+  for (const bond of bonds)
+    if (bond.ruleId === "currencies")
+      currencyEnds.set(
+        bond.end,
+        Math.max(currencyEnds.get(bond.end) ?? 0, bond.construction.end),
+      );
   let numericText = text;
   for (const role of textualRoles)
     numericText =
@@ -150,23 +156,18 @@ export function numericDashes(
     const end = start + match[0].length;
     if (
       /^[.,]/u.test(match[0]) &&
-      /[\p{L}\p{M}\p{N})\]"'»”’,;:!?.] *$/u.test(text.slice(0, start))
+      /[\p{L}\p{M}\p{N})\]"'»”’,;:!?.]$/u.test(
+        text.slice(0, precedingSpaceStart(text, start)),
+      )
     )
       start++;
     const before = numericText.slice(0, start);
-    const prefixCurrency = bonds.some(
-      (bond) =>
-        bond.ruleId === "currencies" &&
-        bond.end === start &&
-        bond.construction.end >= end,
-    );
+    const prefixCurrency = (currencyEnds.get(start) ?? -1) >= end;
     if (/[\p{L}\p{M}\p{N}\u00ad_/]$/u.test(before) && !prefixCurrency) continue;
-    const suffixBond = bonds.some((bond) => bond.start === end);
+    const suffixBond = suffixes.has(end);
     if (/[\p{L}\p{M}\p{N}\u00ad_/]/u.test(text[end] ?? "") && !suffixBond)
       continue;
-    const knownUnit = bonds.some(
-      (bond) => bond.ruleId === "units" && bond.start === end,
-    );
+    const knownUnit = units.has(end);
     const value = text.slice(start, end);
     const simple = !/[-+]$/u.test(before) && simpleNumberOrRange.test(value);
     if (!simple && /[-–]/u.test(value)) {

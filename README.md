@@ -134,6 +134,10 @@ in Chromium, Firefox and WebKit; CI runs it alongside the browser matrix.
 5. Run `pnpm check`. Public npm publication is a separate release step; a new
    package needs its initial publication and trusted publisher configuration.
 
+For the isolated typography growth check, run `pnpm build && pnpm test:scaling`.
+See [scaling regression](docs/acceptance/scaling.md) for the measured cases,
+behavior checks and limits.
+
 ## GitHub Flow
 
 The initial bootstrap is committed to `main`. After bootstrap, create a short
