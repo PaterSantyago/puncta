@@ -11,6 +11,7 @@ import {
   Puncta,
   PunctaProvider,
 } from "../../packages/with-react/dist/index.mjs";
+import { runGroupingCheck } from "./grouping.mjs";
 import { runProtectionCheck } from "./protection.mjs";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -116,5 +117,6 @@ window.runScopesCheck = async () => {
     stateAndNodePreserved: true,
     hydrationErrors: errors,
     ...(await runProtectionCheck()),
+    ...(await runGroupingCheck()),
   };
 };

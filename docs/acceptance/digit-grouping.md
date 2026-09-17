@@ -349,3 +349,32 @@ and scaling scenarios are still #91/#92. New source-level scopes/report scenario
 are verified by the public Node and component SSR suites. No mandatory manual
 check, release or public package publication was performed; publication simulations
 use an isolated local registry.
+
+## React runtime (slice #91)
+
+Issue [#91](https://github.com/PaterSantyago/puncta/issues/91) extends public React
+acceptance after #90. No production implementation change was needed: the existing
+render path already satisfies these contracts. Tests use independent literal
+expectations, not another Puncta transform as an oracle. New tests passed against
+the existing implementation; this is additional executable acceptance, not a claim
+of a new production red/green fix. Existing regression tests remain.
+
+| Requirement                                            | Executable evidence                                                                                                                                                                                                              |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| String(value), exact bigint, unchanged numeric types   | `digit-grouping-react.test.mjs`: changed number and 30-digit bigint, decimals, exponential exceptions, unchanged number/bigint/-0, both locales, disabled grouping                                                               |
+| Transparent leaves, keys/refs, pure/Context/protection | Numeric array and Fragment seams retain digits/types, original input, key/ref/attributes; pure output ignores surrounding Provider settings; opaque and protected leaves remain boundaries                                       |
+| Synchronous and streaming output                       | `ssr-streaming.test.mjs`: exact U+202F shell and normalized groups, independent fallback before controlled release, independent surrounding numbers, cancelled requests and fresh retries                                        |
+| Request isolation                                      | Five concurrent requests across both stream APIs, locale/threshold/normalization/disabled settings, reverse resumption, unchanged reports and source ranges, caller mutation isolation                                           |
+| Hydration and original nodes                           | `browser/hydration-*`: all three renderers, grouped shell/fallback/content, exact bigint, no errors; shell/content and shell child-node identity                                                                                 |
+| Updates from original children                         | `browser/grouping.mjs`: ten updates distinguish automatic separators from original commas/spaces/U+202F, both locales, threshold, normalization, numeric children, keyed reorder, counter/ref/text-node identity and no wrappers |
+| RSC boundaries                                         | Extended Next consumer: server-owned explicit grouping, client numeric leaves and package Flight slots, no-JS HTML and hydration, independent server settings, client source/locale/rule updates                                 |
+
+Environment: Darwin arm64, Node 24.21.0, pnpm 12.4.1, React/React DOM 19.3.0,
+Playwright 1.58.2, Next 16.3.5, frozen lockfile. Browser engines are Chromium
+145.0.7632.6, Firefox 146.0.1 and WebKit 26.0. The RSC fixture separately records
+Next's bundled React version. Execution revision and final checks are recorded
+below after independent review.
+
+Grouping-specific scaling, combined final acceptance and parent #86 completion
+remain #92. This runtime slice does not certify or close the parent. No manual
+visual gate, release or public publication is introduced.

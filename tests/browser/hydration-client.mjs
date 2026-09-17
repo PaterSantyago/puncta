@@ -7,6 +7,9 @@ window.releaseHydration = () => gate.release();
 const root = document.getElementById("root");
 if (!root) throw new Error("Hydration bootstrap arrived before shell");
 window.shellBeforeHydration = document.getElementById("shell");
+window.shellChildrenBeforeHydration = Array.from(
+  window.shellBeforeHydration.childNodes,
+);
 window.contentBeforeHydration = document.getElementById("content");
 window.hydrationRoot = hydrateRoot(
   root,
