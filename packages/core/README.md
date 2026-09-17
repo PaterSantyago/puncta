@@ -1,9 +1,10 @@
 # @use-puncta/core
 
 Synchronous ESM typography, with explicitly installed locales and no React or DOM
-requirement. The current implementation covers quotes, apostrophes, ordinary spaces, punctuation intervals and
-ellipses, units, percentages and currencies, including recognition across transparent inline leaves and nested
-configuration scopes (#39–#45).
+requirement. The implementation covers quotes, apostrophes, ordinary spaces, punctuation intervals,
+ellipses, dashes, ranges, minus, units, percentages and currencies, plus optional
+algorithmic hyphenation in en-gb and es-es. Recognition spans transparent inline
+leaves and respects nested configuration scopes.
 
 ```ts
 import { createPuncta } from "@use-puncta/core";
@@ -25,7 +26,12 @@ conversion creates no new edits. Read a locale identifier from `locale.id`;
 The `spaces` rule collapses repeated U+0020 spaces and fixes unambiguous punctuation
 intervals. It retains line endings, blank lines, indentation, tabs, existing NBSP,
 numeric punctuation and dates. In es-es it removes ordinary inner spaces after
-existing `¿`/`¡` and before `?`/`!`; it does not supply missing signs. Dashes are not reformatted by this slice.
+existing `¿`/`¡` and before `?`/`!`; it does not supply missing signs. Textual double-hyphen markers and recognised dashes use spaced en dashes in
+en-gb and closed em-dash insertions in es-es. A known unit disambiguates
+`10-12 kg` → `10–12\u00a0kg` and `-5 kg` → `−5\u00a0kg`. Standalone ranges
+require `rules.ranges.standalone: true`; ordinary word hyphens and dialogue
+markers are preserved. `rules.dashes.normalizeExisting: false` retains formatted
+dash styles while still recognising explicit markers.
 
 Spacing around ambiguous ellipses (including separated dots), spaced numeric
 punctuation and periods directly between text stays conservative. Detailed results
@@ -160,16 +166,39 @@ retain SHY. Disabling insertion does not disable removal.
 Removal validates settings and language minima without needing an insertion
 resource, including nested scopes.
 
-Algorithmic SHY insertion is available with the installed en-gb locale and
+Algorithmic SHY insertion is available with either installed locale and
 `hyphenation: { enabled: true }`. It runs after typography while retaining
 original source coordinates. Transparent leaves share word admission and seam
 insertions belong to the left leaf. Missing or incompatible resources produce
 `hyphenation.resource-unavailable` or `hyphenation.resource-incompatible` before
-a result is returned. Spanish insertion remains subsequent work; separate SHY
-removal still needs no insertion resource.
+a result is returned. Separate SHY removal needs no insertion resource.
 
-This is not completion of the first-version contract. The full warning catalogue
-and combined-rule acceptance remain subsequent work. Unsupported call options are rejected.
+Hyphenation admits lowercase or initial-capital words of at least six letters.
+English admits a–z; Spanish also admits á, é, í, ó, ú, ü and ñ, including
+unambiguously equivalent decomposed graphemes. The minimum left part is two
+letters; the minimum right part is three in en-gb and two in es-es. These minima
+can be raised. ALL CAPS, mixed case, digits, apostrophes, hyphens and existing SHY
+cause whole-word skips. Unsupported graphemes and mixed scripts preserve the
+word with diagnostics; Spanish words containing `tl` are skipped with
+`hyphenation.language-ambiguity`. No English pronunciation detector is promised.
+Opaque/protected/scope edges conservatively skip adjoining word fragments.
+
+```ts
+const hyphenated = puncta.with({ hyphenation: { enabled: true } });
+hyphenated.text("backbone"); // "back\u00adbone"
+hyphenated.stripSoftHyphens("back\u00adbone"); // "backbone"
+```
+
+These are selected editorial profiles: en-gb follows an Oxford-style quotation
+choice; es-es follows the agreed RAE-oriented profile. They do not exhaust valid
+editorial conventions. Frozen linguistic examples establish bounded evidence,
+not universal accuracy; optional valid hyphenation positions can be omitted.
+Actual line breaks depend on fonts, width, CSS and the rendering environment.
+Puncta inserts opportunities rather than laying out text. HTML is not sanitized.
+
+The repository's `docs/acceptance/first-version.md` records exact tested versions,
+all acceptance commands, corpus/resource identities and measured sizes/timings.
+Unsupported call options are rejected.
 
 MIT licensed, with ISC kernel attribution and Unicode data licensing in `NOTICE.md`.
 The API remains experimental; public publication is separate work.

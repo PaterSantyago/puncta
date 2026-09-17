@@ -1,6 +1,7 @@
 # @use-puncta/with-react
 
-ESM React 19.3 adapter for quotes, apostrophes, spaces, punctuation intervals and ellipses. Core is a regular dependency;
+ESM React 19.3 adapter for typography, optional en-gb/es-es hyphenation and
+separate SHY removal. Core is a regular dependency;
 React is a peer dependency, and React DOM is supplied by the application.
 
 ```tsx
