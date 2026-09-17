@@ -307,3 +307,78 @@ test("mixed nested locales, normalization overrides, entities and protection ret
     text.edits.every((e) => e.ranges.every((r) => r.start >= protectedEnd)),
   );
 });
+
+test("spaced en-dash ranges retain atomic eligibility and full source diagnostics", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    for (const gap of [" ", "\u00a0", "\u2009", "\u202f"]) {
+      const instance = make(locale, {
+        rules: { digitGrouping: { enabled: true }, dashes: { enabled: false } },
+      });
+      for (const [left, right, expectedLeft, expectedRight, warning] of [
+        ["12345", "67890", "12\u202f345", "67\u202f890", false],
+        ["00123", "123456", "00123", "123456", false],
+        ["123456", "00123", "123456", "00123", false],
+        ["12 34", "123456", "12 34", "123456", true],
+        ["123456", "12 34", "123456", "12 34", true],
+      ]) {
+        const source = `${left}${gap}–${gap}${right}`;
+        const expected = `${expectedLeft}${gap}–${gap}${expectedRight}`;
+        const plain = instance.text(source, { detailed: true });
+        assert.equal(
+          plain.result,
+          expected,
+          `${locale}: ${JSON.stringify(source)}`,
+        );
+        verifyReport(plain, expected, warning ? source : undefined, locale);
+        for (let split = 1; split < source.length; split++) {
+          const children = [
+            source.slice(0, split),
+            h("em", { key: "right" }, source.slice(split)),
+          ];
+          const html = instance.html(
+            `${escapeHtml(source.slice(0, split))}<em>${escapeHtml(source.slice(split))}</em>`,
+            { detailed: true },
+          );
+          const react = transformReact(children, { instance, detailed: true });
+          assert.equal(visible(html.result), expected);
+          assert.equal(visible(render(react.result)), expected);
+          assert.equal(
+            visible(render(h(Puncta, { instance }, children))),
+            expected,
+          );
+          for (const report of [html, react])
+            verifyReport(
+              report,
+              expected,
+              warning ? source : undefined,
+              locale,
+            );
+        }
+        assert.deepEqual(instance.text(expected, { detailed: true }).edits, []);
+      }
+    }
+  }
+});
+
+test("spaced range eligibility is independent of dashes and ranges formatting switches", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    for (const dashes of [true, false]) {
+      for (const ranges of [true, false]) {
+        const instance = make(locale, {
+          rules: {
+            digitGrouping: { enabled: true },
+            dashes: { enabled: dashes },
+            ranges: { enabled: ranges },
+          },
+        });
+        const source = "00123 – 123456; 12 34 – 123456; 12345 – 67890";
+        const expected =
+          "00123 – 123456; 12 34 – 123456; 12\u202f345 – 67\u202f890";
+        const report = instance.text(source, { detailed: true });
+        assert.equal(report.result, expected);
+        verifyReport(report, expected, "12 34 – 123456", locale);
+        assert.deepEqual(instance.text(expected, { detailed: true }).edits, []);
+      }
+    }
+  }
+});
