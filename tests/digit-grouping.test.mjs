@@ -331,3 +331,44 @@ test("disabled grouping retains the full previous report and cleanup", () => {
     previous,
   );
 });
+
+test("surrounding punctuation stays outside a standalone number", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    const instance = base.with({
+      locale,
+      rules: { digitGrouping: { enabled: true } },
+    });
+    for (const [source, expected] of [
+      ["¿12345?", "¿12\u202f345?"],
+      ["¡12345!", "¡12\u202f345!"],
+      ["12345:", "12\u202f345:"],
+      ["12345…", "12\u202f345…"],
+      ["12345...", "12\u202f345…"],
+    ])
+      assert.equal(instance.text(source), expected, `${locale}: ${source}`);
+  }
+});
+
+test("parentheses do not expose an operand of unsupported arithmetic", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    const instance = base.with({
+      locale,
+      rules: { digitGrouping: { enabled: true } },
+    });
+    for (const source of [
+      "12345 + (67890)",
+      "(12345) + 67890",
+      "(12345) + (67890)",
+      "12345 + ((67890))",
+      "12345 * [67890]",
+      "12345+(67890)",
+    ])
+      assert.deepEqual(
+        instance
+          .text(source, { detailed: true })
+          .edits.filter((edit) => edit.ruleIds.includes("digitGrouping")),
+        [],
+        `${locale}: ${source}`,
+      );
+  }
+});

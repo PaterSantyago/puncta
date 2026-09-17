@@ -1,4 +1,4 @@
-import { digitGroupingInsertions } from "./digit-grouping.js";
+import { digitGrouping } from "./digit-grouping.js";
 import { rangeIndex } from "./ranges.js";
 import { precedingSpaceStart } from "./spaces.js";
 import { numericDashes, textualDashes } from "./dashes.js";
@@ -98,10 +98,11 @@ export function segmentTypography(
       const dashes = textualDashes(text, settings);
       const bonds = numberBonds(text, settings);
       const numeric = numericDashes(text, settings, bonds, dashes.roles);
-      for (const position of digitGroupingInsertions(text, settings, [
+      const grouping = digitGrouping(text, settings, [
         ...numeric.preserved,
         ...bonds.map((bond) => bond.construction),
-      ]))
+      ]);
+      for (const position of grouping.insertions)
         edit(position, position, "\u202f", "digitGrouping");
       for (const change of numeric.changes)
         edit(change.start, change.end, change.after, change.ruleId);
@@ -155,6 +156,7 @@ export function segmentTypography(
         ...dashes.preserved,
         ...numeric.preserved,
         ...bonds.map((bond) => bond.construction),
+        ...grouping.preserved,
       ];
       // Start only at the beginning of a space run. Retrying at every space
       // makes a long indentation without any dots quadratic.
@@ -187,12 +189,6 @@ export function segmentTypography(
             "Numeric punctuation is ambiguous; its intervals were preserved.",
           );
       }
-      if (settings.rules.digitGrouping.enabled)
-        for (const match of text.matchAll(/(?<=\p{N}) {2,}(?=\p{N})/gu))
-          preserved.push({
-            start: match.index,
-            end: match.index + match[0].length,
-          });
       const preservedIndex = rangeIndex(text.length, preserved);
       let lineCursor = 0;
       let atLineStart = initialLineStart && offset === 0;
