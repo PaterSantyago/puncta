@@ -569,18 +569,29 @@ test("parallel grouping streams isolate locales, thresholds, normalization and r
 }, async (t) => {
   const children = h("p", null, "1,234; 12345; 12 345");
   const cases = [
-    ["pipeable", grouping(), "1\u202f234; 12\u202f345; 12\u202f345"],
-    ["readable", grouping("es-es"), "1,234; 12\u202f345; 12\u202f345"],
-    ["readable", grouping("en-gb", { minDigits: 6 }), "1,234; 12345; 12 345"],
+    ["pipeable", grouping(), "1\u202f234; 12\u202f345; 12\u202f345", "en-gb"],
+    ["readable", grouping("es-es"), "1,234; 12\u202f345; 12\u202f345", "es-es"],
+    [
+      "readable",
+      grouping("en-gb", { minDigits: 6 }),
+      "1,234; 12345; 12 345",
+      "en-gb",
+    ],
     [
       "pipeable",
       grouping("en-gb", { normalizeExisting: false }),
       "1,234; 12\u202f345; 12 345",
+      "en-gb",
     ],
-    ["readable", grouping("es-es", { enabled: false }), "1,234; 12345; 12 345"],
+    [
+      "readable",
+      grouping("es-es", { enabled: false }),
+      "1,234; 12345; 12 345",
+      null,
+    ],
   ];
   const requests = await Promise.all(
-    cases.map(async ([renderer, instance, expected]) => {
+    cases.map(async ([renderer, instance, expected, expectedWarningLocale]) => {
       const delayed = deferredContent();
       const report = transformReact("12 34; 12345", {
         instance,
@@ -604,7 +615,15 @@ test("parallel grouping streams isolate locales, thresholds, normalization and r
       await stream.until("</i>");
       assert.equal(stream.allReady, false);
       assert.ok(stream.html.includes(`<p>${expected}</p>`));
-      return { stream, delayed, instance, expected, report, snapshot };
+      return {
+        stream,
+        delayed,
+        instance,
+        expected,
+        report,
+        snapshot,
+        expectedWarningLocale,
+      };
     }),
   );
   for (const request of requests.toReversed()) {
@@ -626,13 +645,16 @@ test("parallel grouping streams isolate locales, thresholds, normalization and r
       request.report,
     );
   }
-  for (const [index, { report }] of requests.entries()) {
+  for (const { report, expectedWarningLocale } of requests) {
     assert.deepEqual(report.sources, [
       { id: 0, text: "12 34; 12345", path: [] },
     ]);
-    assert.equal(report.warnings.length, index === 4 ? 0 : 1);
-    if (index !== 4) {
-      assert.equal(report.warnings[0].locale, index === 1 ? "es-es" : "en-gb");
+    assert.equal(
+      report.warnings.length,
+      expectedWarningLocale === null ? 0 : 1,
+    );
+    if (expectedWarningLocale !== null) {
+      assert.equal(report.warnings[0].locale, expectedWarningLocale);
       assert.equal(report.warnings[0].ruleId, "digitGrouping");
       assert.deepEqual(report.warnings[0].location.ranges, [
         { sourceId: 0, start: 0, end: 5 },
