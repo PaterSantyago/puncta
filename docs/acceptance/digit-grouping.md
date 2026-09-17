@@ -76,9 +76,78 @@ release/publication and changing or closing parent #86 are outside #93.
 
 ## Final execution (#93)
 
-Final gates and independent review results are recorded here after completion.
-The execution environment uses macOS arm64, Node 24.21.0 and pnpm 12.4.1 with the
-frozen lockfile; React/React DOM 19.3.0. RSC uses Next 16.3.5 and its bundled canary.
+Implementation and executable-test revision: `a1dbffa72af52003b97976d7f8e783f512c5079b`,
+2026-09-17. This subsequent documentation-only commit records the completed runs;
+PR CI checks its exact final head separately. No old slice PASS is substituted
+for these results. The earlier interrupted check at `9388f14` was stopped for the
+signed-endpoint review fix and is not a successful gate.
+
+Environment: macOS Darwin 27.0.0 arm64, Node 24.21.0, pnpm 12.4.1, frozen lockfile,
+React/React DOM 19.3.0, Playwright 1.58.2. Next 16.3.5 uses bundled server/client
+React `19.3.0-canary-cbb046ab-20260731` in the RSC fixture.
+
+```sh
+export PATH=/Users/yuryglushkov/.nvm/versions/node/v24.21.0/bin:$PATH
+pnpm install --frozen-lockfile
+pnpm typecheck
+pnpm build
+node --test tests/digit-grouping*.test.mjs tests/ssr-streaming.test.mjs tests/dashes.test.mjs
+pnpm check
+NODE_ENV=production node --test tests/ssr-streaming.test.mjs tests/digit-grouping*.test.mjs
+pnpm test:browser
+pnpm test:rsc
+pnpm test:scaling
+```
+
+| Final check                      | Result                                                                                                                                                                                                                                                    |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Focused grouping, dashes and SSR | 92/92 PASS after both review fixes                                                                                                                                                                                                                        |
+| `pnpm check`                     | PASS: lint, formatting, typecheck, build, package archives, 286 functional tests, 3 release tests, 6 local publication simulations, installed npm/pnpm consumers and release-plan validation                                                              |
+| Production SSR + all grouping    | 82/82 PASS                                                                                                                                                                                                                                                |
+| Browser                          | Chromium 145.0.7632.6, Firefox 146.0.1, WebKit 26.0: each 149 shared checks, 14 existing mounted updates, eight protection/reorder scenarios, 13 grouping updates and three hydration renderers PASS; no hydration errors, original DOM identity retained |
+| Production RSC                   | All three engines PASS: Flight, no-JS server HTML, hydration, independent server/client grouping and interactive updates                                                                                                                                  |
+| Scaling                          | All 15 scenarios PASS in isolation after other builds/tests; 3.363–5.408× median growth for 4× input, below 8×                                                                                                                                            |
+| Standards review                 | Independent Astra medium review, initial and follow-ups: no actionable findings at final implementation revision                                                                                                                                          |
+| Spec review                      | Independent Astra medium review found spaced-range atomicity P1 and signed-right-endpoint P2; both received public RED→GREEN regressions and final independent re-review confirmed closure with no remaining findings                                     |
+
+The complete matrix above is exercised by these commands. Seeds 8801/8901 each
+run 120 examples, 9001 runs 64 scoped trees, and 9201 runs 120 long models; their
+positive, preserved and diagnostic outcome assertions passed in this final run.
+The new canonical and mixed corpora are literal, without an additional seed.
+
+Browser and RSC artifacts at `artifacts/browser/acceptance.json` and
+`artifacts/rsc/report.json` identify the implementation revision above. CI uploads
+its own final-head artifacts. All checks are automated; there is no required
+manual visual or corpus attestation. Publication tests use an isolated local
+registry, not a public package release.
+
+### Final scaling measurements
+
+Three warmups and seven timed samples per size, median milliseconds. Imports,
+instance and input construction stay outside timing. Numeric scenarios use en-gb,
+detailed reports and disabled hyphenation; functional coverage includes both locales.
+HTML/React leaf counts grow from 1,000 to 4,000; text has one source leaf.
+HTML input lengths include markup; other input lengths describe text. No concurrent
+local builds/tests ran during measurement. This is a workload regression bound,
+not a global linearity or portable latency guarantee.
+
+| Scenario               | Text UTF-16 lengths | Input lengths   | Leaves        | Small ms | Large ms | Ratio  |
+| ---------------------- | ------------------- | --------------- | ------------- | -------- | -------- | ------ |
+| spaces                 | 4,000 / 16,000      | 4,000 / 16,000  | 1 / 1         | 1.693    | 6.542    | 3.865× |
+| words                  | 1,000 / 4,000       | 1,000 / 4,000   | 1 / 1         | 0.971    | 3.264    | 3.363× |
+| mixed                  | 4,300 / 17,200      | 4,300 / 17,200  | 1 / 1         | 3.992    | 14.555   | 3.646× |
+| grouping-digits-text   | 3,000 / 12,000      | 3,000 / 12,000  | 1 / 1         | 1.066    | 3.948    | 3.704× |
+| grouping-digits-html   | 3,000 / 12,000      | 12,000 / 48,000 | 1,000 / 4,000 | 3.952    | 14.824   | 3.751× |
+| grouping-digits-react  | 3,000 / 12,000      | 3,000 / 12,000  | 1,000 / 4,000 | 3.039    | 11.175   | 3.677× |
+| grouping-decimal-text  | 3,000 / 12,000      | 3,000 / 12,000  | 1 / 1         | 1.000    | 3.814    | 3.814× |
+| grouping-decimal-html  | 3,000 / 12,000      | 12,000 / 48,000 | 1,000 / 4,000 | 2.806    | 15.177   | 5.408× |
+| grouping-decimal-react | 3,000 / 12,000      | 3,000 / 12,000  | 1,000 / 4,000 | 2.719    | 11.313   | 4.161× |
+| grouping-groups-text   | 4,000 / 16,000      | 4,000 / 16,000  | 1 / 1         | 1.674    | 7.274    | 4.346× |
+| grouping-groups-html   | 4,000 / 16,000      | 13,000 / 52,000 | 1,000 / 4,000 | 4.049    | 18.223   | 4.501× |
+| grouping-groups-react  | 4,000 / 16,000      | 4,000 / 16,000  | 1,000 / 4,000 | 3.295    | 13.546   | 4.111× |
+| grouping-invalid-text  | 4,000 / 16,000      | 4,000 / 16,000  | 1 / 1         | 1.580    | 5.973    | 3.781× |
+| grouping-invalid-html  | 4,000 / 16,000      | 13,000 / 52,000 | 1,000 / 4,000 | 3.425    | 16.174   | 4.722× |
+| grouping-invalid-react | 4,000 / 16,000      | 4,000 / 16,000  | 1,000 / 4,000 | 2.858    | 11.623   | 4.067× |
 
 ## Historical slice evidence
 
