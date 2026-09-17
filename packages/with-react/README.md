@@ -125,10 +125,12 @@ transformReact("12345", {
 // "12\u202f345"
 ```
 
-The first slice supports standalone ungrouped integers and locale decimals through
-transparent leaves, including arrays and Fragment. Insertions at a leaf boundary
-belong to the left leaf. Protection and opaque components still stop recognition;
-the original children are not mutated. Existing groups, ranges and number-bond
-constructions are deferred and excluded from grouping. This slice establishes
-component `renderToString` coverage; new grouping streaming/hydration fixtures
-belong to later acceptance slices. See [core settings and current limits](../core/README.md#opt-in-digit-grouping-first-implementation-slice).
+Standalone integers, existing groups and locale decimals work through transparent
+leaves, including arrays and Fragment. Insertions at a leaf boundary belong to the
+left leaf; a replaced group separator remains in its original leaf. Invalid
+candidates retain their text and detailed reports locate the whole candidate
+across its source leaves. Protection and opaque components stop recognition; the
+original children are not mutated. Ranges and number-bond constructions remain
+deferred. Component `renderToString` coverage includes normalization; new grouping
+streaming/hydration fixtures belong to later acceptance slices. See
+[core settings and current limits](../core/README.md#opt-in-standalone-digit-grouping).

@@ -86,3 +86,40 @@ recognition now returns its own preserved ranges. Follow-up review found no
 remaining standards findings. Spec review found punctuation boundaries and
 parenthesized/tab-separated arithmetic gaps; red-then-green public regressions
 cover the fixes, and follow-up review confirmed all findings addressed.
+
+## Existing groups and complete candidates: slice #88
+
+[#88](https://github.com/PaterSantyago/puncta/issues/88) extends the historical #87
+baseline above. Existing-group normalization and diagnostics are now implemented
+for standalone candidates. Ranges and known unit/currency/percentage constructions
+remain #89; expanded inheritance/coordinates, streaming/hydration, scaling and
+final acceptance remain later slices. The historical #87 PASS results do not
+certify these new changes.
+
+| #88 criterion                      | Executable evidence in `tests/digit-grouping.test.mjs`                                                                                                                                                                                                                          |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Grammar and localization           | Four group spaces, allowed mixtures, en-gb commas, decimal fractions and trailing zeros; existing locale literal oracles; es-es conflict diagnostics                                                                                                                            |
+| Threshold and normalization        | Default 5 and explicit 4, below-threshold preservation, both normalization settings, unchanged U+202F; generated threshold 12 and diagnostic MAX_SAFE_INTEGER                                                                                                                   |
+| Expected exclusions                | Leading zeros, missing integer, Unicode/mixed digits, combining marks, identifiers/suffixes, scientific/date/time/fraction/version structures and arithmetic, including malformed operands and parentheses                                                                      |
+| Full candidate and diagnostics     | Literal malformed groups, conflicting separators and punctuation-space examples; one structured grouping warning with full UTF-16 range, locale, empty details; large threshold and disabled normalization do not suppress it                                                   |
+| Cleanup and boundaries             | Double/repeated and mixed group spaces, tabs, newlines, comma/period lists and repeat-pass empty edits; disabled compatibility retains the previous report                                                                                                                      |
+| Public representations and reports | All two-leaf splits of compact normalized/ambiguous examples through HTML, pure React and component SSR; warning source ranges; separator ownership, independent replacement edits and exact entity input ranges                                                                |
+| Generated properties               | Seed 8801, 120 cases combining both locales, valid/malformed groups, group-space mixtures, comma groups, signs, literal fractions, thresholds and normalization; exact output, digit/fraction preservation, replay, idempotence, per-character HTML/React splits and protection |
+
+Expected valid generated results assemble independently selected literal groups
+with U+202F; they do not invoke a formatter or convert numbers to JavaScript
+number. Malformed cases shorten a full group and require unchanged output with a
+warning. Failure messages retain initial seed, sample index, state and the exact
+source, permitting replay and reduction to the offending candidate. During test
+development seed 8801 exposed an oracle error comparing serialized `&nbsp;` to
+decoded NBSP; the HTML comparison now decodes NBSP. No production change was made
+for that test-only mismatch.
+
+The new normalization, diagnostic and mixed-boundary assertions each failed
+before their corresponding implementation changes. Focused suites and typecheck
+run throughout development. The mixed-boundary regression preserves U+202F plus
+two ordinary spaces, which cleanup previously shortened. Token coalescing also
+keeps malformed groups inside arithmetic from producing fragment warnings.
+
+Execution results and independent review for this slice are recorded below once
+completed; no pending check is claimed as PASS.

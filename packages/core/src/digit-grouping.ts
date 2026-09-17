@@ -2,52 +2,92 @@ import { rangeIndex } from "./ranges.js";
 import type { Settings } from "./settings.js";
 import type { ProtectedRange } from "./types.js";
 
-/** Accept complete standalone tokens, never a digit prefix or suffix of a
- * notation whose recognition belongs to a later grouping slice. */
+interface GroupingResult {
+  changes: ProtectedRange[];
+  preserved: ProtectedRange[];
+  ambiguous: ProtectedRange[];
+}
+
+/** Recognize a complete standalone candidate before planning separator edits.
+ * Ranges and known number bonds remain owned by their recognizers. */
 export function digitGrouping(
   text: string,
   settings: Settings,
   excluded: readonly ProtectedRange[],
-): { insertions: number[]; preserved: ProtectedRange[] } {
-  const insertions: number[] = [];
+): GroupingResult {
+  const changes: ProtectedRange[] = [];
   const preserved: ProtectedRange[] = [];
-  if (!settings.rules.digitGrouping.enabled) return { insertions, preserved };
+  const ambiguous: ProtectedRange[] = [];
+  if (!settings.rules.digitGrouping.enabled)
+    return { changes, preserved, ambiguous };
   // Cleanup must not turn separate numbers into one grouped candidate next time.
-  for (const match of text.matchAll(/(?<=\p{N}) {2,}(?=\p{N})/gu))
+  for (const match of text.matchAll(
+    /(?<=\p{N})[ \u00a0\u2009\u202f]{2,}(?=\p{N})/gu,
+  ))
     preserved.push({ start: match.index, end: match.index + match[0].length });
   const excludedIndex = rangeIndex(text.length, excluded);
   const grammar =
     settings.locale === "en-gb"
-      ? /^([+−-]?)([0-9]+)(?:\.[0-9]+)?$/u
-      : /^([+−-]?)([0-9]+)(?:[.,][0-9]+)?$/u;
+      ? /^([+−-]?)([0-9]+|[0-9]{1,3}(?:,[0-9]{3})+|[0-9]{1,3}(?:[ \u00a0\u2009\u202f][0-9]{3})+)(?:\.[0-9]+)?$/u
+      : /^([+−-]?)([0-9]+|[0-9]{1,3}(?:[ \u00a0\u2009\u202f][0-9]{3})+)(?:[.,][0-9]+)?$/u;
   const tokens = [...text.matchAll(/[^\s;!?¿¡()[\]{}"'“”‘’«»\uFFFC]+/gu)];
-  for (const [index, token] of tokens.entries()) {
-    const end = token.index + token[0].length;
+  for (let index = 0; index < tokens.length; index++) {
+    const token = tokens[index];
+    let last = token;
+    while (index + 1 < tokens.length) {
+      const next = tokens[index + 1];
+      if (
+        !connectsNumberTokens(
+          last[0],
+          text.slice(last.index + last[0].length, next.index),
+          next[0],
+        )
+      )
+        break;
+      last = next;
+      index++;
+    }
+    const candidate = text
+      .slice(token.index, last.index + last[0].length)
+      .replace(/[.,:…]+$/u, "");
+    const end = token.index + candidate.length;
     if (excludedIndex.overlaps(token.index, end)) continue;
-    const previous = tokens[index - 1];
-    const next = tokens[index + 1];
-    if (
-      (previous &&
-        connectsNumberTokens(
-          previous[0],
-          text.slice(previous.index + previous[0].length, token.index),
-          token[0],
-        )) ||
-      (next &&
-        connectsNumberTokens(token[0], text.slice(end, next.index), next[0]))
-    )
+    const match = grammar.exec(candidate);
+    if (!match) {
+      // Structural exclusions and unsupported digits/identifiers take priority
+      // over an apparently malformed numeric fragment within them.
+      if (!/^[+−-]?[0-9][0-9., \u00a0\u2009\u202f]*$/u.test(candidate))
+        continue;
+      const unsigned = candidate.replace(/^[+−-]/u, "");
+      preserved.push({ start: token.index, end });
+      if (
+        /^0[0-9, \u00a0\u2009\u202f]/u.test(unsigned) ||
+        /^[0-9]+(?:\.[0-9]+){2,}$/u.test(unsigned)
+      )
+        continue;
+      ambiguous.push({ start: token.index, end });
       continue;
-    const match = grammar.exec(token[0].replace(/[.,:…]+$/u, ""));
-    if (!match) continue;
+    }
     const integer = match[2];
-    if (integer.length > 1 && integer.startsWith("0")) continue;
-    if (integer.length < Number(settings.rules.digitGrouping.minDigits))
+    const digits = integer.replace(/[, \u00a0\u2009\u202f]/gu, "");
+    preserved.push({ start: token.index, end });
+    if (digits.length > 1 && digits.startsWith("0")) continue;
+    if (digits.length < Number(settings.rules.digitGrouping.minDigits))
       continue;
     const start = token.index + match[1].length;
-    for (let offset = integer.length - 3; offset > 0; offset -= 3)
-      insertions.push(start + offset);
+    if (digits.length !== integer.length) {
+      if (!settings.rules.digitGrouping.normalizeExisting) continue;
+      for (const separator of integer.matchAll(/[, \u00a0\u2009]/gu))
+        changes.push({
+          start: start + separator.index,
+          end: start + separator.index + 1,
+        });
+    } else {
+      for (let offset = integer.length - 3; offset > 0; offset -= 3)
+        changes.push({ start: start + offset, end: start + offset });
+    }
   }
-  return { insertions, preserved };
+  return { changes, preserved, ambiguous };
 }
 
 /** A group-space or separated operator still connects a numerical construction.
