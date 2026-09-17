@@ -152,12 +152,17 @@ export function createPuncta(
           ? a.location.ranges[0].start - b.location.ranges[0].start
           : 0,
       );
-      let result = source;
-      for (const edit of [...edits].reverse()) {
+      // Disjoint edits already follow original source order. Assemble once rather
+      // than copying a growing result for every separator in a long number.
+      const pieces: string[] = [];
+      let cursor = 0;
+      for (const edit of edits) {
         const range = edit.ranges[0];
-        result =
-          result.slice(0, range.start) + edit.after + result.slice(range.end);
+        pieces.push(source.slice(cursor, range.start), edit.after);
+        cursor = range.end;
       }
+      pieces.push(source.slice(cursor));
+      const result = pieces.join("");
       if (!call.detailed) return result;
       return {
         ...(!includeHyphenation ? { apostrophes } : {}),
@@ -252,21 +257,24 @@ export function createPuncta(
               recognition.quotation,
               false,
             ),
-          insertions: (
-            source: string,
-            edits: readonly Edit[],
-            edges: WordEdges,
-            apostrophes: readonly ProtectedRange[],
-          ) =>
-            insertHyphens(
-              source,
-              resolveSettings(settings),
-              [],
-              edits,
-              validateResource(settings),
-              edges,
-              apostrophes,
-            ),
+          // Adapters need no edit projection for an inactive insertion pass.
+          insertions: !resolveSettings(settings).hyphenation.enabled
+            ? undefined
+            : (
+                source: string,
+                edits: readonly Edit[],
+                edges: WordEdges,
+                apostrophes: readonly ProtectedRange[],
+              ) =>
+                insertHyphens(
+                  source,
+                  resolveSettings(settings),
+                  [],
+                  edits,
+                  validateResource(settings),
+                  edges,
+                  apostrophes,
+                ),
         }),
       }),
     }) as PunctaInstance;

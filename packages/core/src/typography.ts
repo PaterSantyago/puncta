@@ -177,7 +177,11 @@ export function segmentTypography(
             "Ellipsis spacing is ambiguous; its intervals were preserved.",
           );
       }
-      for (const match of text.matchAll(/\p{N}+(?: *[.,:/-] *\p{N}+)+/gu)) {
+      // A suffix of the same digit run cannot succeed when its full run failed.
+      // Avoid retrying the punctuation search at every digit of a long integer.
+      for (const match of text.matchAll(
+        /(?<!\p{N})\p{N}+(?: *[.,:/-] *\p{N}+)+/gu,
+      )) {
         const start = match.index;
         const end = start + match[0].length;
         preserved.push({ start, end });

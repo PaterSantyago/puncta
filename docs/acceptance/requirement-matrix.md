@@ -147,3 +147,15 @@ original DOM identity and source/settings/locale updates; and the production RSC
 boundary. The linked matrix records executable checks and revision-specific
 results. Existing key/ref/protection limits remain. Grouping-specific scaling and
 final combined parent #86 acceptance remain #92; this entry does not certify them.
+
+### Long numeric records and scaling (#92)
+
+`tests/digit-grouping-long.test.mjs` adds exact long digit/decimal/group/invalid
+models, UTF-16 report replay and fixed points for text, HTML and pure React in both
+locales. Seed 9201 runs 120 generated models and asserts that both locales reach
+changes, expected preservation and warnings; failures emit a minimized model and
+source. The separate scaling gate now covers 12 enabled numeric text/HTML/React
+scenarios, with exact 4× input and transparent-tree growth. See
+[functional mapping](digit-grouping.md#long-input-and-scaling-slice-92) and
+[measurements](scaling.md#long-numeric-records-and-transparent-trees-92).
+Final combined parent acceptance remains #93.
