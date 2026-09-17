@@ -103,7 +103,7 @@ JSX component or server Provider is supplied.
 
 MIT licensed. Public publication is separate work.
 
-## Opt-in standalone digit grouping
+## Opt-in digit grouping
 
 The shared nullable `rules.digitGrouping` option is available through component
 `options`, Provider/instance settings and `transformReact`. Both locales default to
@@ -136,9 +136,11 @@ Grouping and normalization are delivered by `renderToString`,
 `renderToPipeableStream` and `renderToReadableStream`, including shell/fallback
 before suspended content resolves. Concurrent requests isolate grouping options,
 locales and reports; abort/retry starts again from original children.
-Chromium, Firefox and WebKit checks cover hydration and updates without DOM repair,
+The mixed corpus includes normalized groups, ranges, exterior bonds and surrounding
+typography in independent shell/fallback/content scopes. Chromium, Firefox and
+WebKit checks cover hydration and updates without DOM repair,
 extra wrappers or replacement of the original shell/content nodes. See
-[core settings and current limits](../core/README.md#opt-in-standalone-digit-grouping).
+[core settings and current limits](../core/README.md#opt-in-digit-grouping).
 
 ### Inheritance and grouping reports
 

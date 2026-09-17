@@ -81,7 +81,7 @@ is part of this check.
 The new `tests/digit-grouping-bonds.test.mjs` suite checks number bonds and ranges
 through component `renderToString`, including every transparent split and seeded
 multi-leaf inputs. This adds synchronous component evidence only. The existing
-streaming fixtures remain a regression gate; new grouping-specific streaming and
+streaming fixtures were a regression gate at #89; grouping-specific streaming and
 hydration acceptance belongs to #91. Current commands and results are recorded in
 [digit grouping, slice #89](digit-grouping.md#number-bonds-and-ranges-slice-89).
 
@@ -105,3 +105,14 @@ NBSP/SHY checks remain. The shell's original text/element child nodes are retain
 as well as shell/content element identity. Runtime update checks cover source,
 locale, threshold, normalization, disabling/re-enabling and keyed state/ref identity.
 See [the execution matrix](digit-grouping.md#react-runtime-slice-91).
+
+## Final mixed grouping acceptance (#93)
+
+Both stream renderers now deliver the complete English mixed oracle in shell and
+the Spanish oracle in fallback before controlled Suspense resolution, then in
+content. `renderToString` checks the same independent expectations. The browser
+HTTP fixture combines range/unit grouping with quotes, hyphenation, normalization,
+locale boundaries and protection; mounted updates also cover range/decimal/bond
+inputs with grouping toggled and locale changed. Existing cancellation, concurrent
+request isolation, DOM identity and RSC checks remain required. Current results
+are recorded in [final execution](digit-grouping.md#final-execution-93).

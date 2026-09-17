@@ -1,3 +1,4 @@
+import { mixedGrouping } from "./fixtures/digit-grouping.mjs";
 import assert from "node:assert/strict";
 import { Writable } from "node:stream";
 import { test } from "node:test";
@@ -672,3 +673,59 @@ test("parallel grouping streams isolate locales, thresholds, normalization and r
     "12 34; 12345",
   );
 });
+
+for (const renderer of ["pipeable", "readable"]) {
+  test(`${renderer}: mixed range and bond corpus is complete in shell/fallback before resolution`, {
+    timeout: 10000,
+  }, async (t) => {
+    const delayed = deferredContent();
+    const [english, spanish] = mixedGrouping;
+    const instance = make("en-gb", {
+      rules: { digitGrouping: { enabled: true } },
+      hyphenation: { enabled: true },
+    });
+    const tree = h(
+      Puncta,
+      { instance },
+      h("p", { id: "mixed-shell" }, english.source),
+      h(
+        Suspense,
+        {
+          fallback: h(
+            Puncta,
+            { locale: "es-es" },
+            h("p", { id: "mixed-fallback" }, spanish.source),
+          ),
+        },
+        h(
+          delayed.Delayed,
+          null,
+          h(
+            Puncta,
+            { locale: "es-es" },
+            h("p", { id: "mixed-content" }, spanish.source),
+          ),
+        ),
+      ),
+      h("code", null, '"12345-67890kg..."'),
+    );
+    const sync = renderToString(tree);
+    assert.ok(sync.includes(english.expected));
+    assert.ok(sync.includes(spanish.expected));
+    const stream = await capture(t, renderer, tree);
+    await stream.until(`id="mixed-fallback"`);
+    assert.equal(stream.allReady, false);
+    assert.ok(stream.html.includes(english.expected));
+    assert.ok(stream.html.includes(spanish.expected));
+    assert.equal(stream.html.includes('id="mixed-content"'), false);
+    delayed.release();
+    await stream.done;
+    assert.ok(
+      stream.html.includes(`<p id="mixed-content">${spanish.expected}</p>`),
+    );
+    assert.ok(
+      stream.html.includes("<code>&quot;12345-67890kg...&quot;</code>"),
+    );
+    assert.deepEqual(stream.errors, []);
+  });
+}

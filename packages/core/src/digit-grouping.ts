@@ -14,6 +14,7 @@ export function digitGrouping(
   text: string,
   settings: Settings,
   bonds: readonly NumberBond[],
+  textualRoles: readonly ProtectedRange[],
 ): GroupingResult {
   const changes: ProtectedRange[] = [];
   const preserved: ProtectedRange[] = [];
@@ -37,6 +38,9 @@ export function digitGrouping(
       continue;
     characters.fill("\uFFFC", designation.start, designation.end);
   }
+  // Recognized prose dashes bound numeric context even when their formatting
+  // is disabled. Keep their role distinct from arithmetic/range operators.
+  for (const { start, end } of textualRoles) characters.fill(";", start, end);
   const numericText = characters.join("");
   const grammar =
     settings.locale === "en-gb"

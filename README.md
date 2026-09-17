@@ -1,13 +1,14 @@
 # Puncta
 
 Puncta is an MIT-licensed ESM typography library. It implements quotes,
-apostrophes, spacing, ellipses, dashes, number bonds and optional algorithmic
-soft hyphens with protection and nested scopes.
+apostrophes, spacing, ellipses, dashes, number bonds, optional digit grouping and
+algorithmic soft hyphens with protection and nested scopes.
 It contains four packages:
 `@use-puncta/core`, `@use-puncta/with-react`, `@use-puncta/with-en-gb` and
 `@use-puncta/with-es-es`. Public npm releases are separate work.
 See [the implemented API and limitations](packages/core/README.md) and
-[the first-version acceptance report](docs/acceptance/first-version.md).
+[the first-version acceptance report](docs/acceptance/first-version.md) and
+[the digit-grouping extension](docs/acceptance/digit-grouping.md).
 
 ## Development
 

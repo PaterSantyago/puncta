@@ -8,10 +8,11 @@ import {
 } from "../../packages/with-react/dist/index.mjs";
 
 export const expected = {
-  shell: "‘back\u00adbone 24\u00a0kg…’ 12\u202f345; 12\u202f345",
-  fallback: "«Ya…» 67\u202f890",
+  shell:
+    "‘back\u00adbone 12\u202f345–67\u202f890\u00a0kg…’ 12\u202f345; 12\u202f345",
+  fallback: "«Ya…» 67\u202f890–123\u202f456\u00a0kg",
   content:
-    "«ca\u00admi\u00adno 50\u00a0%…» 12,345; 123\u202f456\u202f789\u202f012\u202f345\u202f678\u202f901\u202f234\u202f567\u202f890",
+    "«ca\u00admi\u00adno 12\u202f345\u00a0%…» 12,345; 123\u202f456\u202f789\u202f012\u202f345\u202f678\u202f901\u202f234\u202f567\u202f890",
   protected: '"backbone 24kg..." 12345',
 };
 export function createGate(ready = false) {
@@ -49,7 +50,7 @@ export function tree(gate, onHydrated = () => {}, onShellHydrated = () => {}) {
       h(
         "p",
         { id: "content" },
-        '"camino 50%..." 12,345; ',
+        '"camino 12345%..." 12,345; ',
         123456789012345678901234567890n,
       ),
     );
@@ -66,7 +67,7 @@ export function tree(gate, onHydrated = () => {}, onShellHydrated = () => {}) {
         { id: "shell" },
         '"back',
         h("em", null, "bone"),
-        ' 24kg..." ',
+        ' 12345-67890kg..." ',
         12345,
         "; 12,345",
       ),
@@ -76,7 +77,7 @@ export function tree(gate, onHydrated = () => {}, onShellHydrated = () => {}) {
           fallback: h(
             Puncta,
             { locale: "es-es" },
-            h("p", { id: "fallback" }, '"Ya..." ', 67890),
+            h("p", { id: "fallback" }, '"Ya..." ', 67890, "–123456kg"),
           ),
         },
         h(Content),

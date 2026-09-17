@@ -83,6 +83,18 @@ export async function runGroupingCheck() {
     check(ref.current, span);
     await act(() => button.click());
     const updates = [
+      [
+        { source: '"12345-67890kg..."; 12,345.00; 12345%' },
+        "‘12\u202f345–67\u202f890\u00a0kg…’; 12\u202f345.00; 12\u202f345% | 1",
+      ],
+      [
+        { source: '"12345-67890kg..."; 12 345,00; 12345%', locale: "es-es" },
+        "«12\u202f345–67\u202f890\u00a0kg…»; 12\u202f345,00; 12\u202f345\u00a0% | 1",
+      ],
+      [
+        { source: '"12345-67890kg..."; 12,345.00; 12345%', enabled: false },
+        "‘12345–67890\u00a0kg…’; 12,345.00; 12345% | 1",
+      ],
       [{ enabled: false }, "1,234; 12345; 12 345; 12\u202f345 | 1"],
       [
         { normalizeExisting: false },
