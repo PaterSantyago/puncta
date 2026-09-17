@@ -202,3 +202,46 @@ Unsupported call options are rejected.
 
 MIT licensed, with ISC kernel attribution and Unicode data licensing in `NOTICE.md`.
 The API remains experimental; public publication is separate work.
+
+## Opt-in digit grouping (first implementation slice)
+
+`rules.digitGrouping` is a nullable group with defaults
+`{ enabled: false, minDigits: 5, normalizeExisting: true }` in both locales.
+`minDigits` and `normalizeExisting` alone do not enable it. The fields follow the
+same inheritance and null-reset model as other rule groups.
+
+```ts
+const grouped = puncta.with({ rules: { digitGrouping: { enabled: true } } });
+grouped.text("12345.6700"); // "12\u202f345.6700"
+grouped.text("2026"); // "2026"
+grouped.text("2026", { rules: { digitGrouping: { minDigits: 4 } } }); // "2\u202f026"
+grouped.html("12<em>345</em>"); // "12\u202f<em>345</em>"
+```
+
+This slice supports standalone ungrouped ASCII integers and decimals, an optional
+leading `+`, `-` or `−`, decimal `.` in en-gb and decimal `.` or `,` in es-es.
+Only the integer digit count controls the threshold; digits, decimal signs and
+fractional trailing zeros remain text, without numeric conversion. The independent
+minus rule may still format an ASCII sign. Leading zeros, existing groups,
+technical or ambiguous candidates, ranges and recognised unit/currency/percentage
+constructions are conservatively excluded from grouping in this slice. Their
+existing typography rules still run. Existing-group normalization and grouping
+warnings are deferred, although `normalizeExisting` is already accepted and
+validated. This is not the complete contract of issue #86.
+
+`minDigits` accepts safe integers from 4 through `Number.MAX_SAFE_INTEGER`.
+Invalid settings throw `PunctaConfigError` / `config.invalid-option` even if
+processing is disabled: wrong types use `details.reason: "type"`, invalid numeric
+values use `"value"`, and unknown fields use `"unknown"`, with the exact
+`optionPath`. All three fields accept null or undefined; the group accepts an
+object, null or undefined, never a boolean shorthand.
+
+The public `RuleId` union gains `"digitGrouping"`; exhaustive consumers should
+handle it. Detailed results record separate empty-range U+202F insertions at
+original UTF-16 positions and add `digitGrouping` to `appliedRules` only for actual
+changes. Transparent boundaries assign insertions to the end of the left leaf.
+Protection and opaque boundaries retain their existing meaning. With grouping
+enabled, repeated spaces between numbers are retained to keep separate numbers
+separate on a second pass. With grouping disabled, previous cleanup and reports
+remain unchanged. The current coverage and remaining slices are recorded in
+[the grouping acceptance report](../../docs/acceptance/digit-grouping.md).

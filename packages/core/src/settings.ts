@@ -13,6 +13,7 @@ const groups = {
   units: { enabled: true, additional: [] },
   percentages: { enabled: true, space: "none" },
   currencies: { enabled: true },
+  digitGrouping: { enabled: false, minDigits: 5, normalizeExisting: true },
 };
 type Fields = Record<string, boolean | number | string | readonly string[]>;
 export interface Settings {
@@ -141,6 +142,11 @@ function mergeFields(
     } else {
       if (typeof value !== typeof defaults[key])
         invalidOption(fieldPath, "type");
+      if (
+        key === "minDigits" &&
+        (!Number.isSafeInteger(value) || (value as number) < 4)
+      )
+        invalidOption(fieldPath, "value");
       if (key === "space" && value !== "none" && value !== "nbsp")
         invalidOption(fieldPath, "value");
       result[key] = value as boolean | number | string;

@@ -102,3 +102,33 @@ consumer, not a guarantee for all framework versions or edge runtimes; no server
 JSX component or server Provider is supplied.
 
 MIT licensed. Public publication is separate work.
+
+## Opt-in standalone digit grouping
+
+The shared nullable `rules.digitGrouping` option is available through component
+`options`, Provider/instance settings and `transformReact`. Both locales default to
+`{ enabled: false, minDigits: 5, normalizeExisting: true }`.
+
+```tsx
+<Puncta
+  instance={instance}
+  options={{ rules: { digitGrouping: { enabled: true } } }}
+>
+  {"12"}
+  <em>345</em>
+</Puncta>;
+// Server text: "12\u202f<em>345</em>"
+transformReact("12345", {
+  instance,
+  rules: { digitGrouping: { enabled: true } },
+});
+// "12\u202f345"
+```
+
+The first slice supports standalone ungrouped integers and locale decimals through
+transparent leaves, including arrays and Fragment. Insertions at a leaf boundary
+belong to the left leaf. Protection and opaque components still stop recognition;
+the original children are not mutated. Existing groups, ranges and number-bond
+constructions are deferred and excluded from grouping. This slice establishes
+component `renderToString` coverage; new grouping streaming/hydration fixtures
+belong to later acceptance slices. See [core settings and current limits](../core/README.md#opt-in-digit-grouping-first-implementation-slice).

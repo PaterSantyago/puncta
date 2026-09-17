@@ -1,3 +1,4 @@
+import { digitGrouping } from "./digit-grouping.js";
 import { rangeIndex } from "./ranges.js";
 import { precedingSpaceStart } from "./spaces.js";
 import { numericDashes, textualDashes } from "./dashes.js";
@@ -97,6 +98,12 @@ export function segmentTypography(
       const dashes = textualDashes(text, settings);
       const bonds = numberBonds(text, settings);
       const numeric = numericDashes(text, settings, bonds, dashes.roles);
+      const grouping = digitGrouping(text, settings, [
+        ...numeric.preserved,
+        ...bonds.map((bond) => bond.construction),
+      ]);
+      for (const position of grouping.insertions)
+        edit(position, position, "\u202f", "digitGrouping");
       for (const change of numeric.changes)
         edit(change.start, change.end, change.after, change.ruleId);
       for (const span of numeric.ambiguous) {
@@ -149,6 +156,7 @@ export function segmentTypography(
         ...dashes.preserved,
         ...numeric.preserved,
         ...bonds.map((bond) => bond.construction),
+        ...grouping.preserved,
       ];
       // Start only at the beginning of a space run. Retrying at every space
       // makes a long indentation without any dots quadratic.

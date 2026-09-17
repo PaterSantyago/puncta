@@ -31,6 +31,12 @@ export interface RulesOptions {
     | (RuleOptions & { readonly space?: "none" | "nbsp" | null })
     | null;
   readonly currencies?: RuleOptions | null;
+  readonly digitGrouping?:
+    | (RuleOptions & {
+        readonly minDigits?: number | null;
+        readonly normalizeExisting?: boolean | null;
+      })
+    | null;
 }
 export interface HyphenationOptions {
   readonly enabled?: boolean | null;
@@ -73,7 +79,8 @@ export type RuleId =
   | "ellipsis"
   | "units"
   | "percentages"
-  | "currencies";
+  | "currencies"
+  | "digitGrouping";
 export interface Source {
   readonly id: number;
   readonly text: string;
