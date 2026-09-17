@@ -1,6 +1,6 @@
 import {
   accessibleParts,
-  changesTechnicalContext,
+  technicalContext,
   technicalRanges,
 } from "./protection.js";
 import type { Settings } from "./settings.js";
@@ -138,18 +138,20 @@ export function quotes(
       single && /[\p{L}\p{M}]$/u.test(before) && /^\p{L}/u.test(after);
     const singleQuoteOpen =
       top && (top.original === "'" || top.original === "‘");
-    const nextSingle = [...after.matchAll(/['‘’]/gu)].find(
-      (match) =>
-        !(
+    function laterSingleClose() {
+      for (const match of after.matchAll(/['‘’]/gu)) {
+        if (
           match[0] !== "‘" &&
           /[\p{L}\p{M}]$/u.test(after.slice(0, match.index)) &&
           /^\p{L}/u.test(after.slice(match.index + 1))
-        ),
-    );
-    const laterSingleClose =
-      nextSingle !== undefined &&
-      nextSingle[0] !== "‘" &&
-      !openingBoundary(after.slice(0, nextSingle.index));
+        )
+          continue;
+        return (
+          match[0] !== "‘" && !openingBoundary(after.slice(0, match.index))
+        );
+      }
+      return false;
+    }
     const possessive =
       single &&
       /[sS]$/u.test(before) &&
@@ -157,7 +159,7 @@ export function quotes(
       (!singleQuoteOpen ||
         (/^\s/u.test(after) &&
           !/^[,;:.!?…—–-]/u.test(after.trimStart()) &&
-          laterSingleClose));
+          laterSingleClose()));
     if (internal || possessive) {
       apostrophes.push({ start: position, end: position + 1 });
       if (settings.rules.apostrophes.enabled !== false)
@@ -267,22 +269,21 @@ export function quotes(
     }
     pair.children.forEach(apply);
   }
+  const technical = technicalContext(technicalSource);
   for (const root of roots) {
     candidates(root, 0);
     if (!choose(root, 0)) continue;
     const editsStart = edits.length;
     apply(root);
-    let candidate = technicalSource;
-    for (const change of edits
-      .slice(editsStart)
-      .sort((a, b) => b.ranges[0].start - a.ranges[0].start)) {
-      const range = change.ranges[0];
-      candidate =
-        candidate.slice(0, range.start) +
-        change.after +
-        candidate.slice(range.end);
-    }
-    if (changesTechnicalContext(technicalSource, candidate)) {
+    if (
+      technical.changesTokens(
+        edits.slice(editsStart).map((change) => ({
+          start: change.ranges[0].start,
+          end: change.ranges[0].end,
+          after: change.after,
+        })),
+      )
+    ) {
       edits.length = editsStart;
       warn(root.start, "typography.ambiguous");
     }

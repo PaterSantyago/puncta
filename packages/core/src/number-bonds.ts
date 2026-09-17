@@ -1,3 +1,4 @@
+import { precedingSpaceStart } from "./spaces.js";
 import type { Settings } from "./settings.js";
 import type { ProtectedRange, RuleId } from "./types.js";
 
@@ -65,9 +66,8 @@ function numbers(text: string): ProtectedRange[] {
   )) {
     let start = match.index;
     const end = start + match[0].length;
-    const preceding = text.slice(0, start);
+    const head = text.slice(0, precedingSpaceStart(text, start));
     const precedingCode = currencyCodes.some((code) => {
-      const head = preceding.replace(/ +$/u, "");
       return (
         head.endsWith(code) &&
         !/[\p{L}\p{M}\p{N}\u00ad_]$/u.test(head.slice(0, -code.length))
@@ -78,7 +78,7 @@ function numbers(text: string): ProtectedRange[] {
     if (
       /^[.,]/u.test(match[0]) &&
       !precedingCode &&
-      /[\p{L}\p{M}\p{N})\]"'»”’,;:!?.] *$/u.test(preceding)
+      /[\p{L}\p{M}\p{N})\]"'»”’,;:!?.]$/u.test(head)
     )
       start++;
     const before = text.slice(0, start);

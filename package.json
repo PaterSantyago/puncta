@@ -21,6 +21,7 @@
     "test:publish": "node --test scripts/publish.test.mjs",
     "release:publish": "node scripts/publish.mjs",
     "test:functional": "node --test tests/*.test.mjs",
+    "test:scaling": "node scripts/check-scaling.mjs",
     "test:browser": "node tests/browser/run.mjs",
     "test:rsc": "node tests/rsc/run.mjs"
   },

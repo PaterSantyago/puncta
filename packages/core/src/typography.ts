@@ -1,8 +1,10 @@
+import { rangeIndex } from "./ranges.js";
+import { precedingSpaceStart } from "./spaces.js";
 import { numericDashes, textualDashes } from "./dashes.js";
 import { numberBonds } from "./number-bonds.js";
 import {
   accessibleParts,
-  changesTechnicalContext,
+  technicalContext,
   technicalRanges,
 } from "./protection.js";
 import { quotes } from "./quotes.js";
@@ -32,11 +34,8 @@ export function segmentTypography(
       technicalRanges(accessible.text),
     )) {
       const text = part.text;
-      // Actual technical tokens were excluded above. These are only tentative
-      // tokens hidden by discretionary breaks, used by the other rule guards.
-      const discretionaryTokens = text.includes("\u00ad")
-        ? technicalRanges(text.replaceAll("\u00ad", ""))
-        : [];
+      const technical = technicalContext(text);
+      const occupied = rangeIndex(text.length);
       const graphemeBoundaries = new Set([text.length]);
       for (const segment of new Intl.Segmenter("und", {
         granularity: "grapheme",
@@ -52,25 +51,14 @@ export function segmentTypography(
         const before = text.slice(start, end);
         if (
           before === after ||
-          edits.some(
-            (existing) =>
-              existing.ranges[0].start < offset + end &&
-              existing.ranges[0].end > offset + start,
-          ) ||
+          occupied.overlaps(start, end) ||
           !graphemeBoundaries.has(start) ||
           !graphemeBoundaries.has(end)
         )
           return;
-        const wordStart = text.slice(0, start).replaceAll("\u00ad", "").length;
-        const wordEnd = text.slice(0, end).replaceAll("\u00ad", "").length;
         if (
-          discretionaryTokens.some(
-            (token) => token.start < wordEnd && token.end > wordStart,
-          ) &&
-          changesTechnicalContext(
-            text,
-            text.slice(0, start) + after + text.slice(end),
-          )
+          technical.touchesHiddenToken(start, end) &&
+          technical.changesTokens([{ start, end, after }])
         ) {
           ambiguous(
             start,
@@ -80,6 +68,7 @@ export function segmentTypography(
           );
           return;
         }
+        occupied.add({ start, end });
         edits.push({
           kind: !before ? "insert" : !after ? "delete" : "replace",
           before,
@@ -142,10 +131,7 @@ export function segmentTypography(
         for (const match of text.matchAll(/(?<!\.)\.{3}(?!\.)/gu)) {
           const end = match.index + 3;
           if (
-            changesTechnicalContext(
-              text,
-              `${text.slice(0, match.index)}…${text.slice(end)}`,
-            )
+            technical.changesTokens([{ start: match.index, end, after: "…" }])
           ) {
             ambiguous(
               match.index,
@@ -164,7 +150,11 @@ export function segmentTypography(
         ...numeric.preserved,
         ...bonds.map((bond) => bond.construction),
       ];
-      for (const match of text.matchAll(/ *(?:[.…](?:[. …]*[.…])|…) */gu)) {
+      // Start only at the beginning of a space run. Retrying at every space
+      // makes a long indentation without any dots quadratic.
+      for (const match of text.matchAll(
+        /(?<! ) *(?:[.…](?:[. …]*[.…])|…) */gu,
+      )) {
         const start = match.index;
         const end = start + match[0].length;
         preserved.push({ start, end });
@@ -191,25 +181,23 @@ export function segmentTypography(
             "Numeric punctuation is ambiguous; its intervals were preserved.",
           );
       }
-      const isPreserved = (start: number, end: number) =>
-        preserved.some((item) => start < item.end && end > item.start);
+      const preservedIndex = rangeIndex(text.length, preserved);
+      let lineCursor = 0;
+      let atLineStart = initialLineStart && offset === 0;
       for (const match of text.matchAll(/ +/gu)) {
         const start = match.index;
         const end = start + match[0].length;
         const before = text.slice(0, start);
         const after = text.slice(end);
-        const indentation =
-          /[\r\n][ \t]*$/u.test(before) ||
-          (initialLineStart && offset === 0 && /^[ \t]*$/u.test(before));
-        if (indentation || isPreserved(start, end)) continue;
+        for (; lineCursor < start; lineCursor++) {
+          const character = text[lineCursor];
+          if (character === "\r" || character === "\n") atLineStart = true;
+          else if (character !== " " && character !== "\t") atLineStart = false;
+        }
+        if (atLineStart || preservedIndex.overlaps(start, end)) continue;
         const insertsFollowingSpace = /^[,;:!?]+[\p{L}\p{N}¿¡]/u.test(after);
-        const joined = (before + after).replaceAll("\u00ad", "");
-        const join = before.replaceAll("\u00ad", "").length;
         const createsTechnical =
-          !insertsFollowingSpace &&
-          technicalRanges(joined).some(
-            (range) => range.start < join && range.end > join,
-          );
+          !insertsFollowingSpace && technical.joinsToken(start, end);
         if (createsTechnical)
           ambiguous(
             start,
@@ -229,9 +217,11 @@ export function segmentTypography(
       for (const match of text.matchAll(/[,;:!?.]+/gu)) {
         const start = match.index;
         const end = start + match[0].length;
-        if (isPreserved(start, end)) continue;
+        if (preservedIndex.overlaps(start, end)) continue;
         if (
-          !/[\p{L}\p{M}\p{N})\]"'»”’,;:!?.] *$/u.test(text.slice(0, start)) ||
+          !/[\p{L}\p{M}\p{N})\]"'»”’,;:!?.]$/u.test(
+            text.slice(0, precedingSpaceStart(text, start)),
+          ) ||
           !/^[\p{L}\p{N}¿¡]/u.test(text.slice(end))
         )
           continue;
@@ -246,16 +236,7 @@ export function segmentTypography(
         // Punctuation spacing must not turn ordinary source text into a newly
         // opaque technical token on the next invocation (for example an IPv6
         // suffix ending at this insertion). Preserve that ambiguous interval.
-        const candidate = `${text.slice(0, end)} ${text.slice(end)}`.replaceAll(
-          "\u00ad",
-          "",
-        );
-        const wordEnd = text.slice(0, end).replaceAll("\u00ad", "").length;
-        if (
-          technicalRanges(candidate).some(
-            (range) => range.end === wordEnd || range.start === wordEnd + 1,
-          )
-        ) {
+        if (technical.splitsToken(end)) {
           ambiguous(
             start,
             end,
@@ -281,6 +262,10 @@ export function quotationTypography(
     settings,
     protection,
   );
+  const occupied = rangeIndex(
+    text.length,
+    edits.map((edit) => edit.ranges[0]),
+  );
   const boundaries = new Set([text.length]);
   for (const segment of new Intl.Segmenter("und", {
     granularity: "grapheme",
@@ -290,6 +275,7 @@ export function quotationTypography(
     const before = text.slice(start, end);
     if (before === after || !boundaries.has(start) || !boundaries.has(end))
       return;
+    occupied.add({ start, end });
     edits.push({
       kind: !before ? "insert" : !after ? "delete" : "replace",
       before,
@@ -311,13 +297,7 @@ export function quotationTypography(
     for (const change of dashes.changes) {
       const start = part.index + change.start;
       const end = part.index + change.end;
-      if (
-        edits.some(
-          (existing) =>
-            existing.ranges[0].start < end && existing.ranges[0].end > start,
-        )
-      )
-        continue;
+      if (occupied.overlaps(start, end)) continue;
       edit(start, end, change.after, "dashes");
     }
     for (const span of dashes.ambiguous)
@@ -358,13 +338,12 @@ export function typography(
     protection,
     initialLineStart,
   );
+  const occupied = rangeIndex(
+    source.length,
+    quotation.edits.map((edit) => edit.ranges[0]),
+  );
   const edits = segment.edits.filter(
-    (edit) =>
-      !quotation.edits.some(
-        (quoteEdit) =>
-          quoteEdit.ranges[0].start < edit.ranges[0].end &&
-          quoteEdit.ranges[0].end > edit.ranges[0].start,
-      ),
+    (edit) => !occupied.overlaps(edit.ranges[0].start, edit.ranges[0].end),
   );
   return {
     edits: [...edits, ...quotation.edits],
