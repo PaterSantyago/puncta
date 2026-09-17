@@ -34,8 +34,11 @@ browser/scaling claim is made by this literal first-slice suite.
 
 Environment: macOS arm64, Node 24.21.0, pnpm 12.4.1, React/React DOM 19.3.0,
 locked dependencies. Runtime commands use the pinned Node directory in PATH.
-The implementation revision and CI result are recorded in the linked pull request;
-this document is committed with that implementation.
+Implementation revision: `6eb403d3205bc5fd3711595212a04843d28f730a`, tested on
+2026-09-17. Subsequent documentation-only commits record these results. RSC uses
+Next 16.3.5 and its bundled React `19.3.0-canary-cbb046ab-20260731`; the standalone
+SSR and browser fixtures use React/React DOM 19.3.0. CI checks the pull request head
+separately; its result is recorded on the pull request.
 
 ```sh
 pnpm install --frozen-lockfile
@@ -49,7 +52,37 @@ pnpm test:rsc
 pnpm test:scaling
 ```
 
-Execution results will be recorded after running these commands. Existing browser,
-RSC, production-streaming and scaling suites are regression checks here, not proof
-of the deferred grouping scenarios. No manual check, release or publication is
-required or performed.
+All listed local commands passed on the implementation revision above:
+
+| Check                           | Result                                                                                                                                                                                       |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Focused grouping suite          | 12/12 PASS, including punctuation and parenthesized/tab-separated arithmetic regressions                                                                                                     |
+| `pnpm check` after review fixes | PASS: lint, formatting, typecheck, build, package archives, 228 functional tests, 3 release tests, 6 local publication simulations, installed npm/pnpm consumers and release-plan validation |
+| Production SSR + grouping       | 24/24 PASS                                                                                                                                                                                   |
+| Browser regression              | Chromium 145.0.7632.6, Firefox 146.0.1, WebKit 26.0 PASS; 145 shared assertions per engine, mounted updates and all three hydration renderers, no hydration errors                           |
+| RSC regression                  | All three engines PASS: Flight, server HTML, hydration and interactive updates                                                                                                               |
+| Existing scaling gate           | PASS, separately after all other local builds/tests completed; measurements below                                                                                                            |
+
+Scaling used three warmups and seven samples per input, with medians in milliseconds:
+
+| Scenario | Input lengths  | Small median | Large median | 4× input ratio |
+| -------- | -------------- | ------------ | ------------ | -------------- |
+| spaces   | 4,000 / 16,000 | 1.744        | 6.194        | 3.552×         |
+| words    | 1,000 / 4,000  | 0.964        | 3.366        | 3.494×         |
+| mixed    | 4,300 / 17,200 | 4.108        | 17.602       | 4.285×         |
+
+These browser, RSC, production-streaming and scaling suites are existing regression
+checks, not proof of the deferred grouping scenarios. The scaling inputs use the
+default disabled grouping setting; grouping-specific scaling remains #92. Browser
+and RSC local artifacts are generated in `artifacts/browser/acceptance.json` and
+`artifacts/rsc/report.json`; CI uploads equivalent artifacts for its checked head.
+No generated seed applies to this literal suite. No manual check, release or public
+publication was performed; the full check uses an isolated local test registry.
+
+## Review
+
+Standards review identified split ownership of grouping whitespace preservation;
+recognition now returns its own preserved ranges. Follow-up review found no
+remaining standards findings. Spec review found punctuation boundaries and
+parenthesized/tab-separated arithmetic gaps; red-then-green public regressions
+cover the fixes, and follow-up review confirmed all findings addressed.
