@@ -197,4 +197,55 @@ New grouping streaming/hydration fixtures, expanded inheritance/coordinate
 acceptance and grouping-specific scaling remain later slices (#90–92).
 This slice uses component renderToString for new interaction coverage and runs
 existing streaming, browser, RSC and scaling fixtures as regression gates.
-Execution evidence will be recorded below after independent reviews and checks.
+
+### Execution and independent review
+
+Implementation revision: `72a5bbc5579b91c5accc31cfcff71d344e854dc3`, tested on
+2026-09-17. Environment: macOS arm64 (Darwin 27.0.0), Node 24.21.0, pnpm 12.4.1,
+React/React DOM 19.3.0, Playwright 1.58.2, locked dependencies. Subsequent
+documentation-only commits record these results. Browser and RSC artifact files
+record this exact implementation SHA; CI separately checks the final PR head.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm typecheck
+pnpm build
+node --test tests/digit-grouping-bonds.test.mjs tests/digit-grouping.test.mjs tests/number-bonds.test.mjs tests/dashes.test.mjs
+pnpm check
+NODE_ENV=production node --test tests/ssr-streaming.test.mjs tests/digit-grouping.test.mjs tests/digit-grouping-bonds.test.mjs
+pnpm test:browser
+pnpm test:rsc
+pnpm test:scaling
+```
+
+| Check                                 | Result                                                                                                                                                                                             |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Focused grouping/bonds/dashes         | 58/58 PASS; new seed 8901, 120 cases, plus retained seed 8801, 120 cases                                                                                                                           |
+| Final `pnpm check` after review fixes | PASS: lint, formatting, typecheck, build, archives, 249 functional tests, 3 release tests, 6 local publication simulations, installed npm/pnpm consumers and declarations, release-plan validation |
+| Production streaming + grouping       | 45/45 PASS                                                                                                                                                                                         |
+| Browser regression                    | Chromium 145.0.7632.6, Firefox 146.0.1, WebKit 26.0 PASS; 145 shared assertions per engine, mounted updates and three hydration renderers without hydration errors                                 |
+| RSC regression                        | All three engines PASS: Flight, server HTML, hydration and interactive updates; Next 16.3.5                                                                                                        |
+| Separate existing scaling gate        | PASS after all local builds/tests finished; three warmups and seven measured samples per input                                                                                                     |
+
+| Scenario | Input lengths  | Small median (ms) | Large median (ms) | 4× ratio |
+| -------- | -------------- | ----------------- | ----------------- | -------- |
+| spaces   | 4,000 / 16,000 | 1.748             | 6.257             | 3.579×   |
+| words    | 1,000 / 4,000  | 1.007             | 3.447             | 3.422×   |
+| mixed    | 4,300 / 17,200 | 4.106             | 17.792            | 4.333×   |
+
+These unchanged browser/RSC/scaling fixtures remain regression checks with
+grouping disabled; they do not stand in for the dedicated later-slice scenarios.
+Generated local artifacts are `artifacts/browser/acceptance.json` and
+`artifacts/rsc/report.json`; CI uploads corresponding artifacts for its own head.
+No manual check, release or public package publication was performed.
+
+Independent Standards and Spec agents reviewed against fixed point
+`d01c4e2626e1be80aba42a22d548e3e5ebd06d8d`. Standards found no actionable
+violations or smells. Spec identified partial operand grouping when recognized
+designations split arithmetic context: `£12345 + £67890` and
+`12345 kg + 67890 kg`. A red/green public regression now covers currencies,
+units, parentheses-compatible operator context, leading-zero currency ranges and
+percent between operands, alongside a separate-quantities control. Recognition
+retains the complete operator construction before classifying eligibility. Both
+independent follow-up reviews confirmed no remaining findings on the tested
+implementation revision. The full check was rerun after the review fix.
