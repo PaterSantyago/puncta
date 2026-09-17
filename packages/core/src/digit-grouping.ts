@@ -80,7 +80,10 @@ export function digitGrouping(
       .slice(token.index, last.index + last[0].length)
       .replace(/[.,:…]+$/u, "");
     const end = token.index + candidate.length;
-    const range = /^([+−-]?[^–-]+)([–-])([+−-]?[^–-]+)$/u.exec(candidate);
+    // Split at the first delimiter after the optional left sign. The complete
+    // right endpoint is classified below, including its sign or a technical
+    // remainder; never extract a groupable suffix from a longer construction.
+    const range = /^([+−-]?[^–-]+)([–-])(.+)$/u.exec(candidate);
     const endpoints =
       range &&
       (range[2] === "–" ||

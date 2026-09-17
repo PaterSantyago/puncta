@@ -316,6 +316,11 @@ test("spaced en-dash ranges retain atomic eligibility and full source diagnostic
       });
       for (const [left, right, expectedLeft, expectedRight, warning] of [
         ["12345", "67890", "12\u202f345", "67\u202f890", false],
+        ["+12345", "-67890", "+12\u202f345", "-67\u202f890", false],
+        ["−12345", "+67890", "−12\u202f345", "+67\u202f890", false],
+        ["12345", "−67890", "12\u202f345", "−67\u202f890", false],
+        ["12 34", "-67890", "12 34", "-67890", true],
+        ["-67890", "12 34", "-67890", "12 34", true],
         ["00123", "123456", "00123", "123456", false],
         ["123456", "00123", "123456", "00123", false],
         ["12 34", "123456", "12 34", "123456", true],

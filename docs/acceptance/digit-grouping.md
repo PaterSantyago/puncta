@@ -62,7 +62,10 @@ en-gb or be skipped in es-es. A second public RED test confirmed this. Numeric
 en-dash context now takes precedence over prose masking, and endpoint recognition
 excludes delimiter intervals while retaining original separator coordinates.
 Both-side invalid endpoints, full warnings, four spaces, transparent splits and
-independent dashes/ranges switches cover the correction.
+independent dashes/ranges switches cover the correction. Follow-up review found
+a spaced ASCII-minus right endpoint was still excluded; another public RED
+example now covers all three signs, signed malformed neighbors and source
+coordinates. Range splitting retains the entire right endpoint for classification.
 
 The implementation does not infer every phone/year/identifier, group fractions,
 change decimal marks, repair malformed groups, or recover number precision lost
