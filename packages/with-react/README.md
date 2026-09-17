@@ -135,3 +135,41 @@ ranges share that transparent context, including disabled exterior formatting.
 Component `renderToString` coverage includes grouping, normalization and bonds; new grouping
 streaming/hydration fixtures belong to later acceptance slices. See
 [core settings and current limits](../core/README.md#opt-in-standalone-digit-grouping).
+
+### Inheritance and grouping reports
+
+`PunctaProvider` passes grouping settings without transforming its immediate text;
+`Puncta` transforms its accessible children. Both accept the shared nullable
+`options.rules.digitGrouping`. For example, an outer explicit threshold survives
+pausing and re-enabling the rule in nested components:
+
+```tsx
+<PunctaProvider
+  instance={instance}
+  options={{ rules: { digitGrouping: { enabled: true, minDigits: 4 } } }}
+>
+  <Puncta options={{ rules: { digitGrouping: { enabled: false } } }}>
+    1234
+    <Puncta options={{ rules: { digitGrouping: { enabled: true } } }}>
+      1234
+    </Puncta>
+  </Puncta>
+</PunctaProvider>
+```
+
+The outer number stays `1234`; the inner number becomes `1\u202f234`.
+A null field restores the current locale's default; a null group resets every
+field and disables grouping. Changing locale retains explicit fields. A fully
+disabled ancestor remains inherited protection, even if a child enables the rule
+or processing. Running components still validate their own props; declarative
+options in content protected from traversal are not read.
+
+Pure `transformReact` uses its required explicit instance, independently of any
+Context where the returned tree is later rendered. Arrays and Fragment preserve
+accessible numeric context; nested scopes and opaque components interrupt it.
+Reports keep original source paths, UTF-16 offsets and separate separator edits.
+A warning can address several original leaves. Insertions at transparent seams
+belong to the left nonempty leaf; digits remain in their original children.
+React reports have `hasEdits` and no `outputChanged`. Original children are not
+mutated. `stripSoftHyphensReact` validates these shared options while only
+removing SHY, without grouping or its warnings.

@@ -249,3 +249,50 @@ percent between operands, alongside a separate-quantities control. Recognition
 retains the complete operator construction before classifying eligibility. Both
 independent follow-up reviews confirmed no remaining findings on the tested
 implementation revision. The full check was rerun after the review fix.
+
+## Nested scopes, markup and source reports: slice #90
+
+[#90](https://github.com/PaterSantyago/puncta/issues/90) establishes expanded
+scope/report acceptance on top of #87–89. Its public integration suite is
+`tests/digit-grouping-scopes.test.mjs`. All scenarios passed with the existing
+production implementation; this slice adds regression coverage and documentation,
+without a runtime change. Earlier PASS records remain historical evidence only.
+
+| #90 criterion                          | Executable evidence                                                                                                                                                                                                                                                         |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Shared options, inheritance and resets | createPuncta, with, text/HTML call options, declarative HTML/React hosts, Provider/Puncta and pure; undefined, null fields/group, rejected rules:null; both locales                                                                                                         |
+| Pausing and switching locale           | Explicit minDigits/normalizeExisting survive disable/re-enable and language switches; new-locale null resets; nested host and component scopes; inherited full protection                                                                                                   |
+| Validation and traversal               | Exact optionPath/reason and unavailable call locations, original HTML attribute range/React path; disabled calls and running components; protected/off/hidden/editable options skipped before validation                                                                    |
+| SHY operations                         | Text, HTML and pure React remove SHY and validate settings without grouping or its warnings                                                                                                                                                                                 |
+| Context boundaries                     | Inline/comments/arrays/Fragment, same-locale lang aliases; LF/CRLF, br/wbr, blocks, explicit scope, locale switch, opaque component and protected fragments; protected text not inspected for continuation or warnings                                                      |
+| Edit ownership and replay              | All two-leaf splits of six independent compact literals per locale; original source paths/UTF-16 ranges, left insertion ownership, separator replacements, separate edits, unchanged digits and children, per-source replay                                                 |
+| Entities and recovery                  | Decoded SPACE/NBSP entities, digit entities, multi-codepoint entity before a number, astral prefix, full multi-leaf warning ranges, foster-parented noncontiguous sources with honest unavailable provenance                                                                |
+| Report distinctions                    | appliedRules only for changes; serialization-only outputChanged vs hasEdits; no outputChanged in React; pure explicit instance independent of surrounding Context                                                                                                           |
+| Generated trees                        | Seed 9001, 64 trees, literal oracles, random 1–3-character leaves inside arrays/Fragment/inline/comments, nested scopes, both locales, resets/threshold/normalization/protection, warnings, digit preservation, replay and repeat-pass empty edits; every scenario required |
+
+The generator selects independently specified input/output literals rather than
+reconstructing expected grouping with the formatter. Failures include seed,
+sample, generator state, locale, source and options. All two-leaf splits include
+UTF-16 surrogate boundaries; HTML parser warnings for isolated surrogate halves
+are retained separately from grouping diagnostics. React's inter-leaf SSR text
+comments are removed before comparing a split CRLF with decoded HTML because
+those comments otherwise interrupt HTML newline normalization.
+
+A supported digit or separator entity maps at its original boundaries. No HTML
+entity expands to multiple supported grouping characters, so grouping cannot
+produce a `covering` range inside one. The multi-codepoint entity control verifies
+that grouping does not fabricate such an interior position; source-map `covering`
+semantics remain unchanged. Recovery controls explicitly require `unavailable`
+for both grouping edits and warnings on foster-parented noncontiguous text.
+
+Development checks: locked install/build/typecheck/lint and 57 focused tests
+passed (17 new #90 tests plus existing grouping/bonds/options suites). Initial
+new-test failures corrected oracle assumptions about explicit config-error
+locations, surrogate parser warnings, SSR comments between CR/LF and a manually
+counted entity offset; none required changing production behavior. No artificial
+runtime red/green claim is made for an already implemented contract.
+
+Grouping-specific streaming/hydration and React numeric-child acceptance remain
+#91; grouping-specific scaling and final parent acceptance remain #92. This slice
+does not close or certify the whole parent #86. Full checks and independent
+review results are recorded below after execution.
