@@ -378,3 +378,50 @@ below after independent review.
 Grouping-specific scaling, combined final acceptance and parent #86 completion
 remain #92. This runtime slice does not certify or close the parent. No manual
 visual gate, release or public publication is introduced.
+
+### Execution and independent review
+
+Acceptance revision: `26b5edbb3447825cf23554943b978e8de3a1c2d9`, 2026-09-17,
+Darwin 27.0.0 arm64. A subsequent documentation-only commit records these results;
+CI checks the final PR head. Both generated browser/RSC JSON reports identify this
+acceptance revision. No new random generation was introduced in #91; the full
+functional gate retains the earlier seeds and independent oracles.
+
+Standards and Spec reviews independently compared the change against
+`0e5b8ad18d0c6d7c2635acad0abe2c1913d7f2c3`. Spec found no actionable gap.
+Standards suggested replacing positional warning-case checks with explicit
+per-request expected locale data. That change passed focused checks and both
+follow-up reviews confirmed zero remaining findings at the revision above.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm build
+pnpm typecheck
+node --test tests/digit-grouping-react.test.mjs tests/ssr-streaming.test.mjs
+pnpm check
+NODE_ENV=production node --test tests/ssr-streaming.test.mjs tests/digit-grouping*.test.mjs
+pnpm test:browser
+pnpm test:rsc
+pnpm test:scaling
+```
+
+| Check                               | Result                                                                                                                                                                                                            |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Focused numeric leaves + streaming  | 19/19 PASS, including seven new public-interface tests                                                                                                                                                            |
+| Final `pnpm check` after review fix | PASS: lint, formatting, typecheck, build, archives, 273 functional tests, three release tests, six local publication simulations, npm/pnpm installed consumers/declarations and release-plan validation           |
+| Production streaming + grouping     | 69/69 PASS                                                                                                                                                                                                        |
+| Browser                             | All three engines PASS: 149 shared checks per engine, 14 existing mounted updates, eight protection/reorder scenarios, ten grouping updates, all three grouped SSR hydration modes; no hydration/runtime warnings |
+| Production RSC                      | All three engines PASS: Flight, no-JS grouped server HTML, hydration, numeric client leaves, source/locale/rule updates, server configuration independence and node identity                                      |
+| Existing scaling regression         | PASS, run separately after all local builds/tests finished; three warmups, seven measured samples per input                                                                                                       |
+
+| Scenario | Input lengths  | Small median (ms) | Large median (ms) | 4× ratio |
+| -------- | -------------- | ----------------- | ----------------- | -------- |
+| spaces   | 4,000 / 16,000 | 1.690             | 6.092             | 3.605×   |
+| words    | 1,000 / 4,000  | 0.972             | 3.224             | 3.319×   |
+| mixed    | 4,300 / 17,200 | 3.679             | 16.839            | 4.576×   |
+
+Artifacts: `artifacts/browser/acceptance.json` and `artifacts/rsc/report.json`;
+CI uploads its own artifacts for the final PR head. The existing scaling scenarios
+run with grouping disabled and establish regression evidence only. New numerical
+scaling cases, long-input acceptance and final combined range/runtime mapping
+remain #92. All #91 runtime criteria are covered; #86 remains incomplete.
