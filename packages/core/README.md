@@ -258,7 +258,7 @@ separator. Both endpoints must be eligible: `00123–123456` remains ungrouped;
 `1,234–56789` can become `1,234–56\u202f789` with normalization disabled.
 Disabling units/ranges/percentages/currencies formatting preserves their
 recognition context. Grouping never replaces a hyphen on behalf of ranges.
-Further inheritance, streaming/hydration and scaling acceptance for issue #86
+Grouping-specific streaming/hydration and scaling acceptance for issue #86
 remains in later implementation slices.
 
 `minDigits` accepts safe integers from 4 through `Number.MAX_SAFE_INTEGER`.
@@ -279,3 +279,50 @@ their separation on a second pass. Cleanup preserves candidate spelling and does
 not undo normalized groups. With grouping disabled, previous cleanup and reports
 remain unchanged. The current coverage and remaining slices are recorded in
 [the grouping acceptance report](../../docs/acceptance/digit-grouping.md).
+
+### Grouping in nested scopes and source reports
+
+Instance creation, `with`, text/HTML call options and `data-puncta-options` use
+this same group. Missing or `undefined` fields inherit explicit values;
+`null` fields return to the current locale's defaults. `digitGrouping: null`
+resets all three fields, including `enabled` to false. `rules: null` is invalid.
+Turning the rule off retains explicit threshold and normalization settings for
+later re-enabling. A locale change preserves these explicit settings and resolves
+unset fields from the new locale.
+
+```ts
+const compact = grouped.with({
+  rules: { digitGrouping: { minDigits: 4, normalizeExisting: false } },
+});
+const paused = compact.with({ rules: { digitGrouping: { enabled: false } } });
+paused.text("1234; 12 345", {
+  rules: { digitGrouping: { enabled: true } },
+}); // "1\u202f234; 12 345"
+compact.text("1234", { rules: { digitGrouping: { minDigits: null } } }); // "1234"
+```
+
+An explicit nested scope interrupts a number even when its options equal the
+parent's: `12<span data-puncta="">345</span>` stays ungrouped. Inline elements,
+comments and a same-locale `lang` alias remain transparent; line breaks,
+`br`/`wbr`, blocks, changed locales, opaque fragments and protection stop the
+number. Protected contents are not inspected to continue a candidate or produce
+grouping warnings. `data-puncta="off"` takes precedence over options on that
+host, and descendants cannot re-enable the protected scope. Invalid explicit
+call options still throw when processing is disabled. SHY removal validates the
+shared settings but performs no grouping or grouping diagnostics.
+
+Detailed edits keep unchanged digits in their original leaves. For example,
+`12<em>&#32;</em>345` becomes `12<em>\u202f</em>345`: the sole replacement has
+`before: " "`, `after: "\u202f"` and a decoded leaf range of `[0, 1)`. Its HTML
+`inputRange` exactly covers the original `&#32;`. An insertion at
+`12<em>345</em>` has the empty range `[2, 2)` in the left leaf. Multiple separators
+separated by unchanged digits produce separate edits. Warnings locate the entire
+original candidate across all its accessible leaves, using the scope's locale.
+
+HTML `before`/`after` are decoded text. Input positions use `exact` for mapped
+boundaries, `covering` when a decoded range cuts a multi-codepoint origin, and
+`unavailable` with a reason for unmappable parser repairs. Grouping does not
+invent positions inside an entity; the supported digit and separator entities
+map at their boundaries. Replay reconstructs transformed source text, not parser
+recovery or serialized markup. Thus serialization alone can set `outputChanged`
+without `hasEdits`, `digitGrouping` edits or an applied-rule entry.
