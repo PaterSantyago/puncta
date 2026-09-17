@@ -425,3 +425,72 @@ CI uploads its own artifacts for the final PR head. The existing scaling scenari
 run with grouping disabled and establish regression evidence only. New numerical
 scaling cases, long-input acceptance and final combined range/runtime mapping
 remain #92. All #91 runtime criteria are covered; #86 remains incomplete.
+
+## Long-input and scaling slice (#92)
+
+This slice implements [#92](https://github.com/PaterSantyago/puncta/issues/92),
+based on the same canonical recognition/API/acceptance decisions above.
+`tests/digit-grouping-long.test.mjs` adds independent constructive number models,
+without numeric coercion or copying the production recognizer. Long fixtures use
+4,000 triples (over 12,000 integer digits), including a 1,200-digit fraction,
+terminal zeros, both locale decimal conventions, signs and permitted separators.
+
+| #92 criterion                                                  | Executable evidence                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Exact long valid/invalid and transparent inputs                | Both locale long-fixture tests cover continuous digits, valid groups, a short middle group and leading-zero exclusions through text, HTML and pure React with Fragment/inline leaves.                                                                                                                                                                                                                                                      |
+| Precision, reports, replay, fixed points and maximum threshold | Full independent expected strings; edits contain only source separators/empty insertions, exact original UTF-16 ranges including non-BMP prefixes, HTML input coordinates, source replay, structured whole-candidate warning, unique applied rule and no second-pass edits; MAX_SAFE_INTEGER threshold uses ordinary-size inputs.                                                                                                          |
+| Reproducible generation that actually changes/preserves/warns  | Seed 9201, 120 models; both locales, signs, decimal marks, thresholds 4/5/24/MAX_SAFE_INTEGER, normalization and explicit off mode, variable transparent widths. Coverage assertions require all three outcomes in both locales.                                                                                                                                                                                                           |
+| Minimal failure evidence                                       | Failed generated cases greedily remove triples to a deletion-minimal count and minimize leaf width within the model; test output retains seed, sample, RNG state, full minimal model and source. This is model-domain shrinking, not a claim of globally shortest strings. A temporary wrong-separator mutation verified the failure path: seed 9201/sample 2 minimized to count 1, width 1, `😀 12 345.67000!`; the mutation was removed. |
+| Separate numeric scaling including growing representations     | `scripts/check-scaling.mjs`: 12 enabled numeric scenarios plus the three existing regression cases, exact 4× source and tree growth, three warmups/seven samples, detailed calls, setup outside timers. [Complete measurements and environment](scaling.md#long-numeric-records-and-transparent-trees-92).                                                                                                                                 |
+| Preserve disabled behavior and prior contracts                 | Existing seeds 8801/8901/9001 and #91 runtime fixtures remain intact. The measured regression fixes retain public interfaces; 3,000 disabled complete reports match the base bundle (development seed 9202).                                                                                                                                                                                                                               |
+
+The new long suite passed 3/3 tests, and focused grouping/technical-context/
+combined-processing/inline-context checks passed 87/87 at acceptance code revision
+`886e6105bd332c47bec9f12ac1d750aaf872ab9b`. The isolated scaling gate passed 15/15;
+all ratios are below 8×. Final checks and independent review are recorded below.
+
+Final combined acceptance and documentation integration for parent #86 belong to
+#93. This slice does not close or certify the entire parent; no release, public
+publication or manual validation gate is introduced.
+
+### Completion evidence
+
+Final local check revision: `664922404d87f01f53cc1ba6966a645218760d2a`, 2026-09-17.
+This follows the measured revision with only lint-compatible test syntax changes;
+production code and scaling scenarios are identical. The next documentation-only
+commit records these results; CI checks the final PR head. Environment is the
+pinned setup recorded in [scaling](scaling.md#long-numeric-records-and-transparent-trees-92).
+
+Two independent Astra medium reviews compared the implementation with
+`531ae7960b6fb8658bfc95fa45f57749f0a7f2af`: Standards **0 findings**, Spec
+**0 findings**. Both follow-up reviews checked `6649224` and the acceptance
+mapping/measurements, again with **0 remaining findings**. The initial full check
+stopped at two test lint issues; these were fixed before the successful final run.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm build
+pnpm typecheck
+node --test tests/digit-grouping*.test.mjs tests/technical-context.test.mjs tests/combined-processing.test.mjs tests/inline-context.test.mjs
+pnpm test:scaling
+pnpm check
+NODE_ENV=production node --test tests/ssr-streaming.test.mjs tests/digit-grouping*.test.mjs
+pnpm test:browser
+pnpm test:rsc
+```
+
+| Check                           | Result                                                                                                                                                                                                                             |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Focused public contracts        | 87/87 PASS, including new long-input suite 3/3 and retained seeds 8801/8901/9001                                                                                                                                                   |
+| Final `pnpm check`              | PASS: lint, formatting, typecheck, build, archives, 276 functional tests, three release tests, six local publication simulations, npm/pnpm installed consumers and declarations, release-plan validation                           |
+| Production streaming + grouping | 72/72 PASS                                                                                                                                                                                                                         |
+| Browser                         | Chromium 145.0.7632.6, Firefox 146.0.1, WebKit 26.0: each 149 shared checks, 14 existing mounted updates, eight protection/reorder scenarios, ten grouping updates and three grouped hydration renderers PASS; no hydration errors |
+| Production RSC                  | All three engines PASS: Flight, no-JS server HTML, hydration, grouping updates and DOM identity                                                                                                                                    |
+| Separate scaling                | 15/15 PASS; ratios 3.529–5.506×, recorded in full in scaling acceptance; no concurrent builds/tests during measurement                                                                                                             |
+| Disabled baseline comparison    | 3,000 full public text/HTML/React reports PASS against historical core and React bundles, seed 9202                                                                                                                                |
+
+Generated browser/RSC artifacts are under `artifacts/browser/acceptance.json` and
+`artifacts/rsc/report.json`; both identify the final local check revision. They
+remain generated artifacts; CI uploads its own files for the final PR head. All
+six #92 criteria have executable checks and current evidence. #93 still owns
+combined final acceptance/documentation integration; parent #86 remains open.
