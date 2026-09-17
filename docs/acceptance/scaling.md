@@ -73,3 +73,12 @@ against full-context recognition and exhaustively checked integer range-query
 endpoints for source lengths 0–19 after repeated appends. Both the Standards and
 Spec reviews found no issues. These probes exercised implementation invariants;
 the permanent tests continue to exercise the public API.
+
+## Number-bond grouping slice (#89)
+
+The unchanged default-profile scaling gate was rerun separately on
+`72a5bbc5579b91c5accc31cfcff71d344e854dc3`, after all other local tests/builds
+finished. All three 4× ratios remained below 8×; exact medians, environment and
+commands are recorded in [digit grouping #89](digit-grouping.md#execution-and-independent-review).
+Grouping-specific scaling inputs remain #92; these default-disabled measurements
+are regression evidence only.

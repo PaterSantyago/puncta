@@ -244,9 +244,22 @@ identifiers and unknown suffixes remain ungrouped without grouping warnings.
 Scientific notation, slash/colon numeric structures, three-or-more dotted or
 hyphenated segments and arithmetic constructions also stay excluded. Years and
 telephone numbers are not guessed. Protection retains its existing meaning.
-Ranges and recognised unit/currency/percentage constructions are still excluded
-from grouping pending the next implementation slice; their existing typography
-rules continue to run. This is not the complete contract of issue #86.
+Known units (including composites and additions), percentages, angular degrees
+and currencies admit grouping through their existing complete-designation
+catalogues. For example, `12345kg` becomes `12\u202f345\u00a0kg`: internal
+NNBSP and the exterior NBSP bond have separate roles. Existing currency order,
+percent spacing and minus rules retain their own edits and warnings.
+
+En-dash ranges admit two valid endpoints. An ASCII hyphen admits grouping only
+with a known unit or `rules.ranges.standalone: true`; U+2212 is not a range
+separator. Both endpoints must be eligible: `00123–123456` remains ungrouped;
+`12 34–123456` retains the whole range with one grouping warning. Threshold and
+`normalizeExisting` apply independently to eligible endpoints, so en-gb
+`1,234–56789` can become `1,234–56\u202f789` with normalization disabled.
+Disabling units/ranges/percentages/currencies formatting preserves their
+recognition context. Grouping never replaces a hyphen on behalf of ranges.
+Further inheritance, streaming/hydration and scaling acceptance for issue #86
+remains in later implementation slices.
 
 `minDigits` accepts safe integers from 4 through `Number.MAX_SAFE_INTEGER`.
 Invalid settings throw `PunctaConfigError` / `config.invalid-option` even if

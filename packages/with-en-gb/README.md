@@ -40,5 +40,6 @@ integers and `.` decimals use U+202F, for example `12345.6700` →
 `12\u202f345.6700`, preserving the fraction as text. Valid comma groups or groups
 using SPACE/NBSP/THIN SPACE/NNBSP normalize above the threshold; comma/space mixtures
 and malformed groups retain their spelling with a grouping warning.
-`normalizeExisting: false` retains all existing groups. Ranges and known number
-bonds remain deferred. See [the core API and limits](../core/README.md#opt-in-standalone-digit-grouping).
+`normalizeExisting: false` retains all existing groups. Known units, currencies and percentages admit the same grouping; internal U+202F
+remains distinct from exterior bonds. Eligible ranges require two valid endpoints;
+ASCII hyphens need a known unit or standalone-range recognition. See [the core API and limits](../core/README.md#opt-in-standalone-digit-grouping).

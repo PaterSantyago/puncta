@@ -5,14 +5,13 @@ import type { Settings } from "./settings.js";
 import type { ProtectedRange, RuleId } from "./types.js";
 
 const unsignedNumber = String.raw`(?:\d+(?:[.,]\d+)*|[.,]\d+(?:[.,]\d+)*)`;
-const numericExpression = new RegExp(
-  String.raw`[-+−]?${unsignedNumber}(?:[ \u00a0]*[-–−+*/=×÷][ \u00a0]*[-+−]?${unsignedNumber})*`,
-  "gu",
-);
-const simpleNumberOrRange = new RegExp(
-  String.raw`^[-+−]?${unsignedNumber}(?:[-–]${unsignedNumber})?$`,
-  "u",
-);
+const numericExpression = (number: string) =>
+  new RegExp(
+    String.raw`[-+−]?${number}(?:[ \u00a0]*[-–−+*/=×÷][ \u00a0]*[-+−]?${number})*`,
+    "gu",
+  );
+const simpleNumberOrRange = (number: string) =>
+  new RegExp(`^[-+−]?${number}(?:[-–]${number})?$`, "u");
 
 export interface DashChange extends ProtectedRange {
   after: string;
@@ -151,7 +150,11 @@ export function numericDashes(
       numericText.slice(0, role.start) +
       "\uFFFC".repeat(role.end - role.start) +
       numericText.slice(role.end);
-  for (const match of numericText.matchAll(numericExpression)) {
+  const number = settings.rules.digitGrouping.enabled
+    ? String.raw`(?:\d+(?:[., \u00a0\u2009\u202f]\d+)*|[.,]\d+(?:[.,]\d+)*)`
+    : unsignedNumber;
+  const simplePattern = simpleNumberOrRange(number);
+  for (const match of numericText.matchAll(numericExpression(number))) {
     let start = match.index;
     const end = start + match[0].length;
     if (
@@ -169,7 +172,7 @@ export function numericDashes(
       continue;
     const knownUnit = units.has(end);
     const value = text.slice(start, end);
-    const simple = !/[-+]$/u.test(before) && simpleNumberOrRange.test(value);
+    const simple = !/[-+]$/u.test(before) && simplePattern.test(value);
     if (!simple && /[-–]/u.test(value)) {
       const ruleId = value.startsWith("-") ? "minus" : "ranges";
       preserved.push({ start, end });

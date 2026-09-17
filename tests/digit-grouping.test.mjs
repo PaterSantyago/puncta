@@ -148,7 +148,6 @@ test("unsupported complete constructions never expose a numeric prefix or suffix
       "12345/67890",
       "12345:67890",
       "12345-67890",
-      "12345–67890",
       "2026-09-12345",
       "1.23456.789",
       "12345+67890",
@@ -158,11 +157,6 @@ test("unsupported complete constructions never expose a numeric prefix or suffix
       "12345 − 67890",
       "12345 * 67890",
       "12345 / 67890",
-      "12345 67890kg",
-      "12345kg",
-      "12345 kg",
-      "$ 12345",
-      "12345 %",
     ]) {
       const report = instance.text(input, { detailed: true });
       assert.deepEqual(

@@ -59,11 +59,14 @@ const continuation = /^[\p{L}\p{M}\p{N}\u00ad_/°^*·⋅×]/u;
 
 /** Original numeric spans, without interpreting separators or rewriting notation.
  * A code immediately before a number is a recognised boundary, not a word tail. */
-function numbers(text: string): ProtectedRange[] {
+function numbers(text: string, grouped: boolean): ProtectedRange[] {
   const result: ProtectedRange[] = [];
-  for (const match of text.matchAll(
-    /[+−-]?(?:\d+(?:[.,]\d+)*|[.,]\d+)(?:[-–](?:\d+(?:[.,]\d+)*|[.,]\d+))?/gu,
-  )) {
+  const integer = grouped
+    ? String.raw`\d+(?:[ \u00a0\u2009\u202f]\d+)*`
+    : String.raw`\d+`;
+  const number = `(?:${integer}(?:[.,]\\d+)*|[.,]\\d+)`;
+  const pattern = new RegExp(`[+−-]?${number}(?:[-–]${number})?`, "gu");
+  for (const match of text.matchAll(pattern)) {
     let start = match.index;
     const end = start + match[0].length;
     const head = text.slice(0, precedingSpaceStart(text, start));
@@ -101,6 +104,7 @@ export interface NumberBond {
   readonly enabled: boolean;
   readonly warning: "currency.order" | "typography.ambiguous" | null;
   readonly construction: ProtectedRange;
+  readonly designation: ProtectedRange;
 }
 
 /** Recognition owns intervals even when their formatting is disabled. This keeps
@@ -116,13 +120,14 @@ export function numberBonds(text: string, settings: Settings): NumberBond[] {
     .filter((unit) => !reservedUnits.has(unit))
     .sort((a, b) => b.length - a.length);
   const bonds: NumberBond[] = [];
-  const spans = numbers(text);
+  const spans = numbers(text, !!settings.rules.digitGrouping.enabled);
   function add(
     start: number,
     end: number,
     after: string,
     ruleId: RuleId,
     construction: ProtectedRange,
+    designation: ProtectedRange,
     warning: NumberBond["warning"] = null,
   ) {
     bonds.push({
@@ -131,6 +136,7 @@ export function numberBonds(text: string, settings: Settings): NumberBond[] {
       after,
       ruleId,
       construction,
+      designation,
       warning,
       enabled: settings.rules[ruleId].enabled !== false,
     });
@@ -145,10 +151,17 @@ export function numberBonds(text: string, settings: Settings): NumberBond[] {
         !continuation.test(tail.slice(candidate.length)),
     );
     if (unit || (tail.startsWith("°") && !continuation.test(tail.slice(1)))) {
-      add(number.end, markerStart, unit ? "\u00a0" : "", "units", {
-        start: number.start,
-        end: markerStart + (unit?.length ?? 1),
-      });
+      add(
+        number.end,
+        markerStart,
+        unit ? "\u00a0" : "",
+        "units",
+        {
+          start: number.start,
+          end: markerStart + (unit?.length ?? 1),
+        },
+        { start: markerStart, end: markerStart + (unit?.length ?? 1) },
+      );
     } else if (tail.startsWith("%") && !continuation.test(tail.slice(1))) {
       add(
         number.end,
@@ -156,6 +169,7 @@ export function numberBonds(text: string, settings: Settings): NumberBond[] {
         settings.rules.percentages.space === "nbsp" ? "\u00a0" : "",
         "percentages",
         { start: number.start, end: markerStart + 1 },
+        { start: markerStart, end: markerStart + 1 },
       );
     }
   }
@@ -199,6 +213,7 @@ export function numberBonds(text: string, settings: Settings): NumberBond[] {
         text.slice(left.end, validRight.start),
         "currencies",
         { start: left.start, end: validRight.end },
+        { start, end },
         "typography.ambiguous",
       );
       continue;
@@ -214,6 +229,7 @@ export function numberBonds(text: string, settings: Settings): NumberBond[] {
       symbol && prefix ? "" : "\u00a0",
       "currencies",
       { start: prefix ? start : number.start, end: prefix ? number.end : end },
+      { start, end },
       atypical ? "currency.order" : null,
     );
   }

@@ -127,3 +127,11 @@ The #88 mapping adds valid group normalization, full-candidate diagnostics,
 structural exclusions, cleanup boundaries, source separator replacement and
 seed-8801 public representation properties. Its exact commands and revision are
 recorded in the same acceptance report.
+
+## Number grouping interactions (#89)
+
+The optional grouping extension covers complete known designations, atomic
+range eligibility and independent neighboring formatting switches through
+text/HTML/pure React/component SSR. See the criterion-to-test mapping and
+execution evidence in [digit grouping #89](digit-grouping.md#number-bonds-and-ranges-slice-89).
+This does not certify deferred #90–93 acceptance.

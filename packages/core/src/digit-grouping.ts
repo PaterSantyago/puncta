@@ -1,4 +1,4 @@
-import { rangeIndex } from "./ranges.js";
+import type { NumberBond } from "./number-bonds.js";
 import type { Settings } from "./settings.js";
 import type { ProtectedRange } from "./types.js";
 
@@ -8,12 +8,12 @@ interface GroupingResult {
   ambiguous: ProtectedRange[];
 }
 
-/** Recognize a complete standalone candidate before planning separator edits.
- * Ranges and known number bonds remain owned by their recognizers. */
+/** Recognize a complete numeric candidate before planning separator edits.
+ * Known designations come from the same catalogue as exterior number bonds. */
 export function digitGrouping(
   text: string,
   settings: Settings,
-  excluded: readonly ProtectedRange[],
+  bonds: readonly NumberBond[],
 ): GroupingResult {
   const changes: ProtectedRange[] = [];
   const preserved: ProtectedRange[] = [];
@@ -25,12 +25,26 @@ export function digitGrouping(
     /(?<=\p{N})[ \u00a0\u2009\u202f]{2,}(?=\p{N})/gu,
   ))
     preserved.push({ start: match.index, end: match.index + match[0].length });
-  const excludedIndex = rangeIndex(text.length, excluded);
+  // Hide only recognized designations, retaining original numeric coordinates.
+  const characters = text.split("");
+  for (const { designation, ruleId } of bonds) {
+    // Between operands, percent also has an operator role. Retain it until
+    // the full construction has been classified rather than exposing its tail.
+    if (
+      ruleId === "percentages" &&
+      /^[ \u00a0\u2009\u202f]*[+−-]?[0-9]/u.test(text.slice(designation.end))
+    )
+      continue;
+    characters.fill("\uFFFC", designation.start, designation.end);
+  }
+  const numericText = characters.join("");
   const grammar =
     settings.locale === "en-gb"
       ? /^([+−-]?)([0-9]+|[0-9]{1,3}(?:,[0-9]{3})+|[0-9]{1,3}(?:[ \u00a0\u2009\u202f][0-9]{3})+)(?:\.[0-9]+)?$/u
       : /^([+−-]?)([0-9]+|[0-9]{1,3}(?:[ \u00a0\u2009\u202f][0-9]{3})+)(?:[.,][0-9]+)?$/u;
-  const tokens = [...text.matchAll(/[^\s;!?¿¡()[\]{}"'“”‘’«»\uFFFC]+/gu)];
+  const tokens = [
+    ...numericText.matchAll(/[^\s;!?¿¡()[\]{}"'“”‘’«»\uFFFC]+/gu),
+  ];
   for (let index = 0; index < tokens.length; index++) {
     const token = tokens[index];
     // A bare colon only belongs to a construction consumed from its left
@@ -42,7 +56,7 @@ export function digitGrouping(
       if (
         !connectsNumberTokens(
           last[0],
-          text.slice(last.index + last[0].length, next.index),
+          numericText.slice(last.index + last[0].length, next.index),
           next[0],
         )
       )
@@ -54,52 +68,83 @@ export function digitGrouping(
       .slice(token.index, last.index + last[0].length)
       .replace(/[.,:…]+$/u, "");
     const end = token.index + candidate.length;
-    if (excludedIndex.overlaps(token.index, end)) continue;
-    // Missing-integer forms are expected skips; punctuation cleanup must not
-    // split their leading decimal marker from the digit tail on a later pass.
-    if (/^[+−-]?[.,]\p{N}/u.test(candidate)) {
-      preserved.push({ start: token.index, end });
+    const range = /^([+−-]?[^–-]+)([–-])([+−-]?[^–-]+)$/u.exec(candidate);
+    const endpoints =
+      range &&
+      (range[2] === "–" ||
+        settings.rules.ranges.standalone ||
+        bonds.some((bond) => bond.ruleId === "units" && bond.start === end))
+        ? [range[1], range[3]]
+        : [candidate];
+    const records = endpoints.map((value) =>
+      classifyNumber(value, grammar, settings),
+    );
+    // Eligibility belongs to the whole range. A technical endpoint takes
+    // precedence over an apparently malformed fragment in the other endpoint.
+    if (records.some((record) => record.kind === "excluded")) {
+      if (
+        range ||
+        /^[+−-]?[0-9.,][0-9., \u00a0\u2009\u202f]*$/u.test(candidate)
+      )
+        preserved.push({ start: token.index, end });
       continue;
     }
-    const match = grammar.exec(candidate);
-    if (!match) {
-      // Structural exclusions and unsupported digits/identifiers take priority
-      // over an apparently malformed numeric fragment within them.
-      if (!/^[+−-]?[0-9][0-9., \u00a0\u2009\u202f]*$/u.test(candidate))
-        continue;
-      const unsigned = candidate.replace(/^[+−-]/u, "");
-      preserved.push({ start: token.index, end });
-      const integerDigits = unsigned
-        .split(settings.locale === "en-gb" ? /\./u : /[.,]/u, 1)[0]
-        .replace(/[, \u00a0\u2009\u202f]/gu, "");
-      if (
-        (integerDigits.length > 1 && integerDigits.startsWith("0")) ||
-        /^[0-9]+(?:\.[0-9]+){2,}$/u.test(unsigned)
-      )
-        continue;
+    preserved.push({ start: token.index, end });
+    if (records.some((record) => record.kind === "ambiguous")) {
       ambiguous.push({ start: token.index, end });
       continue;
     }
-    const integer = match[2];
-    const digits = integer.replace(/[, \u00a0\u2009\u202f]/gu, "");
-    preserved.push({ start: token.index, end });
-    if (digits.length > 1 && digits.startsWith("0")) continue;
-    if (digits.length < Number(settings.rules.digitGrouping.minDigits))
-      continue;
-    const start = token.index + match[1].length;
-    if (digits.length !== integer.length) {
-      if (!settings.rules.digitGrouping.normalizeExisting) continue;
-      for (const separator of integer.matchAll(/[, \u00a0\u2009]/gu))
-        changes.push({
-          start: start + separator.index,
-          end: start + separator.index + 1,
-        });
-    } else {
-      for (let offset = integer.length - 3; offset > 0; offset -= 3)
-        changes.push({ start: start + offset, end: start + offset });
+    let endpointStart = token.index;
+    for (const record of records) {
+      if (record.kind !== "valid") continue;
+      const { integer, sign } = record;
+      const digits = integer.replace(/[, \u00a0\u2009\u202f]/gu, "");
+      const start = endpointStart + sign.length;
+      if (digits.length >= Number(settings.rules.digitGrouping.minDigits)) {
+        if (digits.length !== integer.length) {
+          if (settings.rules.digitGrouping.normalizeExisting)
+            for (const separator of integer.matchAll(/[, \u00a0\u2009]/gu))
+              changes.push({
+                start: start + separator.index,
+                end: start + separator.index + 1,
+              });
+        } else {
+          for (let offset = integer.length - 3; offset > 0; offset -= 3)
+            changes.push({ start: start + offset, end: start + offset });
+        }
+      }
+      endpointStart += endpoints[0].length + 1;
     }
   }
   return { changes, preserved, ambiguous };
+}
+
+type NumberRecord =
+  | { kind: "valid"; sign: string; integer: string }
+  | { kind: "excluded" | "ambiguous" };
+
+/** Classification never repairs notation or coerces digits to a numeric value. */
+function classifyNumber(
+  value: string,
+  grammar: RegExp,
+  settings: Settings,
+): NumberRecord {
+  if (!/^[+−-]?[0-9][0-9., \u00a0\u2009\u202f]*$/u.test(value))
+    return { kind: "excluded" };
+  const match = grammar.exec(value);
+  const unsigned = value.replace(/^[+−-]/u, "");
+  const integer =
+    match?.[2] ??
+    unsigned.split(settings.locale === "en-gb" ? /\./u : /[.,]/u, 1)[0];
+  const digits = integer.replace(/[, \u00a0\u2009\u202f]/gu, "");
+  if (
+    (digits.length > 1 && digits.startsWith("0")) ||
+    /^[0-9]+(?:\.[0-9]+){2,}$/u.test(unsigned)
+  )
+    return { kind: "excluded" };
+  return match
+    ? { kind: "valid", sign: match[1], integer }
+    : { kind: "ambiguous" };
 }
 
 /** A group-space or separated operator still connects a numerical construction.
@@ -109,7 +154,7 @@ function connectsNumberTokens(
   gap: string,
   right: string,
 ): boolean {
-  if (!/^[ \t\u00a0\u2009\u202f()[\]{}]*$/u.test(gap)) return false;
+  if (!/^[ \t\u00a0\u2009\u202f\uFFFC()[\]{}]*$/u.test(gap)) return false;
   // A comma/period directly after a number ends it before any next token,
   // including a missing-integer decimal or signed item in the list.
   if (gap.length > 0 && /\p{N}[.,]$/u.test(left)) return false;
@@ -118,8 +163,12 @@ function connectsNumberTokens(
     ((left === ":" || /\p{N}:$/u.test(left)) && /^\p{N}/u.test(right))
   )
     return true;
-  if (/[+−–*/=×÷^%-]$/u.test(left) || /^[+−–*/=×÷^%-]/u.test(right))
+  if (
+    /[+−–*/=×÷^%-]$/u.test(left) ||
+    (/\p{N}$/u.test(left) && /^[+−–*/=×÷^%-]/u.test(right))
+  )
     return true;
+  // Designations separate quantities, but never sever an operator context.
   if (!/^[ \u00a0\u2009\u202f]+$/u.test(gap)) return false;
   return (
     (/\p{N}$/u.test(left) && /^[.,]?\p{N}/u.test(right) && gap.length === 1) ||

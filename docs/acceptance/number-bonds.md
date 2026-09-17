@@ -31,3 +31,14 @@ implements the contract's conservative ambiguity policy without moving currency.
 Typography edits, including the currency warnings, project through the existing
 shared structural context. No new public API or React reconciliation behavior is
 introduced; the documented deep protection-toggle limitation remains unchanged.
+
+## Opt-in grouping extension (#89)
+
+With `rules.digitGrouping.enabled`, complete known designations also admit
+interior grouping. The number recognizer includes original group spaces and
+created U+202F; exterior unit/currency/percentage intervals retain their own
+rules, including disabled formatting and atypical currency-order warnings.
+`12345kg` becomes `12\u202f345\u00a0kg`. Unknown complete suffixes stay excluded.
+The full interaction matrix and current evidence are in
+[digit grouping, slice #89](digit-grouping.md#number-bonds-and-ranges-slice-89).
+Earlier separator-preservation claims above describe disabled grouping.

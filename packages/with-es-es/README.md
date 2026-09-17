@@ -37,5 +37,7 @@ integers and `,` or `.` decimals use U+202F, for example `12345,6700` →
 decimal. Valid groups using SPACE/NBSP/THIN SPACE/NNBSP normalize above the threshold.
 Malformed groups and conflicting punctuation such as `1.234,50` retain their
 spelling with a grouping warning. `normalizeExisting: false` retains all existing
-groups. Ranges and known number bonds remain deferred. See
+groups. Known units, currencies and percentages admit the same grouping; internal U+202F
+remains distinct from exterior bonds. Eligible ranges require two valid endpoints;
+ASCII hyphens need a known unit or standalone-range recognition. See
 [the core API and limits](../core/README.md#opt-in-standalone-digit-grouping).
