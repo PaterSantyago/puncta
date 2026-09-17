@@ -11,7 +11,7 @@ const numericExpression = (number: string) =>
     "gu",
   );
 const simpleNumberOrRange = (number: string) =>
-  new RegExp(String.raw`^[-+−]?${number}(?:[-–]${number})?$`, "u");
+  new RegExp(`^[-+−]?${number}(?:[-–]${number})?$`, "u");
 
 export interface DashChange extends ProtectedRange {
   after: string;

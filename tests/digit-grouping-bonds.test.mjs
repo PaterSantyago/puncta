@@ -526,3 +526,35 @@ test("disabled grouping retains existing text, reports and warnings across repre
     }
   }
 });
+
+test("recognized designations do not sever compound arithmetic into groupable operands", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    for (const source of [
+      "12345+£67890",
+      "£12345+67890",
+      "£12345 + £67890",
+      "£00123–£67890",
+      "12345 kg + 67890 kg",
+      "12345kg+67890kg",
+      "12345 + EUR67890",
+      "12345kg * 67890kg",
+      "12345 % 67890",
+    ]) {
+      const report = base.text(source, { locale, detailed: true });
+      assert.deepEqual(
+        report.edits.filter((e) => e.ruleIds.includes("digitGrouping")),
+        [],
+        source,
+      );
+      assert.deepEqual(
+        report.warnings.filter((w) => w.ruleId === "digitGrouping"),
+        [],
+        source,
+      );
+    }
+    assert.equal(
+      base.text("12345kg 67890kg", { locale }),
+      "12\u202f345\u00a0kg 67\u202f890\u00a0kg",
+    );
+  }
+});

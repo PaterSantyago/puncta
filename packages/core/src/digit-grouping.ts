@@ -27,8 +27,16 @@ export function digitGrouping(
     preserved.push({ start: match.index, end: match.index + match[0].length });
   // Hide only recognized designations, retaining original numeric coordinates.
   const characters = text.split("");
-  for (const { designation } of bonds)
+  for (const { designation, ruleId } of bonds) {
+    // Between operands, percent also has an operator role. Retain it until
+    // the full construction has been classified rather than exposing its tail.
+    if (
+      ruleId === "percentages" &&
+      /^[ \u00a0\u2009\u202f]*[+−-]?[0-9]/u.test(text.slice(designation.end))
+    )
+      continue;
     characters.fill("\uFFFC", designation.start, designation.end);
+  }
   const numericText = characters.join("");
   const grammar =
     settings.locale === "en-gb"
@@ -48,7 +56,7 @@ export function digitGrouping(
       if (
         !connectsNumberTokens(
           last[0],
-          text.slice(last.index + last[0].length, next.index),
+          numericText.slice(last.index + last[0].length, next.index),
           next[0],
         )
       )
@@ -146,7 +154,7 @@ function connectsNumberTokens(
   gap: string,
   right: string,
 ): boolean {
-  if (!/^[ \t\u00a0\u2009\u202f()[\]{}]*$/u.test(gap)) return false;
+  if (!/^[ \t\u00a0\u2009\u202f\uFFFC()[\]{}]*$/u.test(gap)) return false;
   // A comma/period directly after a number ends it before any next token,
   // including a missing-integer decimal or signed item in the list.
   if (gap.length > 0 && /\p{N}[.,]$/u.test(left)) return false;
@@ -160,6 +168,7 @@ function connectsNumberTokens(
     (/\p{N}$/u.test(left) && /^[+−–*/=×÷^%-]/u.test(right))
   )
     return true;
+  // Designations separate quantities, but never sever an operator context.
   if (!/^[ \u00a0\u2009\u202f]+$/u.test(gap)) return false;
   return (
     (/\p{N}$/u.test(left) && /^[.,]?\p{N}/u.test(right) && gap.length === 1) ||
