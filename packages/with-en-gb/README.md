@@ -35,9 +35,10 @@ attribution.
 MIT licensed. Public publication is separate work.
 
 Optional `rules.digitGrouping` defaults to
-`{ enabled: false, minDigits: 5, normalizeExisting: true }`. Its first slice groups
-standalone ungrouped ASCII integers and `.` decimals with U+202F, for example
-`12345.6700` → `12\u202f345.6700`, preserving the fraction as text. Existing
-comma/space groups and complex numerical constructions are preserved from grouping;
-normalization and its diagnostics are pending subsequent slices. See
-[the core API and limits](../core/README.md#opt-in-digit-grouping-first-implementation-slice).
+`{ enabled: false, minDigits: 5, normalizeExisting: true }`. Standalone ASCII
+integers and `.` decimals use U+202F, for example `12345.6700` →
+`12\u202f345.6700`, preserving the fraction as text. Valid comma groups or groups
+using SPACE/NBSP/THIN SPACE/NNBSP normalize above the threshold; comma/space mixtures
+and malformed groups retain their spelling with a grouping warning.
+`normalizeExisting: false` retains all existing groups. Ranges and known number
+bonds remain deferred. See [the core API and limits](../core/README.md#opt-in-standalone-digit-grouping).

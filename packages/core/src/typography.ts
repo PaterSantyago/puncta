@@ -102,8 +102,15 @@ export function segmentTypography(
         ...numeric.preserved,
         ...bonds.map((bond) => bond.construction),
       ]);
-      for (const position of grouping.insertions)
-        edit(position, position, "\u202f", "digitGrouping");
+      for (const change of grouping.changes)
+        edit(change.start, change.end, "\u202f", "digitGrouping");
+      for (const span of grouping.ambiguous)
+        ambiguous(
+          span.start,
+          span.end,
+          "Numeric grouping is ambiguous; the complete candidate was preserved.",
+          "digitGrouping",
+        );
       for (const change of numeric.changes)
         edit(change.start, change.end, change.after, change.ruleId);
       for (const span of numeric.ambiguous) {

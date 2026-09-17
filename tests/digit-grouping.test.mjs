@@ -151,7 +151,6 @@ test("unsupported complete constructions never expose a numeric prefix or suffix
       "12345–67890",
       "2026-09-12345",
       "1.23456.789",
-      "1.234,56789",
       "12345+67890",
       "12345 + 67890",
       "12345  +  67890",
@@ -159,15 +158,7 @@ test("unsupported complete constructions never expose a numeric prefix or suffix
       "12345 − 67890",
       "12345 * 67890",
       "12345 / 67890",
-      "12345 67890",
-      "12345\u00a067890",
-      "12345\u200967890",
-      "12345\u202f67890",
       "12345 67890kg",
-      "1 ,23456",
-      "12345 , 67890",
-      "12,345",
-      "12 345",
       "12345kg",
       "12345 kg",
       "$ 12345",
@@ -372,5 +363,494 @@ test("parentheses do not expose an operand of unsupported arithmetic", () => {
         [],
         `${locale}: ${source}`,
       );
+  }
+});
+
+test("existing standalone groups normalize only above the threshold and when requested", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    const instance = base.with({
+      locale,
+      rules: { digitGrouping: { enabled: true } },
+    });
+    for (const separator of [
+      " ",
+      "\u00a0",
+      "\u2009",
+      "\u202f",
+      ...(locale === "en-gb" ? [","] : []),
+    ]) {
+      const source = `12${separator}345${separator}678.900`;
+      assert.equal(
+        instance.text(source),
+        "12\u202f345\u202f678.900",
+        `${locale}: ${source}`,
+      );
+      assert.equal(
+        instance.text(source, {
+          rules: { digitGrouping: { normalizeExisting: false } },
+        }),
+        source,
+      );
+      assert.equal(instance.text(`1${separator}234`), `1${separator}234`);
+      assert.equal(
+        instance.text(`1${separator}234`, {
+          rules: { digitGrouping: { minDigits: 4 } },
+        }),
+        "1\u202f234",
+      );
+    }
+    assert.equal(
+      instance.text("1 234\u00a0567\u2009890\u202f123"),
+      "1\u202f234\u202f567\u202f890\u202f123",
+    );
+    assert.deepEqual(
+      instance.text("12\u202f345", { detailed: true }).edits,
+      [],
+    );
+  }
+});
+
+test("ambiguous complete candidates retain their spelling and structured source diagnostic", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    for (const input of [
+      "12 34",
+      "1234 567",
+      "12345 67890",
+      "1.234 567",
+      "1 ,234",
+      "1 , 234",
+      "1.234,50",
+      "1,234 567",
+      ...(locale === "en-gb" ? ["1,23"] : []),
+    ]) {
+      for (const options of [
+        {},
+        { minDigits: Number.MAX_SAFE_INTEGER },
+        { normalizeExisting: false },
+      ]) {
+        const instance = base.with({
+          locale,
+          rules: { digitGrouping: { enabled: true, ...options } },
+        });
+        const report = instance.text(`😀 ${input}!`, { detailed: true });
+        assert.equal(report.result, `😀 ${input}!`, `${locale}: ${input}`);
+        const warnings = report.warnings.filter(
+          (warning) => warning.ruleId === "digitGrouping",
+        );
+        assert.equal(warnings.length, 1, `${locale}: ${input}`);
+        assert.deepEqual(
+          { ...warnings[0], message: "explanation" },
+          {
+            code: "typography.ambiguous",
+            source: "rule",
+            ruleId: "digitGrouping",
+            locale,
+            details: {},
+            message: "explanation",
+            location: {
+              kind: "text",
+              ranges: [{ sourceId: 0, start: 3, end: 3 + input.length }],
+            },
+          },
+        );
+        assert.deepEqual(report.appliedRules, []);
+        assert.deepEqual(
+          instance.text(report.result, { detailed: true }).edits,
+          [],
+        );
+      }
+    }
+  }
+});
+
+test("all standalone boundaries survive cleanup and repeated processing", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    const instance = base.with({
+      locale,
+      rules: { digitGrouping: { enabled: true } },
+    });
+    for (const gap of ["  ", " \u00a0", "\u2009 ", "\u202f  ", "\t", "\n"]) {
+      const expected = `12\u202f345${gap}67\u202f890`;
+      assert.equal(instance.text(`12345${gap}67890`), expected);
+      assert.deepEqual(instance.text(expected, { detailed: true }).edits, []);
+    }
+    for (const [input, expected] of [
+      ["12 345, 67 890", "12\u202f345, 67\u202f890"],
+      ["12 345. 67 890", "12\u202f345. 67\u202f890"],
+    ])
+      assert.equal(instance.text(input), expected);
+  }
+});
+
+test("expected exclusions take precedence over malformed fragments", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    const instance = base.with({
+      locale,
+      rules: { digitGrouping: { enabled: true } },
+    });
+    for (const input of [
+      "0012345",
+      "0 123",
+      "00.12345",
+      ".12345",
+      ",12345",
+      "−,12345",
+      "١12345",
+      "12345٢",
+      "12345\u0301",
+      "AB12345",
+      "12345suffix",
+      "12345e6",
+      "12345E−6",
+      "12345/67890",
+      "12345:67890",
+      "2026-09-12345",
+      "1.2345.6",
+      "1.234.567",
+      "12 34 + 56789",
+      "12345 + 67 89",
+      "12 34 + (56789)",
+      "(12345) + 67 89",
+    ]) {
+      const report = instance.text(input, { detailed: true });
+      assert.deepEqual(
+        report.edits.filter((edit) => edit.ruleIds.includes("digitGrouping")),
+        [],
+        input,
+      );
+      assert.deepEqual(
+        report.warnings.filter((warning) => warning.ruleId === "digitGrouping"),
+        [],
+        input,
+      );
+    }
+  }
+});
+
+test("normalization reports separate source separators, including HTML entities", () => {
+  const instance = base.with({ rules: { digitGrouping: { enabled: true } } });
+  const report = instance.text("😀 12,345,678.900", { detailed: true });
+  assert.equal(report.result, "😀 12\u202f345\u202f678.900");
+  assert.deepEqual(
+    report.edits,
+    [5, 9].map((start) => ({
+      kind: "replace",
+      before: ",",
+      after: "\u202f",
+      locale: "en-gb",
+      ruleIds: ["digitGrouping"],
+      ranges: [{ sourceId: 0, start, end: start + 1 }],
+    })),
+  );
+  const html = instance.html("12<em>&#32;</em>345&#160;678", {
+    detailed: true,
+  });
+  assert.equal(html.result, "12<em>\u202f</em>345\u202f678");
+  assert.deepEqual(
+    html.edits.map(({ before, after, ranges }) => ({ before, after, ranges })),
+    [
+      {
+        before: " ",
+        after: "\u202f",
+        ranges: [
+          {
+            sourceId: 1,
+            start: 0,
+            end: 1,
+            inputRange: { accuracy: "exact", start: 6, end: 11 },
+          },
+        ],
+      },
+      {
+        before: "\u00a0",
+        after: "\u202f",
+        ranges: [
+          {
+            sourceId: 2,
+            start: 3,
+            end: 4,
+            inputRange: { accuracy: "exact", start: 19, end: 25 },
+          },
+        ],
+      },
+    ],
+  );
+});
+
+test("every transparent split retains replacement ownership and whole-candidate warnings", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    const instance = base.with({
+      locale,
+      rules: { digitGrouping: { enabled: true } },
+    });
+    for (const [source, expected, warningCount] of [
+      ["12 345\u2009678", "12\u202f345\u202f678", 0],
+      ["12 34", "12 34", 1],
+      ["1.234,50", "1.234,50", 1],
+    ]) {
+      for (let split = 1; split < source.length; split++) {
+        const left = source.slice(0, split);
+        const right = source.slice(split);
+        const html = instance.html(
+          `${left}<!-- boundary --><em>${right}</em>`,
+          { detailed: true },
+        );
+        const children = [
+          left,
+          h(Fragment, { key: "fragment" }, h("em", null, right)),
+        ];
+        const react = transformReact(children, { instance, detailed: true });
+        assert.equal(
+          html.result.replace(/<[^>]*>/gu, ""),
+          expected,
+          `${source}@${split}`,
+        );
+        assert.equal(
+          renderToString(react.result).replace(/<[^>]*>/gu, ""),
+          expected,
+        );
+        assert.equal(
+          renderToString(h(Puncta, { instance }, children)).replace(
+            /<[^>]*>/gu,
+            "",
+          ),
+          expected,
+        );
+        for (const report of [html, react]) {
+          const warnings = report.warnings.filter(
+            (warning) => warning.ruleId === "digitGrouping",
+          );
+          assert.equal(warnings.length, warningCount);
+          if (warningCount)
+            assert.deepEqual(
+              warnings[0].location.ranges.map(({ sourceId, start, end }) => ({
+                sourceId,
+                start,
+                end,
+              })),
+              [
+                { sourceId: 0, start: 0, end: split },
+                { sourceId: 1, start: 0, end: source.length - split },
+              ],
+            );
+          for (const edit of report.edits) {
+            assert.equal(edit.kind, "replace");
+            assert.equal(edit.ranges.length, 1);
+            const range = edit.ranges[0];
+            assert.equal(range.end - range.start, 1);
+            assert.equal(
+              [left, right][range.sourceId].slice(range.start, range.end),
+              edit.before,
+            );
+          }
+        }
+      }
+    }
+  }
+});
+
+test("seed 8801: generated groups preserve exact digits, replay, fixed points and representation equivalence", () => {
+  let seed = 8801;
+  const choose = (items) => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return items[Math.floor((seed / 2 ** 32) * items.length)];
+  };
+  for (let sample = 0; sample < 120; sample++) {
+    const locale = choose(["en-gb", "es-es"]);
+    const groups = [
+      choose(["1", "12", "123"]),
+      ...Array.from({ length: choose([1, 2, 3, 8]) }, () =>
+        choose(["000", "123", "456", "789"]),
+      ),
+    ];
+    const commaGroups = locale === "en-gb" && choose([true, false]);
+    const decimal = locale === "es-es" ? choose([".00900", ",6700"]) : ".00900";
+    const sign = choose(["", "+", "−"]);
+    const malformed = choose([true, false]);
+    if (malformed) groups[1] = "12";
+    const number = groups
+      .map(
+        (group, index) =>
+          `${index ? (commaGroups ? "," : choose([" ", "\u00a0", "\u2009", "\u202f"])) : ""}${group}`,
+      )
+      .join("");
+    const source = sign + number + decimal;
+    const normalizeExisting = choose([true, false]);
+    const minDigits = choose([4, 5, 12]);
+    const expected =
+      !malformed && normalizeExisting && groups.join("").length >= minDigits
+        ? sign + groups.join("\u202f") + decimal
+        : source;
+    const instance = base.with({
+      locale,
+      rules: {
+        digitGrouping: { enabled: true, minDigits, normalizeExisting },
+        minus: { enabled: false },
+      },
+    });
+    const context = `seed=8801 sample=${sample} state=${seed} input=${JSON.stringify(source)}`;
+    const report = instance.text(source, { detailed: true });
+    assert.equal(report.result, expected, context);
+    assert.equal(
+      report.result.replace(/[, \u00a0\u2009\u202f]/gu, ""),
+      source.replace(/[, \u00a0\u2009\u202f]/gu, ""),
+      context,
+    );
+    assert.equal(
+      report.warnings.filter((warning) => warning.ruleId === "digitGrouping")
+        .length,
+      Number(malformed),
+      context,
+    );
+    let replay = source;
+    for (const edit of [...report.edits].reverse()) {
+      const { start, end } = edit.ranges[0];
+      assert.equal(end - start, 1, context);
+      assert.equal(source.slice(start, end), edit.before, context);
+      replay = replay.slice(0, start) + edit.after + replay.slice(end);
+    }
+    assert.equal(replay, expected, context);
+    assert.deepEqual(
+      instance.text(expected, { detailed: true }).edits,
+      [],
+      context,
+    );
+    const leaves = [...source];
+    assert.equal(
+      instance
+        .html(leaves.map((leaf) => `<em>${leaf}</em>`).join(""))
+        .replace(/<[^>]*>/gu, "")
+        .replaceAll("&nbsp;", "\u00a0"),
+      expected,
+      context,
+    );
+    assert.equal(
+      renderToString(transformReact(leaves, { instance }))
+        .replace(/<[^>]*>/gu, "")
+        .replaceAll("&nbsp;", "\u00a0"),
+      expected,
+      context,
+    );
+    assert.equal(
+      instance.text(source, { protect: [{ start: 0, end: source.length }] }),
+      source,
+      context,
+    );
+    assert.equal(
+      instance.html(`<code>${source}</code>`).replaceAll("&nbsp;", "\u00a0"),
+      `<code>${source}</code>`,
+      context,
+    );
+    const protectedReact = transformReact(h("code", null, source), {
+      instance,
+      detailed: true,
+    });
+    assert.deepEqual(protectedReact.edits, [], context);
+    assert.deepEqual(protectedReact.warnings, [], context);
+  }
+});
+
+test("a single zero integer does not suppress invalid fractional-group diagnostics", () => {
+  const instance = base.with({
+    locale: "es-es",
+    rules: { digitGrouping: { enabled: true } },
+  });
+  for (const input of ["0,123 456", "0,123,456", "0.123 456"]) {
+    const report = instance.text(input, { detailed: true });
+    assert.equal(report.result, input);
+    assert.equal(
+      report.warnings.filter((warning) => warning.ruleId === "digitGrouping")
+        .length,
+      1,
+      input,
+    );
+  }
+  for (const input of ["00,123 456", "0 123,456", "00.123 456"]) {
+    const report = instance.text(input, { detailed: true });
+    assert.equal(report.result, input);
+    assert.deepEqual(
+      report.warnings.filter((warning) => warning.ruleId === "digitGrouping"),
+      [],
+      input,
+    );
+  }
+});
+
+test("spaced colon structures never expose standalone operands", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    const instance = base.with({
+      locale,
+      rules: { digitGrouping: { enabled: true } },
+    });
+    for (const input of [
+      "12345 : 67890",
+      "12345 :67890",
+      "12345: 67890",
+      "12 34 : 56789",
+      "12345\t:\t67890",
+    ]) {
+      const report = instance.text(input, { detailed: true });
+      assert.deepEqual(
+        report.edits.filter((edit) => edit.ruleIds.includes("digitGrouping")),
+        [],
+        input,
+      );
+      assert.deepEqual(
+        report.warnings.filter((warning) => warning.ruleId === "digitGrouping"),
+        [],
+        input,
+      );
+      assert.equal(instance.html(input), report.result);
+      const leaves = input.split(":");
+      const children = [leaves[0], h("em", { key: "colon" }, ":"), leaves[1]];
+      assert.equal(
+        renderToString(transformReact(children, { instance })).replace(
+          /<[^>]*>/gu,
+          "",
+        ),
+        report.result,
+      );
+      assert.equal(
+        renderToString(h(Puncta, { instance }, children)).replace(
+          /<[^>]*>/gu,
+          "",
+        ),
+        report.result,
+      );
+    }
+    assert.equal(instance.text("ID: 12345"), "ID: 12\u202f345");
+  }
+});
+
+test("list punctuation takes priority over a following missing-integer form", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    const instance = base.with({
+      locale,
+      rules: { digitGrouping: { enabled: true } },
+    });
+    for (const [input, expected] of [
+      ["12345, .67890", "12\u202f345, .67890"],
+      ["12345. ,67890", "12\u202f345. ,67890"],
+    ]) {
+      const report = instance.text(input, { detailed: true });
+      assert.equal(report.result, expected);
+      assert.deepEqual(
+        report.warnings.filter((warning) => warning.ruleId === "digitGrouping"),
+        [],
+      );
+      assert.deepEqual(instance.text(expected, { detailed: true }).edits, []);
+    }
+  }
+});
+
+test("a prose label colon does not swallow a standalone number", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    const instance = base.with({
+      locale,
+      rules: { digitGrouping: { enabled: true } },
+    });
+    const result = instance.text("ID : 12345");
+    assert.equal(result, "ID: 12\u202f345");
+    assert.deepEqual(instance.text(result, { detailed: true }).edits, []);
   }
 });

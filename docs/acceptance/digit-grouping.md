@@ -86,3 +86,79 @@ recognition now returns its own preserved ranges. Follow-up review found no
 remaining standards findings. Spec review found punctuation boundaries and
 parenthesized/tab-separated arithmetic gaps; red-then-green public regressions
 cover the fixes, and follow-up review confirmed all findings addressed.
+
+## Existing groups and complete candidates: slice #88
+
+[#88](https://github.com/PaterSantyago/puncta/issues/88) extends the historical #87
+baseline above. Existing-group normalization and diagnostics are now implemented
+for standalone candidates. Ranges and known unit/currency/percentage constructions
+remain #89; expanded inheritance/coordinates, streaming/hydration, scaling and
+final acceptance remain later slices. The historical #87 PASS results do not
+certify these new changes.
+
+| #88 criterion                      | Executable evidence in `tests/digit-grouping.test.mjs`                                                                                                                                                                                                                          |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Grammar and localization           | Four group spaces, allowed mixtures, en-gb commas, decimal fractions and trailing zeros; existing locale literal oracles; es-es conflict diagnostics                                                                                                                            |
+| Threshold and normalization        | Default 5 and explicit 4, below-threshold preservation, both normalization settings, unchanged U+202F; generated threshold 12 and diagnostic MAX_SAFE_INTEGER                                                                                                                   |
+| Expected exclusions                | Leading zeros, missing integer, Unicode/mixed digits, combining marks, identifiers/suffixes, scientific/date/time/fraction/version structures and arithmetic, including malformed operands and parentheses                                                                      |
+| Full candidate and diagnostics     | Literal malformed groups, conflicting separators and punctuation-space examples; one structured grouping warning with full UTF-16 range, locale, empty details; large threshold and disabled normalization do not suppress it                                                   |
+| Cleanup and boundaries             | Double/repeated and mixed group spaces, tabs, newlines, comma/period lists and repeat-pass empty edits; disabled compatibility retains the previous report                                                                                                                      |
+| Public representations and reports | All two-leaf splits of compact normalized/ambiguous examples through HTML, pure React and component SSR; warning source ranges; separator ownership, independent replacement edits and exact entity input ranges                                                                |
+| Generated properties               | Seed 8801, 120 cases combining both locales, valid/malformed groups, group-space mixtures, comma groups, signs, literal fractions, thresholds and normalization; exact output, digit/fraction preservation, replay, idempotence, per-character HTML/React splits and protection |
+
+Expected valid generated results assemble independently selected literal groups
+with U+202F; they do not invoke a formatter or convert numbers to JavaScript
+number. Malformed cases shorten a full group and require unchanged output with a
+warning. Failure messages retain initial seed, sample index, state and the exact
+source, permitting replay and reduction to the offending candidate. During test
+development seed 8801 exposed an oracle error comparing serialized `&nbsp;` to
+decoded NBSP; the HTML comparison now decodes NBSP. No production change was made
+for that test-only mismatch.
+
+The new normalization, diagnostic and mixed-boundary assertions each failed
+before their corresponding implementation changes. Focused suites and typecheck
+run throughout development. The mixed-boundary regression preserves U+202F plus
+two ordinary spaces, which cleanup previously shortened. Token coalescing also
+keeps malformed groups inside arithmetic from producing fragment warnings.
+
+Implementation revision: `b17dd8e665db2854038b5d3918ec19c72b60778c`, tested on
+2026-09-17 with macOS arm64, Node 24.21.0, pnpm 12.4.1 and locked dependencies.
+The commands are the same reproduction sequence listed for #87 above; new results
+below apply to this revision. Subsequent documentation-only commits record them.
+
+Independent two-axis review compared against
+`64e245f07df4f04cafef7cffd323d8493e355f80`. Standards review found no actionable
+violations or smells. Spec review identified spaced-colon partial formatting and
+list punctuation incorrectly joining a following missing-integer form. Additional
+review caught a prose-label colon swallowing its number on the first pass. All
+were fixed with public red/green regressions. Self-review also corrected es-es
+`0,123 456` being mistaken for a leading-zero integer: a single zero integer does
+not suppress fractional-group warnings. Both independent reviewers confirmed no
+remaining findings on the implementation revision above.
+
+All applicable local commands passed on that implementation revision:
+
+| Check                                 | Result                                                                                                                                                                                       |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Focused grouping suite                | 23/23 PASS; seed 8801, 120 generated cases                                                                                                                                                   |
+| `pnpm check` after final review fixes | PASS: lint, formatting, typecheck, build, package archives, 239 functional tests, 3 release tests, 6 local publication simulations, installed npm/pnpm consumers and release-plan validation |
+| Production SSR + grouping             | 35/35 PASS                                                                                                                                                                                   |
+| Browser regression                    | Chromium 145.0.7632.6, Firefox 146.0.1 and WebKit 26.0 PASS; 145 shared assertions per engine, mounted updates and all three hydration renderers, no hydration errors                        |
+| RSC regression                        | All three engines PASS: Flight, server HTML, hydration and interactive updates                                                                                                               |
+| Existing scaling gate                 | PASS, run separately after every other local build/test completed                                                                                                                            |
+
+Scaling used three warmups and seven measured samples per input:
+
+| Scenario | Input lengths  | Small median (ms) | Large median (ms) | 4× ratio |
+| -------- | -------------- | ----------------- | ----------------- | -------- |
+| spaces   | 4,000 / 16,000 | 1.821             | 6.438             | 3.536×   |
+| words    | 1,000 / 4,000  | 1.009             | 3.433             | 3.401×   |
+| mixed    | 4,300 / 17,200 | 4.030             | 18.079            | 4.486×   |
+
+These unchanged browser/RSC/scaling fixtures are regression evidence, not the
+new grouping runtime or scaling scenarios reserved for #91/#92. Their grouping
+setting remains disabled. Source-level standalone normalization is covered by the
+new public text/HTML/pure React/component SSR tests. Generated browser/RSC
+artifacts remain in `artifacts/browser/acceptance.json` and
+`artifacts/rsc/report.json`; CI checks and uploads artifacts for the exact PR head.
+No manual verification, release or public publication was performed.

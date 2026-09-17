@@ -203,7 +203,7 @@ Unsupported call options are rejected.
 MIT licensed, with ISC kernel attribution and Unicode data licensing in `NOTICE.md`.
 The API remains experimental; public publication is separate work.
 
-## Opt-in digit grouping (first implementation slice)
+## Opt-in standalone digit grouping
 
 `rules.digitGrouping` is a nullable group with defaults
 `{ enabled: false, minDigits: 5, normalizeExisting: true }` in both locales.
@@ -218,16 +218,35 @@ grouped.text("2026", { rules: { digitGrouping: { minDigits: 4 } } }); // "2\u202
 grouped.html("12<em>345</em>"); // "12\u202f<em>345</em>"
 ```
 
-This slice supports standalone ungrouped ASCII integers and decimals, an optional
-leading `+`, `-` or `−`, decimal `.` in en-gb and decimal `.` or `,` in es-es.
-Only the integer digit count controls the threshold; digits, decimal signs and
-fractional trailing zeros remain text, without numeric conversion. The independent
-minus rule may still format an ASCII sign. Leading zeros, existing groups,
-technical or ambiguous candidates, ranges and recognised unit/currency/percentage
-constructions are conservatively excluded from grouping in this slice. Their
-existing typography rules still run. Existing-group normalization and grouping
-warnings are deferred, although `normalizeExisting` is already accepted and
-validated. This is not the complete contract of issue #86.
+Standalone ASCII integers and decimals support an optional leading `+`, `-` or
+`−`, decimal `.` in en-gb and decimal `.` or `,` in es-es. Only the integer digit
+count controls the threshold; digits, decimal signs and fractional trailing zeros
+remain text, without numeric conversion. The independent minus rule may still
+format an ASCII sign.
+
+Existing groups require 1–3 digits first, then exactly three per group, separated
+by one SPACE, NBSP, THIN SPACE or NNBSP; mixtures of these spaces are allowed.
+en-gb also accepts comma groups, without mixing commas and group spaces. es-es
+reads `1,234` as a decimal; `1.234,50` is a conflict. `normalizeExisting: true`
+changes valid separators to U+202F only at or above the threshold. `false` retains
+the entire grouped spelling while still grouping ungrouped numbers. Existing
+groups are never removed, and unchanged U+202F produces no edit.
+
+Malformed groups (`1234 567`, `12 34`), conflicting separators and spaces before
+numeric punctuation (`1 , 234`) retain the whole candidate and produce one
+`typography.ambiguous` warning with `source: "rule"`, `ruleId: "digitGrouping"`,
+the active locale and the whole original candidate location. A high threshold or
+`normalizeExisting: false` does not suppress that warning. Terminal punctuation
+and lists such as `12345, 67890` remain outside each number.
+
+Leading zeros, missing integer parts, non-ASCII/mixed digits, combining marks,
+identifiers and unknown suffixes remain ungrouped without grouping warnings.
+Scientific notation, slash/colon numeric structures, three-or-more dotted or
+hyphenated segments and arithmetic constructions also stay excluded. Years and
+telephone numbers are not guessed. Protection retains its existing meaning.
+Ranges and recognised unit/currency/percentage constructions are still excluded
+from grouping pending the next implementation slice; their existing typography
+rules continue to run. This is not the complete contract of issue #86.
 
 `minDigits` accepts safe integers from 4 through `Number.MAX_SAFE_INTEGER`.
 Invalid settings throw `PunctaConfigError` / `config.invalid-option` even if
@@ -238,10 +257,12 @@ object, null or undefined, never a boolean shorthand.
 
 The public `RuleId` union gains `"digitGrouping"`; exhaustive consumers should
 handle it. Detailed results record separate empty-range U+202F insertions at
-original UTF-16 positions and add `digitGrouping` to `appliedRules` only for actual
-changes. Transparent boundaries assign insertions to the end of the left leaf.
+original UTF-16 positions, replacements of individual source separators, and add `digitGrouping` to `appliedRules` only for actual
+changes. Transparent boundaries assign insertions to the end of the left leaf;
+replacements stay with their original separator leaf.
 Protection and opaque boundaries retain their existing meaning. With grouping
-enabled, repeated spaces between numbers are retained to keep separate numbers
-separate on a second pass. With grouping disabled, previous cleanup and reports
+enabled, two or more group spaces between numbers, tabs and line breaks retain
+their separation on a second pass. Cleanup preserves candidate spelling and does
+not undo normalized groups. With grouping disabled, previous cleanup and reports
 remain unchanged. The current coverage and remaining slices are recorded in
 [the grouping acceptance report](../../docs/acceptance/digit-grouping.md).

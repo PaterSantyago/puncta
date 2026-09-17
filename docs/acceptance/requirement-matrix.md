@@ -117,8 +117,13 @@ characters and additional negative/regression cases.
 
 ## Digit grouping extension
 
-[#87 standalone-number slice](digit-grouping.md) maps the shared option, validation,
+[#87–88 standalone-number slices](digit-grouping.md) map the shared option, validation,
 literal locale examples, public representations, conservative exclusions and
 original-coordinate reports. It is partial implementation of #86; the later
-normalization, bonds, scopes, generated/scaling and streaming/hydration slices
+bonds, scopes, expanded generated/scaling and streaming/hydration slices
 remain outstanding. Earlier first-version evidence is not evidence for grouping.
+
+The #88 mapping adds valid group normalization, full-candidate diagnostics,
+structural exclusions, cleanup boundaries, source separator replacement and
+seed-8801 public representation properties. Its exact commands and revision are
+recorded in the same acceptance report.

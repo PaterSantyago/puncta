@@ -31,9 +31,11 @@ No whole-word exception table is included.
 MIT licensed. Public publication is separate work.
 
 Optional `rules.digitGrouping` defaults to
-`{ enabled: false, minDigits: 5, normalizeExisting: true }`. Its first slice groups
-standalone ungrouped ASCII integers and `,` or `.` decimals with U+202F, for example
-`12345,6700` → `12\u202f345,6700`. The decimal sign and fraction remain literal;
-`1,234` is a decimal. Existing space groups and complex numerical constructions
-are preserved from grouping; normalization and its diagnostics are pending
-subsequent slices. See [the core API and limits](../core/README.md#opt-in-digit-grouping-first-implementation-slice).
+`{ enabled: false, minDigits: 5, normalizeExisting: true }`. Standalone ASCII
+integers and `,` or `.` decimals use U+202F, for example `12345,6700` →
+`12\u202f345,6700`. The decimal sign and fraction remain literal; `1,234` is a
+decimal. Valid groups using SPACE/NBSP/THIN SPACE/NNBSP normalize above the threshold.
+Malformed groups and conflicting punctuation such as `1.234,50` retain their
+spelling with a grouping warning. `normalizeExisting: false` retains all existing
+groups. Ranges and known number bonds remain deferred. See
+[the core API and limits](../core/README.md#opt-in-standalone-digit-grouping).
