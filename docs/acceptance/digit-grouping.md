@@ -295,4 +295,57 @@ runtime red/green claim is made for an already implemented contract.
 Grouping-specific streaming/hydration and React numeric-child acceptance remain
 #91; grouping-specific scaling and final parent acceptance remain #92. This slice
 does not close or certify the whole parent #86. Full checks and independent
-review results are recorded below after execution.
+review results are recorded below.
+
+### Execution and independent review
+
+Implementation/acceptance revision: `230b48f43e3831b747bdf9f42043f3731b3a86d8`,
+2026-09-17. Environment: Darwin 27.0.0 arm64, Node 24.21.0, pnpm 12.4.1,
+React/React DOM 19.3.0 and Playwright 1.58.2 with locked dependencies. Subsequent
+documentation-only commits record results; CI checks the final PR head.
+
+Independent Standards and Spec reviews compared against
+`cafd281d7c088532a4fbd0a4d0ec72f0ccbcd799`. Standards found no actionable
+violations or smells; its optional clarity suggestion changed the separate digit
+invariant to assert actual output rather than fixture integrity. Spec found two
+coverage gaps: successful Provider-level options and checking other defaults
+after a whole-group reset followed by re-enabling. Both now have explicit public
+assertions, including nested scopes. Per-leaf output is also checked against
+replayed source edits. Both follow-up reviews confirmed no remaining findings
+at the revision above.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm build
+pnpm typecheck
+node --test tests/digit-grouping-scopes.test.mjs tests/digit-grouping.test.mjs tests/digit-grouping-bonds.test.mjs tests/options-scopes.test.mjs
+pnpm check
+NODE_ENV=production node --test tests/ssr-streaming.test.mjs tests/digit-grouping.test.mjs tests/digit-grouping-bonds.test.mjs tests/digit-grouping-scopes.test.mjs
+pnpm test:browser
+pnpm test:rsc
+pnpm test:scaling
+```
+
+| Check                                 | Result                                                                                                                                                                                                    |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Focused grouping/scopes               | 57/57 PASS, including 17 new tests; seed 9001 (64 trees), retained seeds 8801 and 8901 (120 cases each)                                                                                                   |
+| Final `pnpm check` after review fixes | PASS: lint, formatting, typecheck, build, archives, 266 functional tests, 3 release tests, 6 local publication simulations, npm/pnpm installed consumers and declarations, release-plan validation        |
+| Production streaming + grouping       | 62/62 PASS                                                                                                                                                                                                |
+| Browser regression                    | Chromium 145.0.7632.6, Firefox 146.0.1, WebKit 26.0 PASS; 145 shared assertions per engine, 14 mounted updates, eight protection/reorder scenarios and three hydration renderers without hydration errors |
+| RSC regression                        | All three engines PASS: Flight, server HTML, hydration and interactive updates; Next 16.3.5                                                                                                               |
+| Separate existing scaling gate        | PASS after all local builds/tests completed; three warmups and seven measured samples per input                                                                                                           |
+
+| Scenario | Input lengths  | Small median (ms) | Large median (ms) | 4× ratio |
+| -------- | -------------- | ----------------- | ----------------- | -------- |
+| spaces   | 4,000 / 16,000 | 1.796             | 6.514             | 3.626×   |
+| words    | 1,000 / 4,000  | 0.953             | 3.354             | 3.520×   |
+| mixed    | 4,300 / 17,200 | 3.929             | 17.862            | 4.546×   |
+
+Browser/RSC artifacts at `artifacts/browser/acceptance.json` and
+`artifacts/rsc/report.json` record the tested revision above. CI uploads equivalent
+artifacts for its final PR head. The unchanged browser/RSC/scaling fixtures use
+grouping disabled and remain regression checks; the dedicated grouping runtime
+and scaling scenarios are still #91/#92. New source-level scopes/report scenarios
+are verified by the public Node and component SSR suites. No mandatory manual
+check, release or public package publication was performed; publication simulations
+use an isolated local registry.
