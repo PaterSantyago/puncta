@@ -17,7 +17,7 @@ transcribed from the contract, never generated from the recogniser.
 | Settings inheritance                              | Calls, `with`, declarative HTML/React, PunctaProvider; independent enabled fields and null defaults                                                                            |
 | Interaction and invariants                        | Quotes/ellipsis/spaces literals, 12,000 seeded generated contexts over two locales and three configurations, original edits with replay, idempotence and full-range protection |
 
-Numeric recognition never interprets or rewrites separators, signs or range
+With digit grouping disabled, numeric recognition never interprets or rewrites separators, signs or range
 markers. It retains original spans for local interval edits. Range/minus
 conversion remains #46. Currency recognition uses those same spans before any
 unit spacing changes: `GBP1kg` becomes `GBP 1 kg` in one call.

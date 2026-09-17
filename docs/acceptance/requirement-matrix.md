@@ -115,47 +115,21 @@ characters and additional negative/regression cases.
 | Corpus freeze hashes, resource regeneration/subprocesses or Node-without-browser-globals inside a browser                           | #33 §§7–8 require these on Node; browser-shared text oracles and Node-only infrastructure checks run in their appropriate environments.                                                                                                                                                                   |
 | New public npm publication or release promotion                                                                                     | #33 §8 explicitly accepts real local-registry archives; public release is separate work.                                                                                                                                                                                                                  |
 
-## Digit grouping extension
+## Digit grouping extension (#83–86, implementation #87–93)
 
-[#87–88 standalone-number slices](digit-grouping.md) map the shared option, validation,
-literal locale examples, public representations, conservative exclusions and
-original-coordinate reports. It is partial implementation of #86; the later
-bonds, scopes, expanded generated/scaling and streaming/hydration slices
-remain outstanding. Earlier first-version evidence is not evidence for grouping.
+The [final grouping contract matrix](digit-grouping.md#final-contract-matrix-93)
+maps each canonical grammar, configuration, diagnostic, coordinate and runtime
+branch to executable checks. It includes every canonical literal with its own
+settings and mixed text/HTML/pure React/component SSR oracles. Standalone numbers,
+normalization, bonds/ranges, scopes/reports, React runtime and long-input/scaling
+slices are implemented; their historical evidence remains in the same report.
 
-The #88 mapping adds valid group normalization, full-candidate diagnostics,
-structural exclusions, cleanup boundaries, source separator replacement and
-seed-8801 public representation properties. Its exact commands and revision are
-recorded in the same acceptance report.
+The final revision also tests prose-dash boundaries, nested locale/normalization
+settings with protection and entities, all two-leaf splits of mixed oracles,
+streaming shell/fallback and mounted updates. Previous separator-preservation
+claims apply to disabled grouping. Enabled grouping may replace only eligible
+integer separators with U+202F; cleanup retains candidate spelling and boundaries
+between separate numbers. `RuleId` includes `digitGrouping`.
 
-## Number grouping interactions (#89)
-
-The optional grouping extension covers complete known designations, atomic
-range eligibility and independent neighboring formatting switches through
-text/HTML/pure React/component SSR. See the criterion-to-test mapping and
-execution evidence in [digit grouping #89](digit-grouping.md#number-bonds-and-ranges-slice-89).
-This does not certify deferred #90–93 acceptance.
-
-## Grouping React runtime (#91)
-
-Following the [#90 scopes/report acceptance](digit-grouping.md#nested-scopes-markup-and-source-reports-slice-90),
-[#91 runtime acceptance](digit-grouping.md#react-runtime-slice-91) verifies numeric
-String(value) leaves, unchanged types, transparent ownership and pure/Context
-boundaries; three server APIs with pre-resolution shell/fallback, concurrent
-configuration/report isolation and abort/retry; three-browser hydration with
-original DOM identity and source/settings/locale updates; and the production RSC
-boundary. The linked matrix records executable checks and revision-specific
-results. Existing key/ref/protection limits remain. Grouping-specific scaling and
-final combined parent #86 acceptance remain #92; this entry does not certify them.
-
-### Long numeric records and scaling (#92)
-
-`tests/digit-grouping-long.test.mjs` adds exact long digit/decimal/group/invalid
-models, UTF-16 report replay and fixed points for text, HTML and pure React in both
-locales. Seed 9201 runs 120 generated models and asserts that both locales reach
-changes, expected preservation and warnings; failures emit a minimized model and
-source. The separate scaling gate now covers 12 enabled numeric text/HTML/React
-scenarios, with exact 4× input and transparent-tree growth. See
-[functional mapping](digit-grouping.md#long-input-and-scaling-slice-92) and
-[measurements](scaling.md#long-numeric-records-and-transparent-trees-92).
-Final combined parent acceptance remains #93.
+See [final execution evidence](digit-grouping.md#final-execution-93) for actual
+results and the tested revision; mapped checks alone are not PASS evidence.

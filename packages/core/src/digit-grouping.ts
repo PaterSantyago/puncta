@@ -14,6 +14,7 @@ export function digitGrouping(
   text: string,
   settings: Settings,
   bonds: readonly NumberBond[],
+  textualRoles: readonly ProtectedRange[],
 ): GroupingResult {
   const changes: ProtectedRange[] = [];
   const preserved: ProtectedRange[] = [];
@@ -36,6 +37,17 @@ export function digitGrouping(
     )
       continue;
     characters.fill("\uFFFC", designation.start, designation.end);
+  }
+  // Recognized prose dashes bound numeric context even when their formatting
+  // is disabled. Keep their role distinct from arithmetic/range operators.
+  for (const { start, end } of textualRoles) {
+    // The prose recognizer also admits a spaced English en dash. Between
+    // numeric endpoints it still belongs to one atomic grouping candidate.
+    const numericRange =
+      text.slice(start, end) === "–" &&
+      /\p{N}[ \u00a0\u2009\u202f]*$/u.test(text.slice(0, start)) &&
+      /^[ \u00a0\u2009\u202f]*[+−-]?[.,]?\p{N}/u.test(text.slice(end));
+    if (!numericRange) characters.fill(";", start, end);
   }
   const numericText = characters.join("");
   const grammar =
@@ -68,13 +80,19 @@ export function digitGrouping(
       .slice(token.index, last.index + last[0].length)
       .replace(/[.,:…]+$/u, "");
     const end = token.index + candidate.length;
-    const range = /^([+−-]?[^–-]+)([–-])([+−-]?[^–-]+)$/u.exec(candidate);
+    // Split at the first delimiter after the optional left sign. The complete
+    // right endpoint is classified below, including its sign or a technical
+    // remainder; never extract a groupable suffix from a longer construction.
+    const range = /^([+−-]?[^–-]+)([–-])(.+)$/u.exec(candidate);
     const endpoints =
       range &&
       (range[2] === "–" ||
         settings.rules.ranges.standalone ||
         bonds.some((bond) => bond.ruleId === "units" && bond.start === end))
-        ? [range[1], range[3]]
+        ? [
+            range[1].replace(/[ \u00a0\u2009\u202f]+$/u, ""),
+            range[3].replace(/^[ \u00a0\u2009\u202f]+/u, ""),
+          ]
         : [candidate];
     const records = endpoints.map((value) =>
       classifyNumber(value, grammar, settings),
@@ -94,11 +112,16 @@ export function digitGrouping(
       ambiguous.push({ start: token.index, end });
       continue;
     }
-    let endpointStart = token.index;
-    for (const record of records) {
+    for (const [endpointIndex, record] of records.entries()) {
       if (record.kind !== "valid") continue;
       const { integer, sign } = record;
       const digits = integer.replace(/[, \u00a0\u2009\u202f]/gu, "");
+      // Delimiter intervals stay outside the endpoints and keep their source
+      // spelling. Locate the right endpoint from its original end, not a
+      // normalized separator width.
+      const endpointStart =
+        token.index +
+        (endpointIndex === 0 ? 0 : candidate.length - endpoints[1].length);
       const start = endpointStart + sign.length;
       if (digits.length >= Number(settings.rules.digitGrouping.minDigits)) {
         if (digits.length !== integer.length) {
@@ -113,7 +136,6 @@ export function digitGrouping(
             changes.push({ start: start + offset, end: start + offset });
         }
       }
-      endpointStart += endpoints[0].length + 1;
     }
   }
   return { changes, preserved, ambiguous };

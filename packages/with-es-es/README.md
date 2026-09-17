@@ -40,4 +40,4 @@ spelling with a grouping warning. `normalizeExisting: false` retains all existin
 groups. Known units, currencies and percentages admit the same grouping; internal U+202F
 remains distinct from exterior bonds. Eligible ranges require two valid endpoints;
 ASCII hyphens need a known unit or standalone-range recognition. See
-[the core API and limits](../core/README.md#opt-in-standalone-digit-grouping).
+[the core API and limits](../core/README.md#opt-in-digit-grouping).

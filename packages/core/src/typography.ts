@@ -98,7 +98,7 @@ export function segmentTypography(
       const dashes = textualDashes(text, settings);
       const bonds = numberBonds(text, settings);
       const numeric = numericDashes(text, settings, bonds, dashes.roles);
-      const grouping = digitGrouping(text, settings, bonds);
+      const grouping = digitGrouping(text, settings, bonds, dashes.roles);
       for (const change of grouping.changes)
         edit(change.start, change.end, "\u202f", "digitGrouping");
       for (const span of grouping.ambiguous)

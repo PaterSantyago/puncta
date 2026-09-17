@@ -1,4 +1,163 @@
-# Standalone digit grouping: slice #87
+# Digit grouping: final acceptance
+
+This report maps the implementation of [#86](https://github.com/PaterSantyago/puncta/issues/86)
+and final integration [#93](https://github.com/PaterSantyago/puncta/issues/93).
+Canonical decisions remain [recognition #83](https://github.com/PaterSantyago/puncta/issues/83#issuecomment-5712793415),
+[API #84](https://github.com/PaterSantyago/puncta/issues/84#issuecomment-5713158505)
+and [acceptance #85](https://github.com/PaterSantyago/puncta/issues/85#issuecomment-5713294764).
+The [research #82](https://github.com/PaterSantyago/puncta/issues/82#issuecomment-5711080145)
+distinguishes language facts from profile choices. U+202F for en-gb, threshold 5,
+input grammar and conservative exclusions are Puncta decisions. Literal expected
+strings are independent of runtime output; no numeric conversion or copied
+recognizer computes the new grouping oracle.
+
+## Final contract matrix (#93)
+
+Paths below are relative to `tests/`. The executable names identify coverage,
+while the final execution section records results. Historical slice results below
+apply only to their stated revisions; their deferred work is now implemented.
+
+| Canonical branch                                                                                                                                           | Executable oracle/property and observable result                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #83 §§1–2,10; #84 §2: every literal and its settings                                                                                                       | `fixtures/digit-grouping.mjs` and `digit-grouping-acceptance.test.mjs`, “every canonical literal…”: all #83 table records and remaining inline grammar examples, #84 threshold/normalization table, both locales through text/HTML/pure React/component SSR, exact strings, complete diagnostics, source replay and empty repeat edits. Protection/inline examples are in the mixed protected test and the original HTML/left-leaf test; #84 reset/re-enable code examples are in scope tests. |
+| ASCII integers, signs + / - / U+2212, long exact digits, decimal marks and trailing zeros                                                                  | `digit-grouping.test.mjs`, “literal standalone decimal, sign and threshold oracles”; `digit-grouping-long.test.mjs`, both locale long-record tests. Minus formatting has its own edits in the bonds UTF-16 test.                                                                                                                                                                                                                                                                               |
+| en-gb comma integer versus es-es decimal; es-es dot/comma decimal; conflicting `1.234,50`                                                                  | Canonical literals above, “ambiguous complete candidates…”; mixed Spanish nested scope retains the conflict with exactly one full-location warning.                                                                                                                                                                                                                                                                                                                                            |
+| Threshold below/on/above 4 and default 5; only integer digits count; MAX_SAFE_INTEGER                                                                      | “explicit grouping…”, “literal standalone…”, “existing standalone groups…”, nullable validation and seed 8801; long models include 4/5/24/MAX_SAFE_INTEGER. No maximum-sized allocation.                                                                                                                                                                                                                                                                                                       |
+| Four group spaces, mixed spaces, en-gb commas, normalization true/false, unchanged U+202F, groups below threshold                                          | “existing standalone groups normalize only above the threshold and when requested”; “existing groups keep whole-number minus, currency and exterior intervals” in bonds; canonical normalization-off range.                                                                                                                                                                                                                                                                                    |
+| Incorrect/partial groups, comma/space mixtures, fractional groups, spaced punctuation, full-candidate warning despite high threshold or normalization off  | “ambiguous complete candidates…”, “a single zero integer does not suppress invalid fractional-group diagnostics”; bonds “complete notation…” includes full-range warnings with extreme threshold and normalization off.                                                                                                                                                                                                                                                                        |
+| Leading zeros, missing integer with optional sign, Unicode/mixed digits, combining marks, underscore, unknown suffixes, SHY/technical protection           | “unsupported complete constructions…”, “expected exclusions take precedence…”; bonds “complete notation and unknown tails…”; scopes “structural boundaries…” and technical-context/protection regressions. No partial numeric edits or grouping warnings.                                                                                                                                                                                                                                      |
+| e/E exponents with sign, slash/colon structures, >=3 hyphen/dot segments, identifiers, arithmetic with spaces/parentheses/designations                     | Canonical literals; “parentheses do not expose…”, “spaced colon structures…”; bonds “recognized designations do not sever compound arithmetic…”. `ID: 12345` remains groupable; no semantic year/telephone inference.                                                                                                                                                                                                                                                                          |
+| Terminal punctuation, comma/dot lists, single group space versus >=2 mixed spaces/tab/newline                                                              | “all standalone boundaries survive cleanup…”, “numeric separators stay distinct…”, “list punctuation takes priority…” and “a prose label colon…”; exact repeat-pass results.                                                                                                                                                                                                                                                                                                                   |
+| En dash, ASCII hyphen with known unit or standalone opt-in, U+2212 exclusion                                                                               | Bonds “range eligibility is atomic…” and “formatting switches…”; original sign remains independent of grouping. New spaced-en-dash tests cover four separator spaces, both locales, every transparent split, invalid endpoints on either side and independent dashes/ranges switches.                                                                                                                                                                                                          |
+| Both endpoints eligible; one technical/leading-zero endpoint excludes whole range; malformed endpoint warns on full range; per-end threshold/normalization | Bonds “range eligibility is atomic…”, “complete notation…” and canonical `00123–123456`, `12 34–123456`, `1,234–56789` records.                                                                                                                                                                                                                                                                                                                                                                |
+| Known whole units, composites, additions, angular degree, percentages/currencies; inner U+202F versus outer U+00A0                                         | Bonds “complete known designations…”, “existing groups keep whole-number minus…”; all 16 units/ranges/percentages/currencies switches and both percentage spacing options. Unknown suffixes never expose a numeric prefix.                                                                                                                                                                                                                                                                     |
+| Mixed typography and prose-dash context, including dash formatting off                                                                                     | New mixed acceptance corpus in both locales: quotes, apostrophes, SHY, spaces, textual dashes, minus, normalized groups, ranges, bonds and invalid ranges. Every two-leaf split, plus “recognized prose dashes…” covers -- / en dash / em dash and independent formatting switch.                                                                                                                                                                                                              |
+| #84 §§1–4: nullable shared API, default off, fields alone never enable; exact type/value/unknown errors                                                    | “grouping validates nullable fields…” and explicit opt-in tests; `scripts/consumer-types.ts` compiles installed shared options and extended `RuleId`.                                                                                                                                                                                                                                                                                                                                          |
+| Missing/undefined inherits, field/group null resets, disabled saves explicit fields, locale changes, all public configuration surfaces                     | `digit-grouping-scopes.test.mjs`, “every configuration surface…”, “nested host and component scopes…”, “host locale switches…”, pure explicit-instance/Context test. `rules: null` is not a new reset form.                                                                                                                                                                                                                                                                                    |
+| Explicit argument/component validation even disabled; protected declaration never read; off before options; SHY removal only validates                     | Scopes “invalid explicit calls…”, “disabled scopes remain inherited protection…”, “active HTML traversal skips…”, “SHY removal validates…”.                                                                                                                                                                                                                                                                                                                                                    |
+| #84 §5: code/source/ruleId/locale/details/message/full range; no duplicated reason; existing other-rule warnings retained                                  | “ambiguous complete candidates…”, bonds “existing groups…” (currency.order), mixed acceptance `verifyReport`; scoped locale warnings. Disabled-mode report equality checks retain earlier diagnostics.                                                                                                                                                                                                                                                                                         |
+| appliedRules unique actual edit/locale pairs, no false entries; repeat has no edits, persistent warning may recur                                          | Original UTF-16/report tests; new mixed `verifyReport` derives applied pairs from actual final edits; canonical no-op/warning cases and generated fixed points.                                                                                                                                                                                                                                                                                                                                |
+| #83 §9, #84 §6: separator-only edits, empty insertion ranges, individual changes, left-leaf seam ownership, original UTF-16 and non-BMP prefixes           | Original report literal, bonds UTF-16 exact edit list; scopes “every two-leaf split…” and “entity separators…”; mixed every-split source replay. Digits stay in their own leaves.                                                                                                                                                                                                                                                                                                              |
+| HTML entities decoded before/after and exact/covering/unavailable semantics; serialization not typography                                                  | Scopes “entity separators…” and “multi-leaf warnings… recovered HTML…”; “normalization reports separate source separators…”; mixed nested entity source range. Existing HTML parsing/report tests retain covering semantics where applicable; no fictitious internal entity positions.                                                                                                                                                                                                         |
+| Transparent inline/comments/arrays/Fragment; newline/br/wbr/block/opaque/protected/scope boundaries; protected content not analyzed                        | Original and scopes every-split tests; scopes “structural boundaries…”; seed 9001 multi-leaf scoped trees; mixed nested document combines protection, entities, locale and normalization overrides. Pure/component opacity remains unchanged.                                                                                                                                                                                                                                                  |
+| #85 §4: representation equivalence, spelling/digits/decimals/zeros, protection, replay and idempotence                                                     | Seeds 8801 (120), 8901 (120), 9001 (64 trees), 9201 (120 long models) plus literal mixed every-split tests. Generators require real changed/preserved/warned cases; long model failures shrink with retained seed/source. No new PBT dependency.                                                                                                                                                                                                                                               |
+| #85 §5: number/bigint String(value), unchanged types, exact bigint, seams, exponent skip, key/ref retention                                                | `digit-grouping-react.test.mjs`, “numeric leaves…”, “numeric transparent seams…” and “pure numeric processing…”. No recovery of precision already lost by JavaScript.                                                                                                                                                                                                                                                                                                                          |
+| renderToString/pipeable/readable; shell/fallback before Suspense resolution; context isolation, parallel reverse resumption, abort/retry                   | `ssr-streaming.test.mjs`, grouping shell/fallback/retry, parallel reports and new “mixed range and bond corpus…” for both stream APIs; production run required separately.                                                                                                                                                                                                                                                                                                                     |
+| Hydration, DOM identity, source/locale/settings changes, automatic separator removal, explicit group retention, protection                                 | `browser/hydration-tree.mjs` / hydration-client/server for all three renderers; `browser/grouping.mjs` numeric and mixed range/bond updates, StrictMode state/key/ref checks. Chromium/Firefox/WebKit execute these; no manual inspection.                                                                                                                                                                                                                                                     |
+| Pure/Context/RSC boundaries and current opaque/deep-protection limitations                                                                                 | Scopes explicit-instance test; `digit-grouping-react.test.mjs`; `rsc/run.mjs` production Flight/no-JS HTML/hydration/updates; existing protection suite.                                                                                                                                                                                                                                                                                                                                       |
+| #85 §6: long correct/incorrect/ungrouped numbers and transparent trees; exact output/reports/repeat                                                        | `digit-grouping-long.test.mjs` both literal locale tests and seed 9201; outcomes and digit/decimal preservation are asserted, not merely absence of crashes.                                                                                                                                                                                                                                                                                                                                   |
+| Scaling <8× median for 4× input/tree, 3 warmups/7 samples, no parallel load                                                                                | `scripts/check-scaling.mjs`: three previous and twelve enabled numeric text/HTML/React scenarios; fixed en-gb detailed mode with hyphenation disabled. Separate final measurements below; no global linearity promise.                                                                                                                                                                                                                                                                         |
+| Disabled compatibility                                                                                                                                     | Existing “disabled grouping retains…” text/HTML/React full-report tests; all historical independent typography suites remain in `pnpm check`. #92 additionally recorded 3,000 historical differential reports with seed 9202; that earlier experiment is not counted as a fresh final run or a new-function oracle.                                                                                                                                                                            |
+
+## Integration result and limits
+
+The mixed corpus first failed in both locales: `word -- -12345-67890kg -- word`
+received range/minus/unit edits but skipped grouping because prose dashes were
+mistaken for numerical operators. Grouping now uses the already recognized textual
+dash roles as boundaries, even when their formatting is disabled. Canonical
+numeric arithmetic/range exclusions remain covered. The initial six acceptance
+checks and the expanded 90-test focused run passed after that fix. Independent
+Spec review then found spaced en-dash ranges could bypass endpoint atomicity in
+en-gb or be skipped in es-es. A second public RED test confirmed this. Numeric
+en-dash context now takes precedence over prose masking, and endpoint recognition
+excludes delimiter intervals while retaining original separator coordinates.
+Both-side invalid endpoints, full warnings, four spaces, transparent splits and
+independent dashes/ranges switches cover the correction. Follow-up review found
+a spaced ASCII-minus right endpoint was still excluded; another public RED
+example now covers all three signs, signed malformed neighbors and source
+coordinates. Range splitting retains the entire right endpoint for classification.
+
+The implementation does not infer every phone/year/identifier, group fractions,
+change decimal marks, repair malformed groups, or recover number precision lost
+before invocation. Protection, unavailable HTML provenance, opaque React traversal
+and existing deep protection-toggle state limits remain. Scaling results cover
+only the stated workload/method, without a portable millisecond budget. Public
+release/publication and changing or closing parent #86 are outside #93.
+
+## Final execution (#93)
+
+Implementation and executable-test revision: `a1dbffa72af52003b97976d7f8e783f512c5079b`,
+2026-09-17. This subsequent documentation-only commit records the completed runs;
+PR CI checks its exact final head separately. No old slice PASS is substituted
+for these results. The earlier interrupted check at `9388f14` was stopped for the
+signed-endpoint review fix and is not a successful gate.
+
+Environment: macOS Darwin 27.0.0 arm64, Node 24.21.0, pnpm 12.4.1, frozen lockfile,
+React/React DOM 19.3.0, Playwright 1.58.2. Next 16.3.5 uses bundled server/client
+React `19.3.0-canary-cbb046ab-20260731` in the RSC fixture.
+
+```sh
+export PATH=/Users/yuryglushkov/.nvm/versions/node/v24.21.0/bin:$PATH
+pnpm install --frozen-lockfile
+pnpm typecheck
+pnpm build
+node --test tests/digit-grouping*.test.mjs tests/ssr-streaming.test.mjs tests/dashes.test.mjs
+pnpm check
+NODE_ENV=production node --test tests/ssr-streaming.test.mjs tests/digit-grouping*.test.mjs
+pnpm test:browser
+pnpm test:rsc
+pnpm test:scaling
+```
+
+| Final check                      | Result                                                                                                                                                                                                                                                    |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Focused grouping, dashes and SSR | 92/92 PASS after both review fixes                                                                                                                                                                                                                        |
+| `pnpm check`                     | PASS: lint, formatting, typecheck, build, package archives, 286 functional tests, 3 release tests, 6 local publication simulations, installed npm/pnpm consumers and release-plan validation                                                              |
+| Production SSR + all grouping    | 82/82 PASS                                                                                                                                                                                                                                                |
+| Browser                          | Chromium 145.0.7632.6, Firefox 146.0.1, WebKit 26.0: each 149 shared checks, 14 existing mounted updates, eight protection/reorder scenarios, 13 grouping updates and three hydration renderers PASS; no hydration errors, original DOM identity retained |
+| Production RSC                   | All three engines PASS: Flight, no-JS server HTML, hydration, independent server/client grouping and interactive updates                                                                                                                                  |
+| Scaling                          | All 15 scenarios PASS in isolation after other builds/tests; 3.363–5.408× median growth for 4× input, below 8×                                                                                                                                            |
+| Standards review                 | Independent Astra medium review, initial and follow-ups: no actionable findings at final implementation revision                                                                                                                                          |
+| Spec review                      | Independent Astra medium review found spaced-range atomicity P1 and signed-right-endpoint P2; both received public RED→GREEN regressions and final independent re-review confirmed closure with no remaining findings                                     |
+
+The complete matrix above is exercised by these commands. Seeds 8801/8901 each
+run 120 examples, 9001 runs 64 scoped trees, and 9201 runs 120 long models; their
+positive, preserved and diagnostic outcome assertions passed in this final run.
+The new canonical and mixed corpora are literal, without an additional seed.
+
+Browser and RSC artifacts at `artifacts/browser/acceptance.json` and
+`artifacts/rsc/report.json` identify the implementation revision above. CI uploads
+its own final-head artifacts. All checks are automated; there is no required
+manual visual or corpus attestation. Publication tests use an isolated local
+registry, not a public package release.
+
+### Final scaling measurements
+
+Three warmups and seven timed samples per size, median milliseconds. Imports,
+instance and input construction stay outside timing. Numeric scenarios use en-gb,
+detailed reports and disabled hyphenation; functional coverage includes both locales.
+HTML/React leaf counts grow from 1,000 to 4,000; text has one source leaf.
+HTML input lengths include markup; other input lengths describe text. No concurrent
+local builds/tests ran during measurement. This is a workload regression bound,
+not a global linearity or portable latency guarantee.
+
+| Scenario               | Text UTF-16 lengths | Input lengths   | Leaves        | Small ms | Large ms | Ratio  |
+| ---------------------- | ------------------- | --------------- | ------------- | -------- | -------- | ------ |
+| spaces                 | 4,000 / 16,000      | 4,000 / 16,000  | 1 / 1         | 1.693    | 6.542    | 3.865× |
+| words                  | 1,000 / 4,000       | 1,000 / 4,000   | 1 / 1         | 0.971    | 3.264    | 3.363× |
+| mixed                  | 4,300 / 17,200      | 4,300 / 17,200  | 1 / 1         | 3.992    | 14.555   | 3.646× |
+| grouping-digits-text   | 3,000 / 12,000      | 3,000 / 12,000  | 1 / 1         | 1.066    | 3.948    | 3.704× |
+| grouping-digits-html   | 3,000 / 12,000      | 12,000 / 48,000 | 1,000 / 4,000 | 3.952    | 14.824   | 3.751× |
+| grouping-digits-react  | 3,000 / 12,000      | 3,000 / 12,000  | 1,000 / 4,000 | 3.039    | 11.175   | 3.677× |
+| grouping-decimal-text  | 3,000 / 12,000      | 3,000 / 12,000  | 1 / 1         | 1.000    | 3.814    | 3.814× |
+| grouping-decimal-html  | 3,000 / 12,000      | 12,000 / 48,000 | 1,000 / 4,000 | 2.806    | 15.177   | 5.408× |
+| grouping-decimal-react | 3,000 / 12,000      | 3,000 / 12,000  | 1,000 / 4,000 | 2.719    | 11.313   | 4.161× |
+| grouping-groups-text   | 4,000 / 16,000      | 4,000 / 16,000  | 1 / 1         | 1.674    | 7.274    | 4.346× |
+| grouping-groups-html   | 4,000 / 16,000      | 13,000 / 52,000 | 1,000 / 4,000 | 4.049    | 18.223   | 4.501× |
+| grouping-groups-react  | 4,000 / 16,000      | 4,000 / 16,000  | 1,000 / 4,000 | 3.295    | 13.546   | 4.111× |
+| grouping-invalid-text  | 4,000 / 16,000      | 4,000 / 16,000  | 1 / 1         | 1.580    | 5.973    | 3.781× |
+| grouping-invalid-html  | 4,000 / 16,000      | 13,000 / 52,000 | 1,000 / 4,000 | 3.425    | 16.174   | 4.722× |
+| grouping-invalid-react | 4,000 / 16,000      | 4,000 / 16,000  | 1,000 / 4,000 | 2.858    | 11.623   | 4.067× |
+
+## Historical slice evidence
+
+The sections below retain their original scope, revisions, findings and PASS
+results. Statements that later work was deferred describe that historical slice,
+not the current implementation. Integration order: #87/PR #94, #88/PR #95,
+#89/PR #96, #90/PR #97, #91/PR #98 and #92/PR #99; all merged into develop before
+#93 began at `22d0e9ec4c12d4dadeb2a7c98fb16c9927b53065`.
+
+## Standalone digit grouping: slice #87
 
 This report covers [#87](https://github.com/PaterSantyago/puncta/issues/87) within
 [#86](https://github.com/PaterSantyago/puncta/issues/86). It does not certify the

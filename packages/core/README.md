@@ -3,7 +3,7 @@
 Synchronous ESM typography, with explicitly installed locales and no React or DOM
 requirement. The implementation covers quotes, apostrophes, ordinary spaces, punctuation intervals,
 ellipses, dashes, ranges, minus, units, percentages and currencies, plus optional
-algorithmic hyphenation in en-gb and es-es. Recognition spans transparent inline
+digit grouping and algorithmic hyphenation in en-gb and es-es. Recognition spans transparent inline
 leaves and respects nested configuration scopes.
 
 ```ts
@@ -25,7 +25,9 @@ conversion creates no new edits. Read a locale identifier from `locale.id`;
 
 The `spaces` rule collapses repeated U+0020 spaces and fixes unambiguous punctuation
 intervals. It retains line endings, blank lines, indentation, tabs, existing NBSP,
-numeric punctuation and dates. In es-es it removes ordinary inner spaces after
+numeric punctuation and dates. Opt-in digit grouping additionally preserves
+complete numeric candidates and repeated spaces separating independent numbers;
+it can normalize valid integer-group separators as described below. In es-es it removes ordinary inner spaces after
 existing `¿`/`¡` and before `?`/`!`; it does not supply missing signs. Textual double-hyphen markers and recognised dashes use spaced en dashes in
 en-gb and closed em-dash insertions in es-es. A known unit disambiguates
 `10-12 kg` → `10–12\u00a0kg` and `-5 kg` → `−5\u00a0kg`. Standalone ranges
@@ -67,7 +69,8 @@ Percentages use no space in en-gb and NBSP in es-es; set
 `GBP`, `EUR`, `USD` use NBSP before or after a number. Symbols `£`, `€`, `$` attach
 before the number in en-gb and use NBSP after it in es-es. The opposite symbol
 order preserves its original interval and reports `currency.order`; currency and
-number notation are never reordered or rewritten. A currency between two numbers
+number order are never changed. Numeric separators retain their spelling unless
+opt-in digit grouping explicitly normalizes eligible integer groups. A currency between two numbers
 belongs to its attached side (no ordinary space, including existing NBSP). When
 both sides have equal attachment, the construction remains unchanged with
 `typography.ambiguous`. These recognised intervals survive general space cleanup
@@ -203,7 +206,7 @@ Unsupported call options are rejected.
 MIT licensed, with ISC kernel attribution and Unicode data licensing in `NOTICE.md`.
 The API remains experimental; public publication is separate work.
 
-## Opt-in standalone digit grouping
+## Opt-in digit grouping
 
 `rules.digitGrouping` is a nullable group with defaults
 `{ enabled: false, minDigits: 5, normalizeExisting: true }` in both locales.
@@ -216,6 +219,7 @@ grouped.text("12345.6700"); // "12\u202f345.6700"
 grouped.text("2026"); // "2026"
 grouped.text("2026", { rules: { digitGrouping: { minDigits: 4 } } }); // "2\u202f026"
 grouped.html("12<em>345</em>"); // "12\u202f<em>345</em>"
+grouped.text("12345-67890kg"); // "12\u202f345–67\u202f890\u00a0kg"
 ```
 
 Standalone ASCII integers and decimals support an optional leading `+`, `-` or
@@ -258,8 +262,9 @@ separator. Both endpoints must be eligible: `00123–123456` remains ungrouped;
 `1,234–56789` can become `1,234–56\u202f789` with normalization disabled.
 Disabling units/ranges/percentages/currencies formatting preserves their
 recognition context. Grouping never replaces a hyphen on behalf of ranges.
-Grouping-specific streaming/hydration and scaling acceptance for issue #86
-remains in later implementation slices.
+Recognized prose dashes also bound numeric context independently of their
+formatting switch. Grouping works with surrounding quotes, spacing, ellipsis
+and optional hyphenation through text, HTML and React, including streaming SSR.
 
 `minDigits` accepts safe integers from 4 through `Number.MAX_SAFE_INTEGER`.
 Invalid settings throw `PunctaConfigError` / `config.invalid-option` even if
@@ -277,7 +282,7 @@ Protection and opaque boundaries retain their existing meaning. With grouping
 enabled, two or more group spaces between numbers, tabs and line breaks retain
 their separation on a second pass. Cleanup preserves candidate spelling and does
 not undo normalized groups. With grouping disabled, previous cleanup and reports
-remain unchanged. The current coverage and remaining slices are recorded in
+remain unchanged. The complete criterion-to-test mapping and revision-specific results are recorded in
 [the grouping acceptance report](../../docs/acceptance/digit-grouping.md).
 
 ### Grouping in nested scopes and source reports

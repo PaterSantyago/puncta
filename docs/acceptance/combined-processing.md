@@ -126,3 +126,17 @@ hydration или RSC-приёмку: это отдельные #54–#56. Отч
 replay, повторная обработка и компонентный SSR покрыты независимыми эталонами;
 [матрица и свидетельства #89](digit-grouping.md#number-bonds-and-ranges-slice-89)
 отделены от исторических результатов выше.
+
+## Final digit-grouping integration (#93)
+
+`tests/digit-grouping-acceptance.test.mjs` adds independent combined oracles from
+`tests/fixtures/digit-grouping.mjs`: both locales, quotes, textual dashes, minus,
+range/unit bonds, normalization, decimals with trailing zeros, currencies,
+percentages, invalid ranges and repeated numeric boundaries. Every transparent
+split is checked through HTML, pure React and component SSR with original-source
+replay, full grouping diagnostics and an edit-free repeat. Nested settings,
+protection and entity coordinates have a separate mixed-document oracle.
+
+These checks exposed prose dashes being treated as numerical operators; grouping
+now consumes the existing recognized textual roles, including with dash formatting
+disabled. See the [final matrix and execution](digit-grouping.md#final-contract-matrix-93).

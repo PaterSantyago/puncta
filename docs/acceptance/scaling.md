@@ -157,3 +157,14 @@ spaces, units, currency and non-BMP prefixes. Every report matched. Existing
 independent locale, combined-processing, scopes and runtime fixtures remain the
 permanent compatibility checks. See [slice #92](digit-grouping.md#long-input-and-scaling-slice-92)
 for functional mapping and final check evidence.
+
+## Final grouping integration (#93)
+
+The isolated gate was rerun after all other final builds/tests on
+`a1dbffa72af52003b97976d7f8e783f512c5079b`: all 15 scenarios passed, with
+3.363–5.408× median growth for 4× input/tree size. Long ungrouped text measured
+1.066 / 3.948 ms (3.704×). The complete per-scenario lengths, leaf counts,
+medians, environment and commands are in the
+[final measurement table](digit-grouping.md#final-scaling-measurements).
+These fresh results supersede earlier measurements for final #93 acceptance;
+the earlier tables remain historical evidence of the diagnosed regressions.

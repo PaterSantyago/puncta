@@ -42,4 +42,8 @@ using SPACE/NBSP/THIN SPACE/NNBSP normalize above the threshold; comma/space mix
 and malformed groups retain their spelling with a grouping warning.
 `normalizeExisting: false` retains all existing groups. Known units, currencies and percentages admit the same grouping; internal U+202F
 remains distinct from exterior bonds. Eligible ranges require two valid endpoints;
-ASCII hyphens need a known unit or standalone-range recognition. See [the core API and limits](../core/README.md#opt-in-standalone-digit-grouping).
+ASCII hyphens need a known unit or standalone-range recognition. See [the core API and limits](../core/README.md#opt-in-digit-grouping).
+
+U+202F is Puncta’s chosen English typography profile, not a claim that all British
+style guides use spaces. The default threshold is also a product choice; a bare
+`2026` groups when `minDigits: 4`, so protect years or identifiers explicitly.
