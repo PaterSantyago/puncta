@@ -103,9 +103,11 @@ export function quotes(
       },
     });
   }
+  // Start once per digit run: retrying every suffix is quadratic when the
+  // apostrophe/inch marker is absent from a long numeric record.
   const measurementDelimiters = new Set<number>();
   for (const match of text.matchAll(
-    /\p{N}+(?:[.,]\p{N}+)?'[ \t]*\p{N}+(?:[.,/]\p{N}+)*(?:[ \t]+\p{N}+\/\p{N}+)?"/gu,
+    /(?<!\p{N})\p{N}+(?:[.,]\p{N}+)?'[ \t]*\p{N}+(?:[.,/]\p{N}+)*(?:[ \t]+\p{N}+\/\p{N}+)?"/gu,
   )) {
     measurementDelimiters.add(match.index + match[0].indexOf("'"));
     measurementDelimiters.add(match.index + match[0].length - 1);
