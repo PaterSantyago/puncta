@@ -57,7 +57,7 @@ function connectsNumberTokens(
   gap: string,
   right: string,
 ): boolean {
-  if (!/^[ \u00a0\u2009\u202f()[\]{}]*$/u.test(gap)) return false;
+  if (!/^[ \t\u00a0\u2009\u202f()[\]{}]*$/u.test(gap)) return false;
   if (/[+−–*/=×÷^%-]$/u.test(left) || /^[+−–*/=×÷^%-]/u.test(right))
     return true;
   if (!/^[ \u00a0\u2009\u202f]+$/u.test(gap)) return false;

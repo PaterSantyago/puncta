@@ -362,6 +362,8 @@ test("parentheses do not expose an operand of unsupported arithmetic", () => {
       "12345 + ((67890))",
       "12345 * [67890]",
       "12345+(67890)",
+      "12345\t+\t67890",
+      "12345\t/\t67890",
     ])
       assert.deepEqual(
         instance
