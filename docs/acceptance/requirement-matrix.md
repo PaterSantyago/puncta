@@ -114,3 +114,11 @@ characters and additional negative/regression cases.
 | Older Node/React majors, every patch in a manifest range, every framework/platform version                                          | #33 §7 fixes a tested matrix. Exact observed versions appear in the report; untested environments have no PASS claim.                                                                                                                                                                                     |
 | Corpus freeze hashes, resource regeneration/subprocesses or Node-without-browser-globals inside a browser                           | #33 §§7–8 require these on Node; browser-shared text oracles and Node-only infrastructure checks run in their appropriate environments.                                                                                                                                                                   |
 | New public npm publication or release promotion                                                                                     | #33 §8 explicitly accepts real local-registry archives; public release is separate work.                                                                                                                                                                                                                  |
+
+## Digit grouping extension
+
+[#87 standalone-number slice](digit-grouping.md) maps the shared option, validation,
+literal locale examples, public representations, conservative exclusions and
+original-coordinate reports. It is partial implementation of #86; the later
+normalization, bonds, scopes, generated/scaling and streaming/hydration slices
+remain outstanding. Earlier first-version evidence is not evidence for grouping.

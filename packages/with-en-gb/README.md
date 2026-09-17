@@ -33,3 +33,11 @@ insertion in an adjoining partial word. Each new SHY is an original-coordinate
 attribution.
 
 MIT licensed. Public publication is separate work.
+
+Optional `rules.digitGrouping` defaults to
+`{ enabled: false, minDigits: 5, normalizeExisting: true }`. Its first slice groups
+standalone ungrouped ASCII integers and `.` decimals with U+202F, for example
+`12345.6700` → `12\u202f345.6700`, preserving the fraction as text. Existing
+comma/space groups and complex numerical constructions are preserved from grouping;
+normalization and its diagnostics are pending subsequent slices. See
+[the core API and limits](../core/README.md#opt-in-digit-grouping-first-implementation-slice).
