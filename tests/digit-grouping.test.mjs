@@ -749,3 +749,96 @@ test("seed 8801: generated groups preserve exact digits, replay, fixed points an
     assert.deepEqual(protectedReact.warnings, [], context);
   }
 });
+
+test("a single zero integer does not suppress invalid fractional-group diagnostics", () => {
+  const instance = base.with({
+    locale: "es-es",
+    rules: { digitGrouping: { enabled: true } },
+  });
+  for (const input of ["0,123 456", "0,123,456", "0.123 456"]) {
+    const report = instance.text(input, { detailed: true });
+    assert.equal(report.result, input);
+    assert.equal(
+      report.warnings.filter((warning) => warning.ruleId === "digitGrouping")
+        .length,
+      1,
+      input,
+    );
+  }
+  for (const input of ["00,123 456", "0 123,456", "00.123 456"]) {
+    const report = instance.text(input, { detailed: true });
+    assert.equal(report.result, input);
+    assert.deepEqual(
+      report.warnings.filter((warning) => warning.ruleId === "digitGrouping"),
+      [],
+      input,
+    );
+  }
+});
+
+test("spaced colon structures never expose standalone operands", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    const instance = base.with({
+      locale,
+      rules: { digitGrouping: { enabled: true } },
+    });
+    for (const input of [
+      "12345 : 67890",
+      "12345 :67890",
+      "12345: 67890",
+      "12 34 : 56789",
+      "12345\t:\t67890",
+    ]) {
+      const report = instance.text(input, { detailed: true });
+      assert.deepEqual(
+        report.edits.filter((edit) => edit.ruleIds.includes("digitGrouping")),
+        [],
+        input,
+      );
+      assert.deepEqual(
+        report.warnings.filter((warning) => warning.ruleId === "digitGrouping"),
+        [],
+        input,
+      );
+      assert.equal(instance.html(input), report.result);
+      const leaves = input.split(":");
+      const children = [leaves[0], h("em", { key: "colon" }, ":"), leaves[1]];
+      assert.equal(
+        renderToString(transformReact(children, { instance })).replace(
+          /<[^>]*>/gu,
+          "",
+        ),
+        report.result,
+      );
+      assert.equal(
+        renderToString(h(Puncta, { instance }, children)).replace(
+          /<[^>]*>/gu,
+          "",
+        ),
+        report.result,
+      );
+    }
+    assert.equal(instance.text("ID: 12345"), "ID: 12\u202f345");
+  }
+});
+
+test("list punctuation takes priority over a following missing-integer form", () => {
+  for (const locale of ["en-gb", "es-es"]) {
+    const instance = base.with({
+      locale,
+      rules: { digitGrouping: { enabled: true } },
+    });
+    for (const [input, expected] of [
+      ["12345, .67890", "12\u202f345, .67890"],
+      ["12345. ,67890", "12\u202f345. ,67890"],
+    ]) {
+      const report = instance.text(input, { detailed: true });
+      assert.equal(report.result, expected);
+      assert.deepEqual(
+        report.warnings.filter((warning) => warning.ruleId === "digitGrouping"),
+        [],
+      );
+      assert.deepEqual(instance.text(expected, { detailed: true }).edits, []);
+    }
+  }
+});

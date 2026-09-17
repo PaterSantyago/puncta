@@ -52,6 +52,12 @@ export function digitGrouping(
       .replace(/[.,:…]+$/u, "");
     const end = token.index + candidate.length;
     if (excludedIndex.overlaps(token.index, end)) continue;
+    // Missing-integer forms are expected skips; punctuation cleanup must not
+    // split their leading decimal marker from the digit tail on a later pass.
+    if (/^[+−-]?[.,]\p{N}/u.test(candidate)) {
+      preserved.push({ start: token.index, end });
+      continue;
+    }
     const match = grammar.exec(candidate);
     if (!match) {
       // Structural exclusions and unsupported digits/identifiers take priority
@@ -60,8 +66,11 @@ export function digitGrouping(
         continue;
       const unsigned = candidate.replace(/^[+−-]/u, "");
       preserved.push({ start: token.index, end });
+      const integerDigits = unsigned
+        .split(settings.locale === "en-gb" ? /\./u : /[.,]/u, 1)[0]
+        .replace(/[, \u00a0\u2009\u202f]/gu, "");
       if (
-        /^0[0-9, \u00a0\u2009\u202f]/u.test(unsigned) ||
+        (integerDigits.length > 1 && integerDigits.startsWith("0")) ||
         /^[0-9]+(?:\.[0-9]+){2,}$/u.test(unsigned)
       )
         continue;
@@ -98,6 +107,14 @@ function connectsNumberTokens(
   right: string,
 ): boolean {
   if (!/^[ \t\u00a0\u2009\u202f()[\]{}]*$/u.test(gap)) return false;
+  // A comma/period directly after a number ends it before any next token,
+  // including a missing-integer decimal or signed item in the list.
+  if (gap.length > 0 && /\p{N}[.,]$/u.test(left)) return false;
+  if (
+    (/\p{N}$/u.test(left) && /^:/u.test(right)) ||
+    ((left === ":" || /\p{N}:$/u.test(left)) && /^\p{N}/u.test(right))
+  )
+    return true;
   if (/[+−–*/=×÷^%-]$/u.test(left) || /^[+−–*/=×÷^%-]/u.test(right))
     return true;
   if (!/^[ \u00a0\u2009\u202f]+$/u.test(gap)) return false;
