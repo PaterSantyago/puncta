@@ -133,6 +133,29 @@ export async function documentationContracts() {
   const contracts = [];
   for (const file of files) {
     const source = await readFile(join(root, file), "utf8");
+    // Entrypoints also expose named aliases and type/value star exports.
+    // These statements can change without changing the original declaration.
+    for (const match of source.matchAll(
+      /^export\s+(type\s+)?(\{[^}]*\}|\*(?:\s+as\s+\w+)?)\s*(?:from\s+["'][^"']+["'])?\s*;/gm,
+    )) {
+      const names = match[2].startsWith("{")
+        ? match[2]
+            .slice(1, -1)
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean)
+            .map((item) => item.split(/\s+as\s+/).at(-1))
+        : [match[2].replace(/\s+/g, " ")];
+      for (const name of names) {
+        contracts.push({
+          file,
+          name: `re-export:${match[1] ? "type " : ""}${name}`,
+          sha256: createHash("sha256")
+            .update(match[0].replace(/\s+/g, " "))
+            .digest("hex"),
+        });
+      }
+    }
     const declarations = [
       ...source.matchAll(
         /^export (?:interface|type|function|class|const) (\w+)/gm,

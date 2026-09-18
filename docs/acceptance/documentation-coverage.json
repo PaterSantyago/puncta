@@ -408,6 +408,22 @@
     },
     {
       "file": "packages/core/src/index.ts",
+      "name": "re-export:PunctaConfigError",
+      "sha256": "4c705b4f1146d2b152f93a5fcafaab1562a49aba851728bab87d169c5b92b5ce",
+      "target": "docs/reference/core.md#punctaconfigerror",
+      "status": "partial",
+      "issue": 114
+    },
+    {
+      "file": "packages/core/src/index.ts",
+      "name": "re-export:type *",
+      "sha256": "1543ddd72aad2c0e6b176b72d292dd0064eebf8c3c568b49f77c384515261e10",
+      "target": "docs/reference/core.md#public-type-index",
+      "status": "partial",
+      "issue": 115
+    },
+    {
+      "file": "packages/core/src/index.ts",
       "name": "createPuncta",
       "sha256": "1d3c7c22b5e3e08c10bbed20e1f1208b746a65910efc9804995e48240faaeca7",
       "target": "docs/reference/core.md#createpuncta",

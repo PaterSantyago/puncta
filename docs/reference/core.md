@@ -3,7 +3,7 @@
 [Documentation index](../README.md)
 
 Import public values and types from `@use-puncta/core`.
-All operations are synchronous. Core needs no React or browser DOM.
+All operations are synchronous. Core operates without React or a browser DOM.
 This page covers instance configuration and text/HTML return overloads.
 Detailed source coordinates, HTML parameters, and SHY removal have pending slices.
 
@@ -24,15 +24,17 @@ function createPuncta(
 
 `locales` supplies imported locale modules. `locale` selects the active loaded ID.
 Both are required. Other fields use the [shared settings](settings.md#shared-fields).
+
 The returned instance has `with`, `text`, `html`, and `stripSoftHyphens` methods.
-It takes a snapshot of the registry, locale resources, and explicit settings.
+It creates a snapshot of the registry, locale resources, and explicit settings.
 Caller mutations cannot change it. No global registry exists.
 
-Invalid modules cause `locale.incompatible`; duplicate IDs cause `locale.duplicate`.
+Invalid modules cause `locale.incompatible`. Duplicate IDs cause `locale.duplicate`.
 A selected ID missing from the registry causes `locale.unavailable`.
 Missing fields, wrong types, unknown keys, and invalid values cause `config.invalid-option`.
 Enabled insertion also validates its locale resource.
-Import supported locale modules; arbitrary locale objects and plugins are unsupported.
+
+Import supported locale modules. Arbitrary locale objects and plugins are unsupported.
 
 ### PunctaConfigError
 
@@ -55,7 +57,8 @@ The readonly fields are `code`, `details`, `optionPath`, and `location`.
 `message` comes from `Error`. Do not depend on its exact English text.
 Defaults are `{}` for `details`, `[]` for `optionPath`, and
 `{ kind: "unavailable", reason: "Configuration argument" }` for `location`.
-`optionPath` identifies the invalid field; numeric parts identify array entries.
+`optionPath` identifies the invalid field. Numeric parts identify array entries.
+
 For `config.invalid-option`, `details.reason` is `required`, `type`, `value`, or `unknown`.
 See the [checked error example](settings.md#locale-dependent-validation).
 The complete code and location catalogue is pending in the diagnostics slice.
@@ -88,9 +91,11 @@ html(source: string, options: HtmlOptions): string | HtmlResult;
 ```
 
 `source` must be a string. Options default to `{}` and inherit instance settings.
-`detailed` defaults to `false`. `true` returns a report; a boolean variable needs a union result type.
+`detailed` defaults to `false`. `true` returns a report. A boolean variable gives a union result type.
+
 `TextOptions` adds `protect` and `detailed` to `PunctaOptions`.
 `HtmlOptions` removes `protect` and adds `mode` and `context`.
+
 HTML defaults to fragment mode with `div` context. Parsing does not sanitize HTML.
 See the [existing HTML and protection details](../../packages/core/README.md).
 Invalid source types or options cause `config.invalid-option`.
@@ -154,16 +159,16 @@ A pending definition is not complete coverage.
 | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `LocaleId`, `Locale`                                              | [Locale exports](locales-and-rules.md#locale-exports)                                                                                         |
 | `PunctaOptions`                                                   | [Shared fields](settings.md#shared-fields)                                                                                                    |
-| `RuleOptions`, `RulesOptions`                                     | [Rule fields](settings.md#rule-fields-and-defaults); grouping details pending                                                                 |
-| `HyphenationOptions`                                              | [Locale validation](settings.md#locale-dependent-validation); insertion details pending                                                       |
-| `PunctaInstance`                                                  | [Creation](#createpuncta) and [methods](#instance-methods); removal overloads pending                                                         |
-| `TextOptions`, `HtmlOptions`                                      | [Text and HTML](#text-and-html); complete format parameters pending                                                                           |
-| `StripTextOptions`, `StripHtmlOptions`, `StripSoftHyphensOptions` | Pending removal slice; [source declaration](../../packages/core/src/types.ts)                                                                 |
-| `ProtectedRange`                                                  | Pending protection slice; [source declaration](../../packages/core/src/types.ts)                                                              |
+| `RuleOptions`, `RulesOptions`                                     | [Rule fields](settings.md#rule-fields-and-defaults), grouping details pending                                                                 |
+| `HyphenationOptions`                                              | [Locale validation](settings.md#locale-dependent-validation), insertion details pending                                                       |
+| `PunctaInstance`                                                  | [Creation](#createpuncta) and [methods](#instance-methods), removal overloads pending                                                         |
+| `TextOptions`, `HtmlOptions`                                      | [Text and HTML](#text-and-html), complete format parameters pending                                                                           |
+| `StripTextOptions`, `StripHtmlOptions`, `StripSoftHyphensOptions` | Pending removal slice, [source declaration](../../packages/core/src/types.ts)                                                                 |
+| `ProtectedRange`                                                  | Pending protection slice, [source declaration](../../packages/core/src/types.ts)                                                              |
 | `RuleId`                                                          | Rule identifier union: ten [standard groups](locales-and-rules.md#rule-examples), `digitGrouping`, `hyphenation.insert`, `hyphenation.remove` |
-| `TextResult`, `HtmlResult`                                        | [Reports](#reports); detailed coordinates pending                                                                                             |
-| `Source`, `InputRange`, `TextRange`, `HtmlRange`                  | Pending diagnostics slice; [source declaration](../../packages/core/src/types.ts)                                                             |
-| `Edit`, `AppliedRule`, `ConfigLocation`, `PunctaWarning`          | Pending diagnostics slice; [source declaration](../../packages/core/src/types.ts)                                                             |
+| `TextResult`, `HtmlResult`                                        | [Reports](#reports), detailed coordinates pending                                                                                             |
+| `Source`, `InputRange`, `TextRange`, `HtmlRange`                  | Pending diagnostics slice, [source declaration](../../packages/core/src/types.ts)                                                             |
+| `Edit`, `AppliedRule`, `ConfigLocation`, `PunctaWarning`          | Pending diagnostics slice, [source declaration](../../packages/core/src/types.ts)                                                             |
 
 ## Reports
 
@@ -171,8 +176,10 @@ A pending definition is not complete coverage.
 It also contains readonly arrays: `edits: Edit[]`, `sources: Source[]`,
 `appliedRules: AppliedRule[]`, and `warnings: PunctaWarning[]`.
 `HtmlResult` has the same fields, with `Edit<HtmlRange>[]` for `edits`.
+
 `hasEdits` means that typography changed source text.
 `outputChanged` compares the complete output string with the input.
 HTML serialization can change output without typography edits.
-Warnings can recur when the text does not change.
+
+Warnings can occur again when the text does not change.
 The diagnostics slice will define report fields and coordinates in full.

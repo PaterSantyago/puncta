@@ -16,8 +16,10 @@ en-gb uses an Oxford-style quotation choice. es-es uses an RAE-oriented choice.
 `LocaleId` is the union `"en-gb" | "es-es"`.
 `Locale` exposes readonly `id: LocaleId` and `version: string`.
 `version` identifies the locale package version.
-Use `locale.id`; the functional API does not expose the scaffold field `localeId`.
-The object is immutable and opaque: import it from its package; do not construct one.
+Use `locale.id`. The functional API does not expose the scaffold field `localeId`.
+
+The object is immutable and opaque: import it from its package. Do not construct one.
+
 Each module is ready synchronously after import, including its hyphenation resource.
 No global registration or automatic locale download occurs.
 Core and each required locale must be direct dependencies.
@@ -27,9 +29,9 @@ See [installation](../getting-started/installation.md) and
 ## Rule examples
 
 All ten groups below are on by default in both locales.
-Optional digit grouping is off. Its dedicated section is pending;
-see [existing grouping details](../../packages/core/README.md#opt-in-digit-grouping).
-Hyphenation insertion and removal are separate operations with a pending guide.
+Optional digit grouping is off. Its dedicated section is pending.
+See [existing grouping details](../../packages/core/README.md#opt-in-digit-grouping).
+Hyphenation insertion and removal are different operations. Their guide is pending.
 
 This complete example runs the same input through both locales.
 The output has columns for the group, en-gb, and es-es.
@@ -94,10 +96,12 @@ Deeper levels alternate single and double pairs.
 `normalizeExisting: false` keeps formatted pairs and uses compatible styles for nearby straight pairs.
 Unpaired or ambiguous quote signs stay unchanged, with `quotes.unpaired` or `typography.ambiguous` warnings.
 Puncta does not add missing signs or move punctuation across a quote.
-The separate `spaces` rule removes ordinary inner spaces in Spanish quotes.
+
+The `spaces` rule removes ordinary inner spaces in Spanish quotes.
 Quotes can cross a single line break, `br`/`wbr`, or an opaque inline fragment.
 Blank lines, blocks, and Suspense end the quote context.
-A child typography scope has independent quote depth; an outer pair can surround it.
+
+A child typography scope has independent quote depth. An outer pair can surround it.
 Protected text does not supply quote signs.
 
 ### Apostrophes
@@ -134,7 +138,7 @@ Ordinary word hyphens and dialogue markers stay unchanged.
 
 With a known unit, `10-12 kg` becomes `10–12\u00a0kg`.
 The range separator is U+2013. The number/unit bond is U+00A0.
-Standalone numeric ranges need `standalone: true`.
+Set `standalone: true` to process standalone numeric ranges.
 A range is not a subtraction expression.
 
 ### Minus
@@ -146,17 +150,18 @@ The range rule controls range separators independently.
 
 ### Units
 
-Known case-sensitive units take a U+00A0 NBSP bond with the number.
+Known case-sensitive units use a U+00A0 NBSP bond with the number.
 Composite units include `km/h` and `m²`.
 The angle degree attaches directly, as in `30°`.
-Temperature units `°C` and `°F` take NBSP.
+Temperature units `°C` and `°F` use NBSP.
 Unknown unit suffixes stay unchanged unless `additional` supplies the complete designation.
 See [additional units and array replacement](../guides/configuration.md#add-units-and-replace-an-array).
+
 New bonds do not cross line breaks, opaque fragments, or typography scope boundaries.
 
 ### Percentages
 
-The en-gb profile attaches `%`; es-es uses U+00A0 before `%`.
+The en-gb profile attaches `%`. The es-es profile uses U+00A0 before `%`.
 The `space` option overrides that convention.
 A locale change keeps an explicit override until a null reset removes it.
 See [the locale reset example](../guides/configuration.md#change-locale-and-reset-a-field).
@@ -168,8 +173,11 @@ Symbols `£`, `€`, and `$` attach before numbers in en-gb.
 In es-es, they use NBSP after numbers.
 Puncta never changes the order of number and currency.
 The opposite symbol order keeps its original interval and causes `currency.order`.
-A currency between two numbers belongs to its more closely attached side.
+
+A currency between two numbers belongs to the side with no U+0020 space.
+An existing NBSP also counts as attachment.
 Equal attachment is ambiguous: the interval stays unchanged with `typography.ambiguous`.
+
 Numeric separators keep their spelling unless optional digit grouping changes them.
 The spaces rule keeps recognized number-bond intervals even when their own rule is off.
 
@@ -195,10 +203,12 @@ for (const source of [
   "10widget",
   "aʼb",
   "1 , 2",
+  "10 £   20",
+  "10\u00a0£20",
 ]) {
   const report = puncta.text(source, { detailed: true });
   console.log(
-    JSON.stringify(report.result),
+    JSON.stringify(report.result).replaceAll("\u00a0", "\\u00a0"),
     report.warnings.map((w) => w.code).join(",") || "none",
   );
 }
@@ -231,6 +241,8 @@ Output:
 "10widget" none
 "aʼb" none
 "1 , 2" typography.ambiguous
+"10 £   20" typography.ambiguous
+"10\u00a0£20" typography.ambiguous
 10–12
 ¿Hola?
 10 £ currency.order

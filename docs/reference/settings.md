@@ -4,7 +4,7 @@
 
 This page defines shared settings and the ten standard typography rule groups.
 The [configuration guide](../guides/configuration.md) shows complete examples.
-Digit grouping and hyphenation procedures have separate, pending documentation slices.
+The digit-grouping and hyphenation guides are pending.
 Their current details remain in the [core package instructions](../../packages/core/README.md).
 
 ## Configuration surfaces
@@ -13,11 +13,11 @@ Their current details remain in the [core package instructions](../../packages/c
 | --------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------- |
 | `createPuncta`              | `locales`, plus all `PunctaOptions` fields                     | `locales` and `locale` required                             |
 | `instance.with`             | `PunctaOptions`                                                | Cannot change `locales`                                     |
-| `instance.text`             | `TextOptions`: shared fields, `protect`, `detailed`            | String input; protection applies only to this call          |
+| `instance.text`             | `TextOptions`: shared fields, `protect`, `detailed`            | String input, protection applies only to this call          |
 | `instance.html`             | `HtmlOptions`: shared fields, `mode`, `context`, `detailed`    | No `protect`                                                |
-| `instance.stripSoftHyphens` | `StripSoftHyphensOptions`: text or HTML options, plus `format` | Format selects valid options; see pending removal reference |
+| `instance.stripSoftHyphens` | `StripSoftHyphensOptions`: text or HTML options, plus `format` | Format selects valid options. See pending removal reference |
 | React pure calls            | `instance`, shared fields, `detailed`                          | No `protect`, `mode`, `context`, or `format`                |
-| React components            | `locale`, `enabled`; `options: { rules, hyphenation }`         | Root instance required; no `detailed`                       |
+| React components            | `locale`, `enabled`, `options: { rules, hyphenation }`         | Root instance required, no `detailed`                       |
 | HTML markers                | `data-puncta`, `data-puncta-locale`, `data-puncta-options`     | JSON options accept only `rules` and `hyphenation`          |
 
 `locales` is a readonly array of imported `Locale` modules.
@@ -31,7 +31,7 @@ The HTML, React, protection, and removal slices will complete their format-speci
 
 | Field         | Type and permitted values                          | Initial default                          |
 | ------------- | -------------------------------------------------- | ---------------------------------------- |
-| `locale`      | `LocaleId`: `"en-gb"` or `"es-es"`; must be loaded | Required at creation; otherwise inherits |
+| `locale`      | `LocaleId`: `"en-gb"` or `"es-es"`, must be loaded | Required at creation, otherwise inherits |
 | `enabled`     | `boolean`                                          | `true`                                   |
 | `rules`       | `RulesOptions` object                              | Locale defaults for each group           |
 | `hyphenation` | `HyphenationOptions` object or `null`              | Insertion off                            |
@@ -59,9 +59,9 @@ An omitted field or explicit `undefined` inherits its explicit parent value.
 | `ranges`        | `enabled: boolean`, `standalone: boolean`           | `true`, `false`                                                                  |
 | `minus`         | `enabled: boolean`                                  | `true`                                                                           |
 | `units`         | `enabled: boolean`, `additional: readonly string[]` | `true`, `[]`                                                                     |
-| `percentages`   | `enabled: boolean`, `space: "none" \| "nbsp"`       | `true`; `"none"` in en-gb, `"nbsp"` in es-es                                     |
+| `percentages`   | `enabled: boolean`, `space: "none" \| "nbsp"`       | `true`, `"none"` in en-gb, `"nbsp"` in es-es                                     |
 | `currencies`    | `enabled: boolean`                                  | `true`                                                                           |
-| `digitGrouping` | Dedicated reference pending                         | Off; see [existing details](../../packages/core/README.md#opt-in-digit-grouping) |
+| `digitGrouping` | Dedicated reference pending                         | Off, see [existing details](../../packages/core/README.md#opt-in-digit-grouping) |
 
 `normalizeExisting: false` keeps existing formatted quote pairs or dash styles.
 It still converts straight quotes or explicit double-hyphen markers.
@@ -72,7 +72,8 @@ Use `standalone: true` for numeric ranges without a known unit.
 Each string must be nonempty, without edge whitespace or control characters.
 Puncta removes exact duplicates. A new array replaces inherited additions.
 Built-in units stay available. An empty array removes additions only.
-The percentage, currency, and angle-degree roles stay separate from additional units.
+
+Additional units do not change the percentage, currency, or angle-degree roles.
 See [rule behavior](locales-and-rules.md#units).
 
 ## Inheritance and reset
@@ -81,20 +82,20 @@ Puncta stores explicit values independently of locale defaults.
 The effective value comes from the nearest explicit setting, or the current locale default.
 A locale change keeps explicit values.
 
-| Input                                           | Effect                                                 |
-| ----------------------------------------------- | ------------------------------------------------------ |
-| Field or group omitted                          | Inherit explicit parent settings                       |
-| Field or group `undefined`                      | Same as omission                                       |
-| Field `null`, such as `percentages.space: null` | Remove that explicit field; use current locale default |
-| Group `null`, such as `ellipsis: null`          | Remove all explicit fields in that group               |
-| `hyphenation: null`                             | Remove all explicit hyphenation fields                 |
-| `rules: {}`                                     | Inherit; does not reset all rules                      |
-| `rules: null`                                   | Invalid whole-object reset                             |
-| `additional: []`                                | Replace inherited additions with an empty array        |
-| `additional: null`                              | Reset additions to the default empty array             |
+| Input                                           | Effect                                                     |
+| ----------------------------------------------- | ---------------------------------------------------------- |
+| Field or group omitted                          | Inherit explicit parent settings                           |
+| Field or group `undefined`                      | Same as omission                                           |
+| Field `null`, such as `percentages.space: null` | Remove that explicit field. Use the current locale default |
+| Group `null`, such as `ellipsis: null`          | Remove all explicit fields in that group                   |
+| `hyphenation: null`                             | Remove all explicit hyphenation fields                     |
+| `rules: {}`                                     | Inherit, does not reset all rules                          |
+| `rules: null`                                   | Invalid whole-object reset                                 |
+| `additional: []`                                | Replace inherited additions with an empty array            |
+| `additional: null`                              | Reset additions to the default empty array                 |
 
 These rules apply at creation, in variants, in calls, and in active nested scopes.
-Snapshots prevent later caller mutations from changing an instance.
+Later caller mutations cannot change the settings in an instance.
 See the [checked examples](../guides/configuration.md).
 
 ## Locale-dependent validation
@@ -104,6 +105,7 @@ See the [checked examples](../guides/configuration.md).
 The default is `{ enabled: false, minWordLength: 6, minLeft: 2, minRight: 3 }` in en-gb.
 In es-es, `minRight` defaults to `2`.
 Minima must be integers at least as large as the current locale default.
+
 A locale change revalidates explicit inherited minima, even when insertion is off.
 Reset an invalid inherited minimum before the locale change, or in the same override.
 The hyphenation slice will explain insertion resources and word limits.

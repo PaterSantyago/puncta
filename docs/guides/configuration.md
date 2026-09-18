@@ -4,11 +4,11 @@
 
 Use instance settings for common choices. Use call settings for one result.
 First, [install core and each required locale](../getting-started/installation.md).
-The examples on this page need both locale packages.
+Install both locale packages to run these examples.
 
 ## Change settings and create a variant
 
-`createPuncta` takes a snapshot of the locale registry and explicit settings.
+`createPuncta` creates a snapshot of the locale registry and explicit settings.
 Later changes to caller objects and arrays do not change that instance.
 `with` returns an instance that operates independently with the same locale registry.
 A call override changes only that call.
@@ -133,9 +133,11 @@ Output (each visible number/unit space is U+00A0, `\u00a0`):
 The order is instance settings, call settings, then nested typography scopes.
 Each scope inherits explicit settings and can override them.
 Its selected locale supplies defaults for fields without an explicit value.
+
 HTML uses `data-puncta-options` for `rules` and `hyphenation` overrides.
 React uses the `options` prop for those groups.
-A protected or disabled subtree stays protected; descendants cannot enable it.
+A protected or disabled subtree stays protected. Descendants cannot enable it.
+
 This example resets an inherited percentage override inside a Spanish scope.
 The outer text keeps the explicit `"none"` setting. The inner scope uses the Spanish default.
 
