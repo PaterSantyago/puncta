@@ -52,7 +52,11 @@ The language review used the official ASD-STE100 Issue 9 rules and dictionary,
 including Rule 1.1, plus the project glossary. Code and literal examples were not
 subjected to a prose vocabulary gate. The author corrected a status link that
 pointed to an old snapshot and replaced new uses of “retain” and “remain”.
-Final review of this report and the corrected revision is pending.
+Final review used commit `751b4dc11b3bdf7ce9383f9d46ae3f03f650b2a9`.
+The standards review found two further language corrections in this report;
+the author applied the suggested wording. No other standards finding was open.
+The specification review found no obstacle to merging the current corrections.
+It confirmed the external acceptance requirement described below.
 
 ## Acceptance status
 
@@ -72,9 +76,9 @@ The completed active release plan is removed as required by the release procedur
 Its original stays at the release commit.
 
 The published archive README files and tag snapshots keep their pre-publication
-notices. Their existing documentation-branch links remain historical references.
-This task verifies those targets and records their old text; it does not claim
-that current source edits update npm metadata, tarballs, or immutable tag content.
+notices. Their existing documentation-branch links are historical references.
+This task checks those targets and records their old text.
+Current source edits do not update npm metadata, tarballs, or immutable tag content.
 Use the current installation page for corrected commands and release status.
 
 Historical acceptance reports stay unchanged. Their statements describe the
