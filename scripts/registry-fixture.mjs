@@ -8,6 +8,8 @@ import { join, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import { setTimeout as delay } from "node:timers/promises";
 
+import { isolatedPackageEnvironment } from "./package-environment.mjs";
+
 export async function registryFixture() {
   const directory = await mkdtemp(join(tmpdir(), "puncta-publish-"));
   const server = createServer();
@@ -87,9 +89,8 @@ export async function registryFixture() {
       registry,
       close,
       env: {
-        ...process.env,
+        ...isolatedPackageEnvironment(directory, process.env),
         NPM_CONFIG_USERCONFIG: npmrc,
-        NPM_CONFIG_CACHE: join(directory, "cache"),
         NPM_CONFIG_AUDIT: "false",
         NPM_CONFIG_FUND: "false",
       },

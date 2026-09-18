@@ -161,7 +161,7 @@ npm init playwright@latest
 
 ### 1.2 Prerequisite: seed test
 
-A **seed test** is a minimal test that lands the page in the state every scenario starts from: navigation to the app, any required login, feature flags, etc. Scenarios assume a fresh start *after* the seed. `--debug=cli` pauses *inside* this test, so the seed is where every planning and generation session begins.
+A **seed test** is a minimal test that prepares the initial state for every scenario. It includes application navigation, required login, feature flags, and similar setup. Scenarios assume a fresh start *after* the seed. `--debug=cli` pauses *inside* this test, so the seed is where every planning and generation session begins.
 
 Minimum viable seed:
 
@@ -226,7 +226,7 @@ Map out:
 - Primary user journeys end-to-end.
 - Edge cases: empty states, validation errors, very long input, boundary values.
 - Persistence: reload, local/session storage, URL fragments.
-- Navigation: which controls change the URL, back/forward behaviour.
+- Navigation: which controls change the URL, back/forward behavior.
 
 **Important**: Do not just open the app url with playwright-cli, always go through the test to capture any custom setup done there.
 **Important**: Stop the background test when done exploring.
@@ -298,9 +298,9 @@ playwright-cli attach tw-XXXX
 # resume
 ```
 
-**Do not** just open the app url with playwright-cli, always go through the test to capture any custom setup done there.
+**Do not** only open the application URL with playwright-cli. Always run through the test to capture its custom setup.
 
-Walk the scenario's `Steps:` one by one with `playwright-cli`, treating the spec as the plan and the live app as the source of truth. If a step is vague ("click the button" — which button?), references an element that no longer exists, or contradicts the app's actual behaviour, use your judgement: update the spec to match what the app really does, then keep going. Editing the spec mid-generation is expected.
+Walk the scenario's `Steps:` one by one with `playwright-cli`, treating the spec as the plan and the live app as the source of truth. Use your judgment if a step is unclear, references a missing element, or contradicts actual application behavior. For example, "click the button" does not identify a button. Update the specification to match application behavior, then continue. Editing the spec mid-generation is expected.
 
 Every action prints the equivalent Playwright TypeScript (see [How generation works](#0-how-generation-works)):
 
@@ -365,7 +365,7 @@ Any failure goes to Section 3.
 
 ## 3. Heal
 
-Goal: fix failing tests, and update the spec if the app's intended behaviour changed.
+Goal: fix failing tests, and update the spec if the app's intended behavior changed.
 
 ### 3.1 Find failing tests
 
@@ -400,7 +400,7 @@ Rehearse the corrected interaction with `playwright-cli` — the generated code 
 
 ### 3.3 Apply the fix
 
-Edit the test file: update the locator, assertion, step order, or inputs to match the corrected behaviour. Stop the background debug run. Rerun the single test to confirm green.
+Edit the test file: update the locator, assertion, step order, or inputs to match the corrected behavior. Stop the background debug run. Rerun the single test to confirm green.
 
 Never skip hooks or add sleeps as a fix. Never use `networkidle`.
 
@@ -408,19 +408,19 @@ Never skip hooks or add sleeps as a fix. Never use `networkidle`.
 
 Open the spec referenced by the `// spec:` header in the test file and locate the scenario that matches the test.
 
-- **Fix was purely technical** (locator drift, better assertion shape) and the spec's user-level behaviour still matches the app → leave the spec alone.
+- **Fix was purely technical** (locator drift, better assertion shape) and the spec's user-level behavior still matches the app → leave the spec alone.
 - **Fix changed user-visible steps, inputs, order, or expected outcomes** that the spec describes → update the spec to match reality. Keep the scenario id and file path stable; only the step / expect lines change.
-- **Unclear whether the app change is intentional** (spec is stale) **or a regression** (test was right, app is wrong) → **stop and ask the user**. Provide:
+- **Unclear whether the app change is intentional or a regression** → **stop and ask the user**. An intentional change makes the specification outdated. A regression means the test is correct and the application is wrong. Provide:
   - the scenario id (e.g. `2.3`),
   - the spec lines that no longer match,
-  - the observed app behaviour (quote a snapshot excerpt or a concrete outcome).
+  - the observed app behavior (quote a snapshot excerpt or a concrete outcome).
 
 Only after the user answers, either update the spec (intentional change) or file/flag the test as covering a bug (regression).
 
 ### 3.5 Iteration and giving up
 
 - Fix failures one at a time; rerun after each.
-- If after thorough investigation you are confident the test is correct but the app is wrong *and* the user has confirmed it's a bug: mark the test `test.fixme(...)` with a comment pointing at the user's decision or issue link. Never silently skip.
+- First investigate thoroughly and confirm that the test is correct and the application is wrong. The user must also confirm the bug. Then mark the test `test.fixme(...)` and add a comment linking to the user's decision or issue. Never silently skip.
 
 ---
 

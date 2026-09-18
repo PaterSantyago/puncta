@@ -4,7 +4,7 @@ A property test that fails has told you one of three things, and they need diffe
 responses:
 
 - **The property is wrong** — you asserted something the code never promised.
-- **The spec is ambiguous** — behaviour at this edge was never decided.
+- **The spec is ambiguous** — behavior at this edge was never decided.
 - **The code is wrong** — a documented guarantee is violated.
 
 Most of the work is telling them apart. Skipping that step is how PBT gets a
@@ -23,8 +23,7 @@ authority:
 | Existing tests | The contract maintainers believe they have |
 | Function name | Weak, but `sort` really does imply ordering |
 
-The name is the weakest signal and the one most likely to mislead you — plenty of
-functions called `normalize` do something narrower than the word suggests.
+The name is the weakest signal and the most likely to mislead. Many functions called `normalize` have a narrower purpose than that name suggests.
 
 Worked example. Hypothesis reports `test_normalize(s='\x00')` failing idempotence:
 
@@ -54,14 +53,12 @@ strategy bug — the fix is `st.text(alphabet=...)`, not a bug report.
 | Property contradicts the docstring or type | Wrong property | Fix the property |
 | Edge case the spec never addresses | Ambiguous spec | Ask the maintainer; a discussion, not a bug report |
 | Disappears under realistic constraints | Test artifact | Fix the strategy |
-| Behaviour differs from a sibling function | Possible inconsistency | Worth raising, flag the uncertainty |
+| Behavior differs from a sibling function | Possible inconsistency | Worth raising, flag the uncertainty |
 
-Precondition violations and explicitly-undefined behaviour are not bugs. Passing `-1`
+Precondition violations and explicitly-undefined behavior are not bugs. Passing `-1`
 to a function documented as taking positive integers tells you nothing.
 
-Report what you find with the classification attached, including the cases you are
-unsure about — say "ambiguous spec, needs a maintainer decision" rather than staying
-quiet. A suppressed finding cannot be triaged by anyone else.
+Report each finding with its classification, including uncertain cases. For these cases, say "ambiguous spec, needs a maintainer decision". Do not omit the finding. A suppressed finding cannot be triaged by anyone else.
 
 ## Failure patterns that recur
 
@@ -69,9 +66,7 @@ quiet. A suppressed finding cannot be triaged by anyone else.
 `'\uD800'`. Whether that is a bug turns entirely on whether the format claims to
 accept arbitrary `str` or only valid UTF-8.
 
-**Denormals break numeric invariants.** A probability function returning a negative
-value for `x=1e-320` is a genuine bug against a documented `[0, 1]` range, and it is
-exactly the input no human writes by hand.
+**Denormals break numeric invariants.** A probability function that returns a negative value for `x=1e-320` violates a documented `[0, 1]` range. Such inputs are unlikely in manual examples.
 
 **Hash/equality divergence violates a language contract**, not just a docstring —
 `a == b` must imply `hash(a) == hash(b)` in Python. No grounding required; report it.

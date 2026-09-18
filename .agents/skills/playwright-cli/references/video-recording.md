@@ -39,7 +39,7 @@ playwright-cli video-start recordings/checkout-test-run-42.webm
 
 ### 2. Record entire hero scripts.
 
-When recording a video for the user or as a proof of work, it is best to create a code snippet and execute it with run-code.
+For a user video or work evidence, prefer a code snippet executed with run-code.
 It allows inserting appropriate pauses between the actions and annotating the video. There are new Playwright APIs for that.
 
 1) Perform scenario using CLI and take note of all locators and actions. You'll need those locators to request their bounding boxes for highlight.
@@ -138,7 +138,7 @@ gh pr comment 123 --body "Walkthrough of the new flow." --attach ./demo.webm
 gh issue comment 456 --body "Recording of the repro steps." --attach ./repro.webm
 ```
 
-`gh` appends unreferenced attachments to the end of the body, which is the right place for a walkthrough. Videos are limited to 10 MB on free plans and 100 MB on paid plans, so keep the script focused, record at a modest size such as 1280x800 and drop chapters that do not add to the story. See [pr-attachments.md](pr-attachments.md) for the full set of commands, including attaching test artifacts from CI.
+`gh` appends unreferenced attachments to the end of the body, which is the right place for a walkthrough. Video limits are 10 MB on free plans and 100 MB on paid plans. Keep the script focused. Use a moderate size, such as 1280x800, and remove sections that add no useful information. See [pr-attachments.md](pr-attachments.md) for the full set of commands, including attaching test artifacts from CI.
 
 ## Tracing vs Video
 

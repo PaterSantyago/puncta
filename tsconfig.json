@@ -6,7 +6,10 @@
     "strict": true,
     "jsx": "react-jsx",
     "noEmit": true,
-    "paths": { "@use-puncta/core": ["./packages/core/src/index.ts"] }
+    "paths": {
+      "@use-puncta/core": ["./packages/core/src/index.ts"]
+    },
+    "resolveJsonModule": true
   },
   "include": ["packages/*/src"]
 }

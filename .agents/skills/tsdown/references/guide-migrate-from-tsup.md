@@ -69,7 +69,7 @@ pass `--package-manager <name>` or `--no-install`.
 | `removeNodeProtocol: true` | `nodeProtocol: 'strip'` |
 | `injectStyle: true` | `css: { inject: true }` |
 
-The old names were accepted (with deprecation warnings) up to tsdown v0.22.14 and have been removed since — v0.23+ silently ignores them, so a leftover tsup option won't error. Migrate in two stages: install `tsdown@0.22.14` first and resolve every deprecation warning (a warning-free build proves the mapping is complete), then upgrade to the latest version. The `tsdown-migrate` tool installs v0.22.14 for this reason.
+tsdown accepted old names with deprecation warnings through v0.22.14. Version v0.23+ silently ignores them. Thus, a remaining tsup option does not cause an error. Migrate in two stages. First, install `tsdown@0.22.14` and resolve every deprecation warning. A build without warnings proves the mapping is complete. Then upgrade to the latest version. The `tsdown-migrate` tool installs v0.22.14 for this reason.
 
 ### Deprecated but Compatible Options
 
@@ -236,7 +236,7 @@ Some tsup features are not yet available. Check [GitHub issues](https://github.c
 
 ### Build Fails After Migration
 
-1. **Check Node.js version** - Requires Node.js 22.18.0+ to run tsdown itself. The bundled output can still target lower Node.js versions via `target`; if you need to support Node.js 18 / 20, build with Node.js 22+ in CI and test the produced output (or packed tarball) on the lower versions.
+1. **Check Node.js version** - Requires Node.js 22.18.0+ to run tsdown itself. The bundled output can target earlier Node.js versions through `target`. For Node.js 18 / 20 support, build with Node.js 22+ in CI. Test the output or packed tarball on the earlier versions.
 2. **Install TypeScript** - Required for DTS generation
 3. **Review config changes** - Ensure format and options are correct
 4. **Check dependencies** - Verify all dependencies are installed

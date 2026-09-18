@@ -30,3 +30,27 @@ jobs:
           path: artifacts/
           if-no-files-found: error
           retention-days: 30
+  browser:
+    name: browser (Chromium, Firefox, WebKit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - run: npm install --global pnpm@12.4.1
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - run: pnpm build
+      - run: pnpm test:browser
+      - run: pnpm test:rsc
+      - uses: actions/upload-artifact@v4
+        with:
+          name: browser-${{ github.sha }}
+          path: |
+            artifacts/browser/
+            artifacts/rsc/
+          if-no-files-found: error
+          retention-days: 30

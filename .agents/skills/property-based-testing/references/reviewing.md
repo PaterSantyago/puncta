@@ -27,9 +27,7 @@ def test_useless(x):
 
 Nothing about `compute` can make this fail.
 
-**But `f(x) == f(x)` is not automatically tautological.** It is a real determinism
-property whenever `f` is not obviously pure — serializers over dicts or sets, anything
-touching iteration order, hashing, or time. `pickle.dumps(obj) == pickle.dumps(obj)`
+**But `f(x) == f(x)` is not automatically tautological.** It tests determinism when `f` is not clearly pure. Examples include serializers over dicts or sets, iteration order, hashing, and time. `pickle.dumps(obj) == pickle.dumps(obj)`
 genuinely fails for objects with a nondeterministic `__reduce__`. Ask whether a broken
 implementation could falsify it. If yes, it is a property; if no, it is noise.
 
@@ -73,6 +71,4 @@ Compare each test against the property catalog in SKILL.md and name the stronges
 property the code supports but the suite does not assert. A suite that checks
 `len(sort(xs)) == len(xs)` and never checks ordering is the common case.
 
-Also worth flagging: floating-point equality without a tolerance, assertions on
-dict/set iteration order, and anything reading the clock — these produce flakes that
-get blamed on Hypothesis and then get deleted.
+Also report floating-point equality without a tolerance, dict/set iteration-order assertions, and clock access. These can cause intermittent failures that are attributed to Hypothesis and then removed.

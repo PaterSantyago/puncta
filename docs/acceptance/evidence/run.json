@@ -1,0 +1,38 @@
+{
+  "testedCommit": "6381d3c820082647147cde9732173a4b5b78afde",
+  "testedTree": "e7dda7a7f41965f4677640d2b4888ccd7939013d",
+  "recordedAt": "2026-09-16T23:54:18.593366+00:00",
+  "commands": [
+    {
+      "command": "pnpm check",
+      "exitCode": 0,
+      "logSha256": "363d625a877fb84e75f00f4cb2946061b72f26986596718f60a8fb1ed5223736"
+    },
+    {
+      "command": "pnpm test:browser",
+      "exitCode": 0,
+      "logSha256": "5ff0d7b5dd32640b0998ad5df6c08126005fb322e553580c98140c756cf253b8"
+    },
+    {
+      "command": "pnpm test:rsc",
+      "exitCode": 0,
+      "logSha256": "7bbf579eb7cb9c2368da3efca2a02552f1f51e096686f4218bb902843fc6a8ee"
+    },
+    {
+      "command": "node scripts/measure-acceptance.mjs /tmp/puncta-coordination/58-measurements.json",
+      "exitCode": 0,
+      "logSha256": "df491d0b6f09a7c7074290e65272294476a71808aec5d6f3122b286805e6e721"
+    },
+    {
+      "command": "pnpm --filter puncta-example-ssr start",
+      "exitCode": 0,
+      "logSha256": "8845577246e73686e247684017c28b733d7ce54ed2fe7ada069d81f406ba1d6b"
+    }
+  ],
+  "functionalTests": 209,
+  "releaseTests": 3,
+  "publishTests": 6,
+  "installedConsumers": 8,
+  "npm": "11.19.0",
+  "scope": "All local gates and timings share the named immutable candidate. Subsequent report/evidence commits change no product source, tests, tools, package documents or lockfile. PR CI validates the final head via a synthetic merge commit; see the PR checks for that separate environment."
+}

@@ -7,9 +7,28 @@
       "**/*.mjs",
       "**/*.json",
       "!**/dist",
-      "!**/artifacts"
+      "!**/artifacts",
+      "!**/.next",
+      "!**/next-env.d.ts"
     ]
   },
-  "formatter": { "indentStyle": "space" },
-  "linter": { "rules": { "preset": "recommended" } }
+  "formatter": {
+    "indentStyle": "space"
+  },
+  "linter": {
+    "rules": {
+      "preset": "recommended"
+    }
+  },
+  "overrides": [
+    {
+      "includes": [
+        "packages/with-en-gb/src/hyphenation.json",
+        "packages/with-es-es/src/hyphenation.json"
+      ],
+      "formatter": {
+        "enabled": false
+      }
+    }
+  ]
 }

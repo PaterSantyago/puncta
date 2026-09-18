@@ -1,0 +1,82 @@
+{
+  "commit": "6381d3c820082647147cde9732173a4b5b78afde",
+  "node": "v24.21.0",
+  "next": "16.3.5",
+  "react": "19.3.0",
+  "reactDom": "19.3.0",
+  "playwright": "1.58.2",
+  "browsers": [
+    {
+      "name": "chromium",
+      "version": "145.0.7632.6",
+      "executablePath": "/Users/yuryglushkov/Library/Caches/ms-playwright/chromium-1208/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing",
+      "registry": {
+        "name": "chromium",
+        "revision": "1208",
+        "installByDefault": true,
+        "browserVersion": "145.0.7632.6",
+        "title": "Chrome for Testing"
+      },
+      "serverReact": "19.3.0-canary-cbb046ab-20260731",
+      "clientReact": "19.3.0-canary-cbb046ab-20260731",
+      "checks": [
+        "Flight client reference",
+        "server HTML without JavaScript",
+        "hydration",
+        "text/locale/hyphenation updates",
+        "independent server configuration",
+        "no runtime warnings"
+      ]
+    },
+    {
+      "name": "firefox",
+      "version": "146.0.1",
+      "executablePath": "/Users/yuryglushkov/Library/Caches/ms-playwright/firefox-1509/firefox/Nightly.app/Contents/MacOS/firefox",
+      "registry": {
+        "name": "firefox",
+        "revision": "1509",
+        "installByDefault": true,
+        "browserVersion": "146.0.1",
+        "title": "Firefox"
+      },
+      "serverReact": "19.3.0-canary-cbb046ab-20260731",
+      "clientReact": "19.3.0-canary-cbb046ab-20260731",
+      "checks": [
+        "Flight client reference",
+        "server HTML without JavaScript",
+        "hydration",
+        "text/locale/hyphenation updates",
+        "independent server configuration",
+        "no runtime warnings"
+      ]
+    },
+    {
+      "name": "webkit",
+      "version": "26.0",
+      "executablePath": "/Users/yuryglushkov/Library/Caches/ms-playwright/webkit-2248/pw_run.sh",
+      "registry": {
+        "name": "webkit",
+        "revision": "2248",
+        "installByDefault": true,
+        "revisionOverrides": {
+          "debian11-x64": "2105",
+          "debian11-arm64": "2105",
+          "ubuntu20.04-x64": "2092",
+          "ubuntu20.04-arm64": "2092"
+        },
+        "browserVersion": "26.0",
+        "title": "WebKit"
+      },
+      "serverReact": "19.3.0-canary-cbb046ab-20260731",
+      "clientReact": "19.3.0-canary-cbb046ab-20260731",
+      "checks": [
+        "Flight client reference",
+        "server HTML without JavaScript",
+        "hydration",
+        "text/locale/hyphenation updates",
+        "independent server configuration",
+        "no runtime warnings"
+      ]
+    }
+  ]
+}

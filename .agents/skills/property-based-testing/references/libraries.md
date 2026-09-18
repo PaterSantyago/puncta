@@ -58,17 +58,18 @@ function testDepositIncreasesBalance(uint256 amount) public {
 
 ### Contract invariants worth asserting
 
-Solvency (`sum(balances) <= totalAssets`), supply conservation, access control (a
-non-owner call sequence never reaches an owner-only state change), monotonic
-counters, and round-trip on share/asset conversion (`convertToShares` then
-`convertToAssets` never returns more than you put in).
+Check these invariants:
+
+- Solvency: `sum(balances) <= totalAssets`.
+- Supply conservation.
+- Access control: a non-owner call sequence never reaches an owner-only state change.
+- Monotonic counters.
+- Share/asset conversion roundtrip: `convertToShares` then `convertToAssets` never returns more than the input.
 
 ### Tautologies specific to Solidity
 
 Type bounds are not properties. `uint256 x >= 0` is always true, and so is
-`address(this).balance >= 0` — the compiler guarantees it. Likewise a property that
-only reads state the fuzzer cannot reach is vacuous: if no call sequence can enter
-the branch, the invariant is never exercised. Check Echidna's coverage output rather
+`address(this).balance >= 0` — the compiler guarantees it. A property that only reads unreachable state is also vacuous. If no call sequence can enter the branch, the invariant is never exercised. Check Echidna's coverage output rather
 than assuming.
 
 `echidna_` functions must be `view`/`pure` and take no arguments — a property that

@@ -1,0 +1,70 @@
+// Literal oracles from #83 §10 and #84 §2, with each example's own settings.
+// U+202F, the threshold and conservative skips are Puncta profile decisions;
+// frozen backbone/camino hyphenation and quote/bond examples come from #28/#29/#33.
+export const canonicalGrouping = [
+  ["both", "1234567", "1\u202f234\u202f567"],
+  ["both", "2026", "2\u202f026"],
+  ["en-gb", "1,234", "1\u202f234"],
+  ["es-es", "1,234", "1,234"],
+  ["en-gb", "12345.6700", "12\u202f345.6700"],
+  ["es-es", "12345,6700", "12\u202f345,6700"],
+  ["es-es", "12345.678", "12\u202f345.678"],
+  ["es-es", "1.234,50", "1.234,50", {}, true],
+  ["both", "1 234\u202f567", "1\u202f234\u202f567"],
+  ["en-gb", "1,234 567", "1,234 567", {}, true],
+  ["en-gb", "12,345.67", "12,345.67", { normalizeExisting: false }],
+  ["both", "12345", "12\u202f345", { normalizeExisting: false }],
+  ["both", "12 34", "12 34", {}, true],
+  ["both", "12345 67890", "12345 67890", {}, true],
+  ["both", "1.234 567", "1.234 567", {}, true],
+  ["both", "12345  67890", "12\u202f345  67\u202f890"],
+  ["both", "12345, 67890", "12\u202f345, 67\u202f890"],
+  ["both", "1 , 234", "1 , 234", {}, true],
+  ["both", "12345.", "12\u202f345."],
+  ...[
+    "0012345",
+    "0 123",
+    "0.12345",
+    ".12345",
+    ",12345",
+    "12345e6",
+    "2026-09-17",
+    "12:30",
+    "1.2345.6",
+    "AB12345",
+    "12345+67890",
+    "12345/67890",
+  ].map((source) => ["both", source, source]),
+  ["both", "12345–67890", "12\u202f345–67\u202f890"],
+  ["both", "00123–123456", "00123–123456"],
+  ["both", "12 34–123456", "12 34–123456", {}, true],
+  ["en-gb", "1,234–56789", "1,234–56\u202f789", { normalizeExisting: false }],
+  ["both", "ID: 12345", "ID: 12\u202f345"],
+  // Remaining inline grammar examples in #83, including exponent's Unicode sign.
+  ...["00.12345", "12345E−6", "03/04/2026", "1.234.567"].map((source) => [
+    "both",
+    source,
+    source,
+  ]),
+  ["both", "1 ,234", "1 ,234", {}, true],
+  ["both", "1234 567", "1234 567", {}, true],
+  ["en-gb", "1,23", "1,23", {}, true],
+  ["both", "12345", "12\u202f345", { minDigits: 5 }],
+  ["both", "2026", "2026", { minDigits: 5 }],
+  ["en-gb", "12,345", "12\u202f345", { minDigits: 5 }],
+  ["en-gb", "1,234", "1,234", { minDigits: 5 }],
+  ["en-gb", "12,345", "12,345", { minDigits: 5, normalizeExisting: false }],
+];
+
+export const mixedGrouping = [
+  {
+    locale: "en-gb",
+    source: `😀 "backbone -- -12345-67890  kg -- don't..."; 12,345.6700; EUR12345; 12345 %; 12 34–123456; 12345  67890`,
+    expected: `😀 ‘back\u00adbone – −12\u202f345–67\u202f890\u00a0kg – don’t…’; 12\u202f345.6700; EUR\u00a012\u202f345; 12\u202f345%; 12 34–123456; 12\u202f345  67\u202f890`,
+  },
+  {
+    locale: "es-es",
+    source: `😀 "camino -- -12345-67890  kg -- don't..."; 12 345,6700; EUR12345; 12345 %; 12 34–123456; 12345  67890`,
+    expected: `😀 «ca\u00admi\u00adno —−12\u202f345–67\u202f890\u00a0kg— don’t…»; 12\u202f345,6700; EUR\u00a012\u202f345; 12\u202f345\u00a0%; 12 34–123456; 12\u202f345  67\u202f890`,
+  },
+];

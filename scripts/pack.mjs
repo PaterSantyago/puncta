@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
-import semver from "semver";
 import { execFileSync } from "node:child_process";
-import { mkdir, readFile, rm, mkdtemp } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { resolve, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import semver from "semver";
 
 import { publicPackages } from "./workspace.mjs";
 
@@ -38,21 +38,81 @@ for (const { path: cwd, manifest } of packages) {
       "git+https://github.com/PaterSantyago/puncta.git",
       "Packed repository must match the public GitHub provenance source",
     );
-    assert.deepEqual(Object.keys(packed.exports), ["."]);
+    assert.deepEqual(
+      Object.keys(packed.exports),
+      packed.name === "@use-puncta/with-react" ? [".", "./pure"] : ["."],
+    );
     assert.deepEqual(Object.keys(packed.exports["."]).sort(), [
       "import",
       "types",
     ]);
-    for (const target of Object.values(packed.exports["."])) {
+    for (const target of Object.values(packed.exports).flatMap((entry) =>
+      Object.values(entry),
+    )) {
       assert.ok(target.startsWith("./dist/"));
       assert.ok((await readFile(join(base, target))).length);
     }
     for (const document of ["LICENSE", "README.md"])
       assert.ok((await readFile(join(base, document))).length);
+    if (
+      packed.name === "@use-puncta/core" ||
+      packed.name === "@use-puncta/with-en-gb" ||
+      packed.name === "@use-puncta/with-es-es"
+    ) {
+      const notice = await readFile(join(base, "NOTICE.md"), "utf8");
+      assert.match(
+        notice,
+        packed.name === "@use-puncta/core"
+          ? /Yevhen Tiurin/
+          : packed.name === "@use-puncta/with-en-gb"
+            ? /Dominik Wujastyk/
+            : /Javier Bezos/,
+      );
+      assert.match(notice, /Permission/);
+      assert.match(notice, /WARRANT/);
+    }
+    const localeId = packed.name.match(
+      /^@use-puncta\/with-(en-gb|es-es)$/,
+    )?.[1];
+    if (localeId) {
+      // Verify the recipe itself, then compare the archive's provenance with it.
+      execFileSync(process.execPath, [
+        `scripts/hyphenation/prepare-${localeId}.mjs`,
+        "--check",
+      ]);
+      const shipped = JSON.parse(
+        await readFile(join(base, "hyphenation-manifest.json"), "utf8"),
+      );
+      const recipe = JSON.parse(
+        await readFile(
+          new URL(`../resources/${localeId}/manifest.json`, import.meta.url),
+          "utf8",
+        ),
+      );
+      assert.deepEqual(shipped, recipe);
+      if (localeId === "es-es") {
+        const notice = await readFile(join(base, "NOTICE.md"), "utf8");
+        assert.match(notice, /Francesc Carmona/);
+        assert.match(notice, /CervanTeX/);
+      }
+    }
     const contents = execFileSync("tar", ["-tzf", archive], {
       encoding: "utf8",
     });
-    assert.ok(!contents.includes("package/src/"));
+    const documents = new Set([
+      "package.json",
+      "LICENSE",
+      "README.md",
+      "NOTICE.md",
+      ...(localeId ? ["hyphenation-manifest.json"] : []),
+    ]);
+    for (const entry of contents.trim().split("\n")) {
+      const path = entry.replace(/^package\//, "");
+      assert.ok(
+        documents.has(path) || /^dist\/[^/]+\.(?:mjs|d\.mts)$/.test(path),
+        `Unexpected archive content: ${entry}`,
+      );
+    }
     for (const section of [
       "dependencies",
       "peerDependencies",
@@ -67,7 +127,12 @@ for (const { path: cwd, manifest } of packages) {
         "peerDependencies",
         "optionalDependencies",
       ]) {
-        assert.deepEqual(packed[section] ?? {}, {});
+        assert.deepEqual(
+          packed[section] ?? {},
+          section === "dependencies"
+            ? { entities: "6.0.1", parse5: "8.0.0" }
+            : {},
+        );
       }
     if (packed.name === "@use-puncta/with-react") {
       assert.ok(
@@ -78,8 +143,24 @@ for (const { path: cwd, manifest } of packages) {
       assert.equal(packed.dependencies["react-dom"], undefined);
       assert.equal(packed.peerDependencies["react-dom"], undefined);
       const js = await readFile(join(base, packed.exports["."].import), "utf8");
-      assert.match(js, /from ["']@use-puncta\/core["']/);
-      assert.match(js, /from ["']react\/jsx-runtime["']/);
+      assert.match(js, /^"use client";/);
+      const pureModules = [];
+      const pending = [join(base, packed.exports["./pure"].import)];
+      const visited = new Set();
+      while (pending.length) {
+        const path = pending.pop();
+        if (visited.has(path)) continue;
+        visited.add(path);
+        const module = await readFile(path, "utf8");
+        pureModules.push(module);
+        // Follow tsdown's relative static imports rather than assuming one output file.
+        for (const match of module.matchAll(/from ["'](\.[^"']+)["']/g))
+          pending.push(resolve(dirname(path), match[1]));
+      }
+      const pure = pureModules.join("\n");
+      assert.doesNotMatch(pure, /["']use client["']/);
+      assert.match(pure, /from ["']@use-puncta\/core["']/);
+      assert.match(pure, /from ["']react["']/);
     }
     if (packed.peerDependencies?.["@use-puncta/core"]) {
       assert.ok(
