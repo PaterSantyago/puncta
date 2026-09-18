@@ -102,6 +102,22 @@ try {
   const adapter = archives.find(
     ({ name }) => name === "@use-puncta/with-react",
   );
+  async function consumerEnvironment(manager, cwd) {
+    if (manager === "pnpm" && externalRegistry && bundle) {
+      // Verify freshly published, checked versions rather than pnpm's older
+      // dist-tag fallback. Keep the age policy for every other dependency.
+      await writeFile(
+        join(cwd, "pnpm-workspace.yaml"),
+        `minimumReleaseAgeExclude:\n${archives
+          .map(
+            ({ name, version }) =>
+              `  - ${JSON.stringify(`${name}@${version}`)}`,
+          )
+          .join("\n")}\n`,
+      );
+    }
+    return isolatedPackageEnvironment(cwd, environment);
+  }
   async function publish(archive) {
     await run(
       "npm",
@@ -153,7 +169,7 @@ try {
         },
       }),
     );
-    const env = isolatedPackageEnvironment(cwd, environment);
+    const env = await consumerEnvironment(manager, cwd);
     const args = ["install", "--ignore-scripts", "--registry", registry];
     if (manager === "pnpm")
       args.push(
@@ -200,7 +216,7 @@ try {
           devDependencies: { typescript: "7.0.2" },
         }),
       );
-      const env = isolatedPackageEnvironment(cwd, environment);
+      const env = await consumerEnvironment(manager, cwd);
       const args = ["install", "--ignore-scripts", "--registry", registry];
       if (manager === "pnpm")
         args.push(
