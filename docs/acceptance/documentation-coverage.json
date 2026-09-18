@@ -14,7 +14,11 @@
     "docs/acceptance/documentation-108.md",
     "docs/guides/html.md",
     "docs/guides/protection.md",
-    "docs/acceptance/documentation-109.md"
+    "docs/acceptance/documentation-109.md",
+    "docs/getting-started/react.md",
+    "docs/guides/react.md",
+    "docs/reference/react.md",
+    "docs/acceptance/documentation-110.md"
   ],
   "examples": [
     {
@@ -154,6 +158,79 @@
       "id": "core-format-validation",
       "file": "docs/reference/core.md",
       "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "react-start",
+      "file": "docs/getting-started/react.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-react",
+        "@use-puncta/with-en-gb"
+      ]
+    },
+    {
+      "id": "react-direct",
+      "file": "docs/getting-started/react.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-react",
+        "@use-puncta/with-en-gb"
+      ]
+    },
+    {
+      "id": "react-component",
+      "file": "docs/guides/react.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-react",
+        "@use-puncta/with-en-gb"
+      ]
+    },
+    {
+      "id": "react-scopes",
+      "file": "docs/guides/react.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-react",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-es-es"
+      ]
+    },
+    {
+      "id": "react-pure",
+      "file": "docs/guides/react.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-react",
+        "@use-puncta/with-en-gb"
+      ]
+    },
+    {
+      "id": "react-children",
+      "file": "docs/guides/react.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-react",
+        "@use-puncta/with-en-gb"
+      ]
+    },
+    {
+      "id": "react-errors",
+      "file": "docs/reference/react.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-react",
+        "@use-puncta/with-en-gb"
+      ]
+    },
+    {
+      "id": "package-react",
+      "file": "packages/with-react/README.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-react",
+        "@use-puncta/with-en-gb"
+      ]
     }
   ],
   "coverage": [
@@ -236,9 +313,24 @@
     },
     {
       "id": "react",
-      "status": "pending",
+      "status": "covered",
       "issue": 110,
-      "scope": "All React exports/types/scopes, pure functions, mounted behavior."
+      "scope": "Issue 110: components, transformReact, public props/options/results, child boundaries, scopes, protection and mounted state. SHY removal remains pending in issue 112. Server integration remains pending in issue 113.",
+      "pages": [
+        "docs/getting-started/react.md",
+        "docs/guides/react.md",
+        "docs/reference/react.md"
+      ],
+      "examples": [
+        "react-start",
+        "react-direct",
+        "react-component",
+        "react-scopes",
+        "react-pure",
+        "react-children",
+        "react-errors",
+        "package-react"
+      ]
     },
     {
       "id": "digit-grouping",
@@ -278,6 +370,118 @@
     }
   ],
   "sourceContracts": [
+    {
+      "file": "packages/with-react/src/index.tsx",
+      "name": "PunctaProps",
+      "sha256": "4b79118250bc799ec533bc1edd3fdac8091e8bb33178d9d999768d79f6ddee63",
+      "status": "covered",
+      "issue": 110,
+      "target": "docs/reference/react.md#component-props"
+    },
+    {
+      "file": "packages/with-react/src/index.tsx",
+      "name": "PunctaProviderProps",
+      "sha256": "b74c71e0d418873272d3bbccae26cfd42eb7e952eec50130f103e192e56df025",
+      "status": "covered",
+      "issue": 110,
+      "target": "docs/reference/react.md#component-props"
+    },
+    {
+      "file": "packages/with-react/src/index.tsx",
+      "name": "Puncta",
+      "sha256": "fa387d576877011458e3768160301fbdc9f22b36ff0ce70b18d4b8d481495d64",
+      "status": "covered",
+      "issue": 110,
+      "target": "docs/reference/react.md#components"
+    },
+    {
+      "file": "packages/with-react/src/index.tsx",
+      "name": "PunctaProvider",
+      "sha256": "d8fce2f973786ce24a9f26dd58fd6bb662ae05124ff2087c0ee1f73e469f9a6d",
+      "status": "covered",
+      "issue": 110,
+      "target": "docs/reference/react.md#components"
+    },
+    {
+      "file": "packages/with-react/src/pure.ts",
+      "name": "ReactTransformOptions",
+      "sha256": "cef76e3d44e80fa355672faba23f6aa44f5002ca33d60ee920253d879238fecc",
+      "status": "covered",
+      "issue": 110,
+      "target": "docs/reference/react.md#reacttransformoptions"
+    },
+    {
+      "file": "packages/with-react/src/pure.ts",
+      "name": "ReactResult",
+      "sha256": "b1bd680ba3e16c9ccfea8be90aac170e4069468594d81721da5c841f52ae628f",
+      "status": "covered",
+      "issue": 110,
+      "target": "docs/reference/react.md#reactresult"
+    },
+    {
+      "file": "packages/with-react/src/pure.ts",
+      "name": "transformReact",
+      "sha256": "e231a4c44473002b8cda8def00ec7ddda6b1fe67b346fe995b3afda69bfa6e04",
+      "status": "covered",
+      "issue": 110,
+      "target": "docs/reference/react.md#transformreact"
+    },
+    {
+      "file": "packages/with-react/src/pure.ts",
+      "name": "transformReact",
+      "sha256": "eecaf7ece31afc82f35152d7b28519940d1ee69acdb3b57261eb5ec4e9d1ed3b",
+      "status": "covered",
+      "issue": 110,
+      "target": "docs/reference/react.md#transformreact"
+    },
+    {
+      "file": "packages/with-react/src/pure.ts",
+      "name": "transformReact",
+      "sha256": "ba647c915120341cfdd661a90ac9d6d74bb10689a51b0583ed559fc4a51cb8da",
+      "status": "covered",
+      "issue": 110,
+      "target": "docs/reference/react.md#transformreact"
+    },
+    {
+      "file": "packages/with-react/src/pure.ts",
+      "name": "transformReact",
+      "sha256": "b4f2da47f9daafd5a3ea6717f545c36ef23f0f373d98af7959dbe7278d952f0b",
+      "status": "covered",
+      "issue": 110,
+      "target": "docs/reference/react.md#transformreact"
+    },
+    {
+      "file": "packages/with-react/src/pure.ts",
+      "name": "stripSoftHyphensReact",
+      "sha256": "f084c079873c64fa17885e99723f35d78d431600f845aefc46892d9f0b0ad609",
+      "status": "pending",
+      "issue": 112,
+      "target": "docs/reference/react.md#stripsofthyphensreact"
+    },
+    {
+      "file": "packages/with-react/src/pure.ts",
+      "name": "stripSoftHyphensReact",
+      "sha256": "c747ebec807a0deaf99d508451bb556dcb41ff11fb4817f94326a9c659958679",
+      "status": "pending",
+      "issue": 112,
+      "target": "docs/reference/react.md#stripsofthyphensreact"
+    },
+    {
+      "file": "packages/with-react/src/pure.ts",
+      "name": "stripSoftHyphensReact",
+      "sha256": "b211fddf020b979bb1636c905494f1a217ad80986db55ad2e79a304017f6dca9",
+      "status": "pending",
+      "issue": 112,
+      "target": "docs/reference/react.md#stripsofthyphensreact"
+    },
+    {
+      "file": "packages/with-react/src/pure.ts",
+      "name": "stripSoftHyphensReact",
+      "sha256": "5ed614a5f943e8af3e80302dff4f9309a89b1ebe4da724d2ddca2cd8fee54d12",
+      "status": "pending",
+      "issue": 112,
+      "target": "docs/reference/react.md#stripsofthyphensreact"
+    },
     {
       "file": "packages/core/src/types.ts",
       "name": "LocaleId",

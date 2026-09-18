@@ -91,3 +91,23 @@ A new scope or an opaque element stops word and bond recognition.
 A `lang` that selects the current locale keeps context, but an explicit Puncta marker starts a new scope.
 Remove an unnecessary marker when the text must share its parent's context.
 See [context boundaries](guides/html.md#context-boundaries).
+
+## Text in a custom React component stays unchanged
+
+An outer `Puncta` cannot inspect the component's rendered output.
+Put `Puncta` in the custom component and supply an instance through a Provider.
+See the [checked component example](guides/react.md#process-a-custom-component).
+A Provider alone supplies settings but does not transform text.
+
+## React reports a missing or nested instance
+
+Supply `instance` at the root `Puncta` or Provider.
+Remove the prop from components in an existing Puncta Context.
+Every pure call must receive its own explicit instance.
+See [React configuration failures](reference/react.md#check-configuration-failures).
+
+## State resets after a protection change
+
+A protection change above multiple hosts can remount deeper stateful children.
+Do not depend on state preservation across arbitrary deep protection changes.
+See [the reconciliation limit](guides/react.md#preserve-state-during-updates).

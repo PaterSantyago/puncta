@@ -1,76 +1,67 @@
 # @use-puncta/with-react
 
-ESM React 19.3 adapter for typography, optional en-gb/es-es hyphenation and
-separate SHY removal. Core is a regular dependency;
-React is a peer dependency, and React DOM is supplied by the application.
+Use Puncta to process accessible React children without a DOM wrapper.
+This package is an ESM adapter with TypeScript declarations.
+The declared React peer range is `^19.3.0`. Your application supplies React DOM.
+
+## Install
+
+The functional API is unreleased. The public `0.1.0-alpha.0` scaffold does not have this API.
+Use matching core, adapter, and locale packages from the functional version.
+Declare core directly when your application imports it.
+Follow the [npm or pnpm installation procedure](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/installation.md).
+
+## Example
+
+This full TSX program prints the rendered HTML.
+An outer `Puncta` cannot inspect custom component output.
+Put `Puncta` in your component to process that text.
+
+<!-- puncta:example package-react -->
 
 ```tsx
 import { createPuncta } from "@use-puncta/core";
 import { enGb } from "@use-puncta/with-en-gb";
 import { Puncta, PunctaProvider } from "@use-puncta/with-react";
-import { transformReact } from "@use-puncta/with-react/pure";
+import { renderToStaticMarkup } from "react-dom/server";
 
 const instance = createPuncta({ locales: [enGb], locale: enGb.id });
 const example = (
   <PunctaProvider instance={instance}>
     <Puncta>Wait...</Puncta>
-    <Puncta options={{ rules: { ellipsis: { enabled: false } } }}>
-      Wait...
-    </Puncta>
   </PunctaProvider>
 );
-const report = transformReact("Wait...", { instance, detailed: true });
+console.log(renderToStaticMarkup(example));
 ```
 
-`Puncta` renders `Wait…` without a DOM wrapper. Its root entry preserves
-`"use client"`. The `/pure` entry has no client directive, hooks or Context;
-`transformReact` returns a ReactNode by default or `ReactResult` with
-`detailed: true`. Reports use numeric array indices and `"children"` transitions
-and `"fallback"` transitions for source paths; they have no `outputChanged` field.
+<!-- puncta:output package-react -->
+
+```text
+Wait…
+```
+
+## Guide and reference
+
+- [React quick start](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/react.md).
+- [React guide: scopes, protection, pure calls, and state limits](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/react.md).
+- [React API and public types](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/react.md).
+
+These links use the documentation branch until a functional release exists.
+At release, the links must point to the matching release.
+
+## Soft-hyphen removal
+
+The hyphenation slice will move this section to its canonical guide and reference.
 
 `stripSoftHyphensReact(children, { instance, ...options })` from `/pure` removes
-all accessible U+00AD without running typography. It has the same options and
-ordinary/detailed result forms as `transformReact`; `format`, `mode`, `context`
-and `protect` are rejected. Protection, unavailable language, disabled scopes,
-attributes and opaque content retain SHY. Removal needs no insertion resource;
-its options and language minima are still validated.
+all accessible U+00AD without typography processing. It uses the same options and
+ordinary/detailed result forms as `transformReact`. It rejects `format`, `mode`, `context`, and `protect`.
+Protection, unavailable language, disabled scopes, attributes, and opaque content keep SHY.
+Removal operates without an insertion resource. Options and language minima are still validated.
 
-Text, arrays, Fragments and ordinary host children share inline recognition.
-Cross-leaf replacements belong to the first affected leaf; empty elements survive.
-Numbers and bigint contribute their text while retaining their type when unchanged.
-Null, undefined and booleans create no boundary. Original children, keys, refs and
-other props are retained; attributes and `dangerouslySetInnerHTML` are not transformed.
-User components, portals, promises and arbitrary iterables remain opaque without
-being called, awaited or iterated. Suspense content, fallback and surrounding text
-have independent recognition contexts. Reports address the original input tree.
+## Server integration
 
-`PunctaProvider` configures children without transforming its immediate text.
-`Puncta` and Provider receive original children from outer scopes. Both support
-`instance?`, `locale?`, `enabled?` and `options?` (rules/hyphenation only). A root
-instance is required at runtime; providing another instance under Context is an
-error. Component arguments are validated even when processing is disabled.
-An independent pure call always needs its own explicit instance, ignores Context,
-and returns no hidden Provider. Components within that result use their normal
-render-time Context.
-
-Accessible host elements support the same declarative markers and lang rules as
-HTML. Full disabling remains inherited protection, whereas individual rules can be
-reset or re-enabled. Context bridges add no DOM elements. Keyed state and refs survive reordering,
-including behind several hosts within a protected subtree. Configuration and new children recompute from source.
-
-Protection crosses opaque user components through Context: a nested Puncta or
-Provider cannot override an inherited ban with `enabled={true}`. Protected children
-are not traversed. The core protected-element catalog also applies to host elements;
-React `hidden={false}` does not protect, and `contentEditable={false}` cannot undo
-inherited protection. External DOM ancestors are never inspected. Pure transforms
-preserve protection structurally but do not install Context for future components.
-
-Known reconciliation limit: switching protection on an ancestor of several accessible
-hosts can remount deeper stateful children. The eager traversal stops at the newly
-protected host, removing Context bridges previously inserted below it. Direct-child
-marker changes and reordering with unchanged protection are tested; arbitrary deep
-protection toggles do not have a state-preservation guarantee. The implementation
-does not inspect protected descendants to retain those bridges.
+The server-rendering slice will move the existing integration details below to its guide.
 
 Node 24.21.0 and React/React DOM 19.3.0 checks cover `renderToString`,
 `renderToPipeableStream` and `renderToReadableStream` through the compatible
@@ -101,7 +92,9 @@ three browsers (`pnpm build && pnpm test:rsc`). See
 consumer, not a guarantee for all framework versions or edge runtimes; no server
 JSX component or server Provider is supplied.
 
-MIT licensed. Public publication is separate work.
+## License
+
+MIT.
 
 ## Opt-in digit grouping
 

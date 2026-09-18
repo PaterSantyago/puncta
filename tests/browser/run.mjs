@@ -8,6 +8,7 @@ import { arch, platform, release } from "node:os";
 import { dirname, resolve } from "node:path";
 import { build } from "esbuild";
 import { chromium, firefox, webkit } from "playwright";
+import { documentationExamples } from "../../scripts/documentation.mjs";
 import { createHydrationServer } from "./hydration-server.mjs";
 import { expected } from "./hydration-tree.mjs";
 
@@ -57,6 +58,50 @@ for (const name of ["shared", "scopes", "hydration-client"]) {
   });
   bundles.set(`/${name}.js`, result.outputFiles[0].text);
 }
+
+const documentationExample = (await documentationExamples()).find(
+  ({ id }) => id === "react-start",
+);
+assert.ok(documentationExample, "React quick-start source must exist");
+const documentationBundle = await build({
+  stdin: {
+    contents:
+      documentationExample.source +
+      `
+import { act } from "react";
+import { createRoot } from "react-dom/client";
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+window.runDocumentationCheck = async () => {
+  const container = document.createElement("div");
+  document.body.append(container);
+  const root = createRoot(container);
+  await act(() => root.render(<Example />));
+  const html = container.innerHTML;
+  await act(() => root.unmount());
+  container.remove();
+  return html;
+};`,
+    resolveDir: resolve("examples/ssr"),
+    loader: "tsx",
+  },
+  bundle: true,
+  write: false,
+  format: "esm",
+  platform: "browser",
+  tsconfigRaw: { compilerOptions: { jsx: "react-jsx" } },
+  define: { "process.env.NODE_ENV": '"development"' },
+  plugins: [
+    {
+      name: "documentation-public-core",
+      setup(builder) {
+        builder.onResolve({ filter: /^@use-puncta\/core$/ }, () => ({
+          path: resolve("packages/core/dist/index.mjs"),
+        }));
+      },
+    },
+  ],
+});
+bundles.set("/documentation.js", documentationBundle.outputFiles[0].text);
 const hydration = createHydrationServer();
 const server = createServer((request, response) => {
   if (/^\/(ssr|pipeable|readable)\//.test(request.url)) {
@@ -72,7 +117,7 @@ const server = createServer((request, response) => {
   } else {
     response.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
     response.end(
-      '<!doctype html><title>Puncta browser acceptance</title><script type="module" src="/shared.js"></script><script type="module" src="/scopes.js"></script>',
+      '<!doctype html><title>Puncta browser acceptance</title><script type="module" src="/shared.js"></script><script type="module" src="/scopes.js"></script><script type="module" src="/documentation.js"></script>',
     );
   }
 });
@@ -135,8 +180,15 @@ try {
       });
       await page.goto(url);
       await page.waitForFunction(
-        () => window.runSharedChecks && window.runScopesCheck,
+        () =>
+          window.runSharedChecks &&
+          window.runScopesCheck &&
+          window.runDocumentationCheck,
       );
+      const documentation = await page.evaluate(() =>
+        window.runDocumentationCheck(),
+      );
+      assert.equal(`${documentation}\n`, documentationExample.output);
       const shared = await page.evaluate(() => window.runSharedChecks());
       const mounted = await page.evaluate(() => window.runScopesCheck());
       const hydrationChecks = [];
@@ -247,6 +299,13 @@ try {
         userAgent: await page.evaluate(() => navigator.userAgent),
         shared,
         mounted,
+        documentation: {
+          id: documentationExample.id,
+          sourceSha256: createHash("sha256")
+            .update(documentationExample.source)
+            .digest("hex"),
+          output: documentation,
+        },
         hydration: hydrationChecks,
       };
       report.browsers.push(result);

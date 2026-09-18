@@ -135,7 +135,11 @@ try {
           react: "19.3.0",
           "react-dom": "19.3.0",
           ...(locales.length
-            ? { typescript: "7.0.2", "@types/react": "19.3.0" }
+            ? {
+                typescript: "7.0.2",
+                "@types/react": "19.3.0",
+                "@types/react-dom": "19.3.0",
+              }
             : {}),
           ...Object.fromEntries(
             locales.map((id) => [
@@ -259,7 +263,7 @@ try {
         await writeFile(
           join(cwd, "transitive.tsx"),
           [
-            'import { Puncta, PunctaProvider } from "@use-puncta/with-react";',
+            'import { Puncta, PunctaProvider, type PunctaProps, type PunctaProviderProps } from "@use-puncta/with-react";',
             'import type { ReactTransformOptions } from "@use-puncta/with-react/pure";',
             ...locales.map(
               (id, index) =>
@@ -312,7 +316,7 @@ try {
         await writeFile(
           join(cwd, "consumer.tsx"),
           [
-            'import { Puncta, PunctaProvider } from "@use-puncta/with-react";',
+            'import { Puncta, PunctaProvider, type PunctaProps, type PunctaProviderProps } from "@use-puncta/with-react";',
             'import { createPuncta, type TextResult, type HtmlResult, type StripSoftHyphensOptions, type Locale } from "@use-puncta/core";',
             'import { transformReact, stripSoftHyphensReact, type ReactResult } from "@use-puncta/with-react/pure";',
             'import type { ReactNode } from "react";',
@@ -326,6 +330,8 @@ try {
             ),
             ...[
               "const instance = instance0;",
+              "const componentProps: PunctaProps = {instance, children: 'Wait...', enabled: true};",
+              "const providerProps: PunctaProviderProps = componentProps;",
               "declare const detailed: boolean;",
               'const text: string = instance.text("Wait...");',
               'const textFalse: string = instance.text("Wait...", {detailed: false});',
@@ -362,6 +368,7 @@ try {
               'const htmlReport: HtmlResult = instance.html("Wait...", {detailed: true});',
               'const htmlUnion: string | HtmlResult = instance.html("Wait...", {detailed});',
               'const tree: ReactNode = transformReact("Wait...", {instance});',
+              'const treeFalse: ReactNode = transformReact("Wait...", {instance, detailed: false});',
               'const treeReport: ReactResult = transformReact("Wait...", {instance, detailed: true});',
               'const treeUnion: ReactNode | ReactResult = transformReact("Wait...", {instance, detailed});',
               "// @ts-expect-error Detailed is not a string.",
@@ -418,6 +425,18 @@ try {
         console.log(
           `${manager} ${locales.join(", ")}: public API declarations verified with explicitly installed core`,
         );
+        if (locales.length === 2) {
+          await checkInstalledDocumentation({
+            cwd,
+            env,
+            run,
+            packages: [
+              "@use-puncta/core",
+              "@use-puncta/with-react",
+              ...locales.map((id) => `@use-puncta/with-${id}`),
+            ],
+          });
+        }
       }
     }
   }

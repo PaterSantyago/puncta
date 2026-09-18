@@ -11,8 +11,7 @@ This guide describes the unreleased functional version.
 2. [Process text or HTML](getting-started/text-and-html.md).
 3. Read [compatibility and version status](compatibility.md).
 
-For React, use the [current package instructions](../packages/with-react/README.md).
-The separate React quick start is pending.
+For React, follow the [React quick start](getting-started/react.md).
 
 ## Complete a task
 
@@ -21,7 +20,9 @@ The separate React quick start is pending.
 - [Process HTML fragments and documents](guides/html.md).
 - [Protect text ranges and markup](guides/protection.md).
 
-The React, server rendering, and hyphenation guides are pending.
+- [Process React children and nested scopes](guides/react.md).
+
+The server rendering and hyphenation guides are pending.
 Existing details remain in the [core package instructions](../packages/core/README.md)
 and [React package instructions](../packages/with-react/README.md).
 
@@ -31,8 +32,9 @@ and [React package instructions](../packages/with-react/README.md).
 - [Settings, defaults, and reset behavior](reference/settings.md).
 - [Locales and typography rules](reference/locales-and-rules.md).
 
-The React and diagnostics references are pending. Use the
-[React package instructions](../packages/with-react/README.md) for current details.
+- [React components, pure functions, and public types](reference/react.md).
+
+The diagnostics reference is pending.
 Core format-specific and diagnostic definitions remain partly pending.
 
 ## Solve a problem

@@ -124,6 +124,8 @@ function headings(markdown) {
 // A source change requires a new semantic review; a matching hash is not that review.
 export async function documentationContracts() {
   const files = [
+    "packages/with-react/src/index.tsx",
+    "packages/with-react/src/pure.ts",
     "packages/core/src/types.ts",
     "packages/core/src/index.ts",
     "packages/core/src/config.ts",
