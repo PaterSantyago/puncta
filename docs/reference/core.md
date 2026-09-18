@@ -164,7 +164,7 @@ interface HtmlOptions extends Omit<TextOptions, "protect"> {
 
 | Parameter  | Default            | Valid input and applicability                             |
 | ---------- | ------------------ | --------------------------------------------------------- |
-| `source`   | Required           | String for both methods, including an empty string        |
+| `source`   | Necessary          | String for both methods. An empty string is permitted     |
 | `detailed` | `false`            | Boolean for both methods, selects the return overload     |
 | `protect`  | No explicit ranges | Readonly array of `ProtectedRange`, plain text only       |
 | `mode`     | `"fragment"`       | `"fragment"` or `"document"`, HTML only                   |
@@ -174,13 +174,14 @@ The shared fields come from [PunctaOptions](settings.md#shared-fields).
 Omitted format parameters or explicit `undefined` use their defaults.
 `null` is invalid for these parameters.
 Whole call options must be an object, not `null` or an array.
-Unknown fields are invalid, including fields from another format.
+Unknown fields are invalid. This also applies to fields from a different format.
 
-For `context`, use a supported HTML name such as `div`, `table`, `tbody`, `tr`, `title`, or `code`.
+For `context`, use a supported HTML name. Examples are `div`, `table`, `tbody`, `tr`, `title`, and `code`.
 The [element lists](../guides/html.md#supported-element-names) define all supported names.
 The context affects parsing only, without a wrapper or inherited protection.
 Unknown or custom names, uppercase names, `svg`, and `math` are invalid.
-An explicit `context` is invalid in document mode, including `"div"`.
+
+An explicit `context` is invalid in document mode, even `"div"`.
 See the [mode examples](../guides/html.md#select-fragment-or-document).
 
 ### ProtectedRange
@@ -189,11 +190,11 @@ Each range has readonly numeric `start` and `end` fields.
 They refer to the original source in UTF-16 units.
 The interval includes `start` and excludes `end`.
 Both must be integers at grapheme boundaries, with `0 <= start <= end <= source.length`.
-Extra range fields, missing fields, and non-object entries are invalid.
+Additional range fields, missing fields, and non-object entries are invalid.
 
 Puncta sorts a private copy and combines adjacent or overlapping ranges.
 Empty valid ranges have no effect. The input array stays unchanged.
-A wrong `protect` container type causes `config.invalid-option`.
+An incorrect `protect` container type causes `config.invalid-option`.
 An invalid entry causes `protect.invalid-range`, with its index in `details.index` and `optionPath`.
 Validation applies even when typography is disabled.
 
@@ -211,7 +212,7 @@ The [shared validation rules](settings.md#validation-when-disabled) also apply.
 Active HTML markers receive validation during traversal.
 Invalid JSON causes `markup.invalid-config`.
 Invalid marker values or JSON option fields cause `config.invalid-option`.
-An explicit locale absent from the registry causes `locale.unavailable`.
+An explicit locale missing from the registry causes `locale.unavailable`.
 Protected elements and off subtrees skip their declarative configuration.
 An unavailable `lang` produces a warning instead of an explicit locale error.
 
@@ -255,7 +256,7 @@ markup.invalid-config []
 ```
 
 The first range splits the emoji's surrogate pair.
-A range inside a decomposed letter/accent grapheme also fails.
+A range in a decomposed letter/accent grapheme also fails.
 The API and marker errors identify different configuration locations.
 Full location definitions are pending in the diagnostics slice.
 

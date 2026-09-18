@@ -65,7 +65,7 @@ Use the correct table context for the rows or cells in a fragment.
 The parser can repair markup and change entity or attribute spelling.
 
 Compare `hasEdits` with `outputChanged` in a detailed result.
-A serialization change does not require a typography edit.
+A serialization change can occur without a typography edit.
 Do not use edit ranges as patches to reconstruct HTML output.
 See [serialization limits](guides/html.md#understand-serialization).
 
@@ -78,7 +78,7 @@ Use a supported loaded language or an explicit locale marker for that region.
 
 For plain text, check explicit ranges against the original source.
 Do not count Unicode code points or use offsets from a previous result.
-For `protect.invalid-range`, use whole graphemes within the source bounds.
+For `protect.invalid-range`, use full graphemes in the source bounds.
 See [range validation](reference/core.md#protectedrange).
 
 A URL can keep punctuation that looks like sentence punctuation.

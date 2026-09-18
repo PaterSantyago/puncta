@@ -29,8 +29,9 @@ The existing documentation checker extracts each displayed TypeScript example an
 The existing isolated npm/pnpm consumers compile and execute those same sources through public package imports.
 This slice adds eight examples to the fourteen from the earlier slices.
 The examples check exact results, not only the absence of errors.
+
 An additional source comparison checked all 128 supported element names against the shared element tables.
-The `TextOptions`, `HtmlOptions`, and `ProtectedRange` inventory entries now point to complete format definitions.
+The `TextOptions`, `HtmlOptions`, and `ProtectedRange` inventory entries now point to full format definitions.
 Their existing source fingerprints are unchanged.
 
 `pnpm check` passed on 2026-09-18 with Node 24.21.0, npm 11.19.0,
@@ -51,7 +52,9 @@ pnpm 12.4.1, and TypeScript 7.0.2.
 The eight new examples also passed an earlier exact-output check against built entrypoints.
 The full run used the existing installed consumers for the final example and declaration checks.
 No library test or duplicate example runner was added to the repository.
-Independent factual and ASD-STE100 Issue 9 review is pending.
+An independent review of revision `71dd89aec7b17043b88dd8a5290117bcad583c51` found no factual, navigation, or coverage defects.
+The review found two groups of language issues.
+The corrections below await an independent recheck.
 
 ## Language and limits
 
@@ -61,7 +64,23 @@ The author checked ordinary wording, permitted verb forms, active voice, sentenc
 Exact API identifiers and literal outputs stay unchanged.
 The independent language review is an additional acceptance requirement.
 
-Complete diagnostic schemas, React-specific procedures, and SHY removal are in their assigned slices.
+Full diagnostic schemas, React-specific procedures, and SHY removal are in their assigned slices.
 Useful legacy material for those subjects stays in the core and adapter READMEs.
 No library behavior, versions, tags, or public package contents changed.
 Public functional installation and release-specific links are pending until publication.
+
+## Review corrections
+
+The author applied the two language finding groups from the independent review.
+Ordinary wording and verb forms now use the specified alternatives from the official Issue 9 dictionary.
+The author divided long paragraphs after the wording changes and in the verification record.
+Code, literal inputs, expected outputs, library behavior, and the coverage inventory are unchanged.
+
+The coordinator checked all ten absolute branch URLs from the package READMEs on 2026-09-18.
+Each returned HTTP 200. Local file and anchor checks also passed.
+Public functional installation and release-specific URLs are still pending until publication.
+
+Focused documentation and formatting checks passed after these prose corrections.
+The author did not run the full suite again.
+The full-suite result above applies to the unchanged examples and library source.
+The final independent factual and language recheck is pending.

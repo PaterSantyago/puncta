@@ -24,7 +24,7 @@ Their current details remain in the [core package instructions](../../packages/c
 It defines the registry at creation. A call cannot add a locale.
 See [locale exports](locales-and-rules.md#locale-exports).
 See [text/HTML parameters](core.md#format-parameters) and [HTML procedures](../guides/html.md).
-React and removal procedures remain in their pending slices.
+React and removal procedures stay in their pending slices.
 
 ## Shared fields
 
@@ -182,11 +182,12 @@ The empty object `{}` is valid and keeps inherited explicit settings.
 
 `lang` accepts `en` and `en-gb` for en-gb, or `es` and `es-es` for es-es.
 These aliases are not case-sensitive. They do not load a locale module.
-Other valid tags, including `en-US`, have no locale alias.
-Empty, invalid, unsupported, or unloaded language values leave that region's text unchanged.
+Other valid tags have no locale alias. An example is `en-US`.
+
+Empty, invalid, unsupported, or unloaded language values keep that region's text unchanged.
 They produce `markup.language-unavailable`, with reason `empty`, `invalid`, `unsupported`, or `not-loaded`.
 
-A supported nested language can start typography again inside an unavailable-language region.
+A supported nested language can start typography again in an unavailable-language region.
 Invalid explicit settings there still cause configuration errors.
 A `lang` attribute alone that selects the current locale keeps inline context.
 An explicit marker creates an independent scope even when the effective settings do not change.

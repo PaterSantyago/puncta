@@ -57,7 +57,7 @@ HTML and protection have their own guides:
 - [Format parameters and validation](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/core.md#format-parameters).
 
 Detailed source-coordinate definitions are pending. Source paths index the parsed
-tree, including comments and elements inserted by the parser. Entity/CRLF decoding
+tree, with comments and elements inserted by the parser. Entity/CRLF decoding
 and astral characters retain UTF-16 provenance. Unmappable parser repairs report
 `accuracy: "unavailable"` with a reason.
 

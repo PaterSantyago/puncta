@@ -3,16 +3,16 @@
 [Documentation index](../README.md)
 
 Use `html()` to apply typography to text in an HTML string.
-First, [install core and the required locales](../getting-started/installation.md).
-All examples below are complete programs.
+First, [install core and the necessary locales](../getting-started/installation.md).
+All examples below are full programs.
 
 HTML parsing does not sanitize input. Puncta does not remove scripts or event attributes.
-Use an independent HTML sanitizer when your application must produce safe HTML.
+Use an HTML sanitizer that operates independently when your application must produce safe HTML.
 
 ## Select fragment or document
 
 The default mode is `"fragment"`. The default fragment context is `"div"`.
-Select `"document"` for a complete document.
+Select `"document"` for a full document.
 Puncta never selects a mode from the source content.
 
 <!-- puncta:example html-modes -->
@@ -48,7 +48,7 @@ An actual `<code>` element in the source does protect its contents.
 
 A `table` context permits table rows and can add a `tbody` element.
 A `title` context uses RCDATA: the parser decodes entities and reads tags as text.
-Raw-text contexts, such as `script`, keep literal entities during serialization.
+Raw-text contexts keep literal entities during serialization. The `script` context is an example.
 Use a supported lowercase HTML element name for `context`.
 The [core reference](../reference/core.md#format-parameters) defines its limits.
 
@@ -103,16 +103,16 @@ An explicit `data-puncta-locale` has priority over `lang` on the same element.
 The nested null reset removes the explicit ellipsis setting.
 The nested scope then uses its locale default.
 
-An unavailable language leaves its text unchanged and produces a warning.
+An unavailable language keeps its text unchanged and produces a warning.
 A supported nested language can start typography again.
 But descendants cannot cancel inherited protection or `data-puncta="off"`.
 See [inherited protection](protection.md#protect-markup-and-keep-protection).
 
 ## Work across inline elements
 
-Transparent inline elements, such as `b`, `em`, and `span`, share recognition context.
-Comments do not interrupt this context.
-Puncta can recognize one token across several text leaves.
+Transparent inline elements share recognition context. Examples are `b`, `em`, and `span`.
+Comments do not stop this context.
+Puncta can recognize one token across more than one text leaf.
 A leaf is one text node in the parsed tree.
 
 <!-- puncta:example html-joins -->
@@ -192,9 +192,9 @@ Unsupported elements stay protected and opaque.
 
 ## Understand serialization
 
-Puncta uses the tree from the HTML parser, including parser repairs.
+Puncta uses the tree from the HTML parser, with parser repairs.
 Typography keeps that tree and its attribute values.
-It does not apply typography to attributes, including `title`, `alt`, and `href`.
+It does not apply typography to attributes. Examples are `title`, `alt`, and `href`.
 Serialization does not promise the original bytes, attribute quotes, entity spelling, or tag case.
 Protected text also has this limit after parsing.
 
@@ -228,7 +228,7 @@ false true 0
 <code>...</code>
 ```
 
-`hasEdits` reports typography changes. `outputChanged` compares the complete strings.
+`hasEdits` reports typography changes. `outputChanged` compares the full strings.
 The example has a serialization change with no typography edits.
 Edit reports are not patches to reconstruct serialized HTML.
 The script and event attribute stay in the result: parsing is not sanitization.
@@ -237,7 +237,7 @@ Parser warnings use `html.parse`, with the parser code in `details.parserCode`.
 Protection does not stop parser warnings.
 No warnings does not prove valid HTML or the absence of parser repairs.
 An input with an actual `plaintext` element keeps its original markup structure during text changes.
-This special case prevents new closing tags from becoming plaintext on a later parse.
+With this special case, a later parse does not read new closing tags as plaintext.
 
 Related: [Protection](protection.md), [core API](../reference/core.md),
 [HTML symptoms](../troubleshooting.md#html-output-has-unexpected-markup).

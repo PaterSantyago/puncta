@@ -4,7 +4,7 @@
 
 Protected text does not receive typography analysis or changes.
 First, [install core and a locale](../getting-started/installation.md).
-All examples below are complete programs.
+All examples below are full programs.
 
 ## Protect original text ranges
 
@@ -56,9 +56,9 @@ An outer quote can include the gap, but the protected text cannot affect quote r
 
 Puncta automatically protects recognized technical tokens in accessible text.
 No option is necessary.
-These forms include URLs with a scheme or `www.`, email addresses, valid IP addresses,
-and version strings such as `v1.2.3`.
-A scheme can be `https:`, `mailto:`, or another valid scheme prefix.
+These forms include URLs with a scheme or `www.`, email addresses, valid IP addresses, and version strings.
+An example version is `v1.2.3`.
+A scheme can be `https:`, `mailto:`, or a different valid scheme prefix.
 
 <!-- puncta:example protection-technical -->
 
@@ -88,15 +88,15 @@ Technical-token recognition also works across transparent inline leaves.
 URL punctuation can belong to a path, query, or fragment.
 Puncta keeps this punctuation.
 
-This protection does not cover all technical text.
+This protection does not include all technical text.
 Puncta does not parse Markdown, code syntax, file paths, or arbitrary identifiers.
 Use explicit ranges for those plain-text regions, or protected elements in HTML.
 
 ## Protect markup and keep protection
 
-Use `code` for code text, or `data-puncta="off"` for another subtree.
+Use `code` for code text, or `data-puncta="off"` for a different subtree.
 An off marker protects the element and all its descendants.
-A nested marker or language cannot start typography again inside it.
+A nested marker or language cannot start typography again in it.
 
 <!-- puncta:example protection-markup -->
 
@@ -135,20 +135,20 @@ Output:
 markup.element-unsupported
 ```
 
-The invalid JSON inside the off subtree causes no configuration error.
-Puncta skips declarative configuration inside protected elements and off subtrees.
+The invalid JSON in the off subtree causes no configuration error.
+Puncta skips declarative configuration in protected elements and off subtrees.
 But explicit API arguments still receive validation when `enabled` is `false`.
 See the [validation example](../reference/core.md#format-validation).
 
 An API call with effective `enabled: false` protects its full HTML input from typography.
 No descendant can cancel that protection.
 A different call or instance variant can set `enabled: true` again.
-This is different from a descendant inside a protected subtree.
+This is different from a descendant in a protected subtree.
 
 ### Protected and opaque elements
 
 The HTML element categories below apply without CSS inspection.
-Protection includes all descendants, even HTML descendants inside SVG or MathML.
+Protection includes all descendants, even HTML descendants in SVG or MathML.
 Unknown elements are opaque and protected, with a `markup.element-unsupported` warning.
 An already protected subtree does not produce additional element warnings from its descendants.
 
@@ -167,7 +167,7 @@ The presence of `hidden` protects a subtree, even with `hidden="false"`.
 
 An opaque fragment stops word and bond recognition on both sides.
 Inline protected elements use this boundary.
-A block element such as `pre` also stops quote context.
+Block elements also stop quote context. The `pre` element is an example.
 The `br`, `wbr`, and `hr` elements have no processed text and use their [structural boundaries](html.md#context-boundaries).
 
 Protection keeps parsed text, not the original HTML bytes.
