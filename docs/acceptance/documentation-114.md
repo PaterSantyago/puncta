@@ -71,11 +71,17 @@ Session evidence is in `/tmp/puncta-docs-coordination/`:
 The author used the official ASD-STE100 Issue 9 rules and dictionary and the corrections from reviews 109–113.
 Code, API identifiers, literals, and technical terms keep their specified forms.
 No project dictionary applies.
+
 A separate factual and language review checked the candidate and the correction commit.
 It found a Markdown table error, an incomplete `covering` mapping definition, and six language correction groups.
 The author corrected all findings. The reviewer confirmed that the content has no unresolved findings.
 The review record is `/tmp/puncta-docs-coordination/review-114.md`.
-Review of the final evidence revision is pending coordinator confirmation.
+
+Final independent review passed for evidence revision
+`2b54593bedb2aa828874e9c8b155a89f5b096f19`.
+No unresolved factual, navigation, coverage, or ASD-STE100 Issue 9 findings remain within issue 114.
+The main check and installed npm/pnpm example checks passed.
+Issue 114 is accepted. Public functional-installation and release/tag checks remain pending until publication.
 
 This change adds no rendered-behavior claim or integration-source change.
 Browser and RSC evidence from [issue 113](documentation-113.md#checks) applies to the unchanged examples.
