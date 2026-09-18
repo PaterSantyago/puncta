@@ -64,11 +64,12 @@ This slice adds no new mounted behavior claim and does not repeat browser or RSC
 A different agent reviewed revision `247844bb8beaaebdb797450783fd9214aa5b3646` against the implementation base.
 The factual, coverage, navigation, and scope review had no findings.
 The standards review found three P2 language groups: ordinary wording, verbal -ing constructions, and passive voice with a known actor.
-The author applied the requested corrections. A different agent must still check those corrections.
+The author applied the requested corrections.
+A different agent checked revision `6748be3002d04b154f327d61e3ea73e5499bcbd3` and found no unresolved issue.
 
 The author checked prose against the official ASD-STE100 Issue 9 rules and dictionary.
 Exact identifiers, code, and literal examples keep their spelling.
-No project dictionary applies. The final language correction check is pending.
+No project dictionary applies. The separate factual and language review is complete.
 
 Package README links point to the documentation branch. Local target pages and anchors passed verification.
 The coordinator checked 20 remote documentation URLs. All returned HTTP 200.
