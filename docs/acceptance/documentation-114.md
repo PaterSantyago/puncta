@@ -32,29 +32,50 @@ Messages, `parserCode`, and reason values are not diagnostic codes.
 
 ## Checks
 
-Focused workspace and SSR type checks passed.
-Local built public entrypoints gave the displayed output for all three new programs.
-The installed npm/pnpm checks and main project check are pending.
-The installed harness will extract and compile the displayed programs, then compare their output.
-There are 49 displayed programs and eight unchanged integration excerpts.
+The main `pnpm check` passed with exit code 0.
+It checked candidate `ba87d365b3b8f2279b2942d02215f767e6fb853e` and the prose corrections made during the run.
+Correction commit `796a5c90abeea5d5d5daab31722facad170a2dc7` changes no executable source or displayed code/output block.
+The final documentation and format checks also passed after those corrections.
 
-Negative checks passed for a new source code missing from the inventory, an error missing from its catalog, and a warning missing from the inventory.
+Both npm and pnpm consumers compiled and executed all 49 displayed programs.
+The installed harness extracted the displayed source and compared the output.
+The eight integration excerpts and their canonical source files are unchanged.
+Checks used Node 24.21.0, pnpm 12.4.1, TypeScript 7.0.2, and React/React DOM 19.3.0.
+The matching functional archives have manifest version `0.1.0-alpha.0`.
+They are not the public scaffold.
+
+| Command or check                    | Result                                                                                                                                                                              |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm typecheck`                    | Pass: workspace and SSR consumer                                                                                                                                                    |
+| Local displayed diagnostic programs | Pass: all three new programs against built public entrypoints                                                                                                                       |
+| `pnpm docs:check`                   | Pass: 31 pages, 428 local links/anchors, 49 displayed programs, eight integration excerpts, two expected pending coverage groups                                                    |
+| `pnpm check`                        | Pass: lint, format, documentation, types, build, archives, 286 functional tests, three release tests, six publication simulations, installed npm/pnpm consumers, release validation |
+| Negative omission checks            | Pass: new source code, missing error row, missing warning inventory entry                                                                                                           |
+| Correction fence comparison         | Pass: all code/output fences unchanged from the candidate                                                                                                                           |
+
 The negative-check script restored the files after each probe.
 The final documentation check passed after these probes.
+The coordinator checked all 30 package documentation branch URLs. All returned HTTP 200.
 
 Session evidence is in `/tmp/puncta-docs-coordination/`:
 
+- `114-check.log` and `114-check-exit.txt`: main project check and exit code 0.
 - `114-types.log`: focused workspace and SSR types.
 - `114-local-examples.log`: displayed diagnostic programs against local built public entrypoints.
 - `114-negative.log`: code omission probes and restored documentation check.
-- `114-check.log`: main project check, pending.
+- `114-corrections-docs.log`, `114-corrections-format.log`, and `114-corrections-fences.log`: focused correction checks.
+- `114-remote-links.json`: package documentation URL results.
 
 ## Review and limits
 
 The author used the official ASD-STE100 Issue 9 rules and dictionary and the corrections from reviews 109–113.
 Code, API identifiers, literals, and technical terms keep their specified forms.
 No project dictionary applies.
-A separate factual and language review is pending.
+A separate factual and language review checked the candidate and the correction commit.
+It found a Markdown table error, an incomplete `covering` mapping definition, and six language correction groups.
+The author corrected all findings. The reviewer confirmed that the content has no unresolved findings.
+The review record is `/tmp/puncta-docs-coordination/review-114.md`.
+Review of the final evidence revision is pending coordinator confirmation.
 
 This change adds no rendered-behavior claim or integration-source change.
 Browser and RSC evidence from [issue 113](documentation-113.md#checks) applies to the unchanged examples.
@@ -62,4 +83,4 @@ These separate checks are not part of `pnpm check`.
 
 The functional release is unpublished.
 Public installation and release/tag validation are pending until publication.
-Remote branch URLs need a check after the coordinator pushes the candidate.
+No package publication or release/tag change is part of this issue.
