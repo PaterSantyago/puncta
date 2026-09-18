@@ -1,0 +1,204 @@
+{
+  "checkedAt": "2026-09-18T16:33:37.574Z",
+  "node": "v24.21.0",
+  "npm": "11.19.0",
+  "pnpm": "12.4.1",
+  "registry": "https://registry.npmjs.org",
+  "releaseCommit": "932ab23b959c92eef435cca7fb55a08ec12d93bc",
+  "policy": "Fresh projects; no minimumReleaseAge exception or lockfile; exact documented versions.",
+  "installationPageSha256": "6296035b91877bbb46375630a885708e7b1a87cac983ca9fbf3d8a5c4484f582",
+  "results": [
+    {
+      "command": "npm install --save-exact @use-puncta/core@0.1.0-alpha.1 @use-puncta/with-en-gb@0.1.0-alpha.1",
+      "example": "first-result",
+      "origin": "displayed installation command",
+      "installed": {
+        "@use-puncta/core": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        },
+        "@use-puncta/with-en-gb": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        }
+      },
+      "exampleFile": "README.md",
+      "sourceSha256": "18fa816fdb9b836c2cc1a2e08312f1916df93b7d105271da4d6dd45d60db51e7",
+      "expected": "Wait…\n",
+      "actual": "Wait…\n",
+      "status": "passed"
+    },
+    {
+      "command": "pnpm add --save-exact @use-puncta/core@0.1.0-alpha.1 @use-puncta/with-en-gb@0.1.0-alpha.1",
+      "example": "first-result",
+      "origin": "displayed installation command",
+      "installed": {
+        "@use-puncta/core": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        },
+        "@use-puncta/with-en-gb": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        }
+      },
+      "exampleFile": "README.md",
+      "sourceSha256": "18fa816fdb9b836c2cc1a2e08312f1916df93b7d105271da4d6dd45d60db51e7",
+      "expected": "Wait…\n",
+      "actual": "Wait…\n",
+      "status": "passed"
+    },
+    {
+      "command": "npm install --save-exact @use-puncta/core@0.1.0-alpha.1 @use-puncta/with-en-gb@0.1.0-alpha.1 @use-puncta/with-react@0.1.0-alpha.1 react@19.3.0 react-dom@19.3.0",
+      "example": "package-react",
+      "origin": "displayed installation command",
+      "installed": {
+        "@use-puncta/core": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        },
+        "@use-puncta/with-en-gb": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        },
+        "@use-puncta/with-react": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        },
+        "react": {
+          "requested": "19.3.0",
+          "resolved": "19.3.0"
+        },
+        "react-dom": {
+          "requested": "19.3.0",
+          "resolved": "19.3.0"
+        }
+      },
+      "exampleFile": "packages/with-react/README.md",
+      "sourceSha256": "3957717bb3233b14fc64cff7c692d98c0799ec8cd6facb9d2f6ee1270c359df1",
+      "expected": "Wait…\n",
+      "actual": "Wait…\n",
+      "status": "passed"
+    },
+    {
+      "command": "pnpm add --save-exact @use-puncta/core@0.1.0-alpha.1 @use-puncta/with-en-gb@0.1.0-alpha.1 @use-puncta/with-react@0.1.0-alpha.1 react@19.3.0 react-dom@19.3.0",
+      "example": "package-react",
+      "origin": "displayed installation command",
+      "installed": {
+        "@use-puncta/core": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        },
+        "@use-puncta/with-en-gb": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        },
+        "@use-puncta/with-react": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        },
+        "react": {
+          "requested": "19.3.0",
+          "resolved": "19.3.0"
+        },
+        "react-dom": {
+          "requested": "19.3.0",
+          "resolved": "19.3.0"
+        }
+      },
+      "exampleFile": "packages/with-react/README.md",
+      "sourceSha256": "3957717bb3233b14fc64cff7c692d98c0799ec8cd6facb9d2f6ee1270c359df1",
+      "expected": "Wait…\n",
+      "actual": "Wait…\n",
+      "status": "passed"
+    },
+    {
+      "command": "npm install --save-exact @use-puncta/core@0.1.0-alpha.1 @use-puncta/with-es-es@0.1.0-alpha.1",
+      "example": "package-with-es-es",
+      "origin": "documented Spanish substitution",
+      "installed": {
+        "@use-puncta/core": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        },
+        "@use-puncta/with-es-es": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        }
+      },
+      "exampleFile": "packages/with-es-es/README.md",
+      "sourceSha256": "e778cba1b803b1af7a01da10024c6b9a54c3bb6432314fdf419d927957f9e4ad",
+      "expected": "Wait…\n",
+      "actual": "Wait…\n",
+      "status": "passed"
+    },
+    {
+      "command": "npm install --save-exact @use-puncta/core@0.1.0-alpha.1 @use-puncta/with-en-gb@0.1.0-alpha.1 @use-puncta/with-es-es@0.1.0-alpha.1",
+      "example": "first-result",
+      "origin": "documented both-locales extension",
+      "installed": {
+        "@use-puncta/core": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        },
+        "@use-puncta/with-en-gb": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        },
+        "@use-puncta/with-es-es": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        }
+      },
+      "exampleFile": "README.md",
+      "sourceSha256": "18fa816fdb9b836c2cc1a2e08312f1916df93b7d105271da4d6dd45d60db51e7",
+      "expected": "Wait…\n",
+      "actual": "Wait…\n",
+      "status": "passed"
+    },
+    {
+      "command": "pnpm add --save-exact @use-puncta/core@0.1.0-alpha.1 @use-puncta/with-es-es@0.1.0-alpha.1",
+      "example": "package-with-es-es",
+      "origin": "documented Spanish substitution",
+      "installed": {
+        "@use-puncta/core": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        },
+        "@use-puncta/with-es-es": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        }
+      },
+      "exampleFile": "packages/with-es-es/README.md",
+      "sourceSha256": "e778cba1b803b1af7a01da10024c6b9a54c3bb6432314fdf419d927957f9e4ad",
+      "expected": "Wait…\n",
+      "actual": "Wait…\n",
+      "status": "passed"
+    },
+    {
+      "command": "pnpm add --save-exact @use-puncta/core@0.1.0-alpha.1 @use-puncta/with-en-gb@0.1.0-alpha.1 @use-puncta/with-es-es@0.1.0-alpha.1",
+      "example": "first-result",
+      "origin": "documented both-locales extension",
+      "installed": {
+        "@use-puncta/core": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        },
+        "@use-puncta/with-en-gb": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        },
+        "@use-puncta/with-es-es": {
+          "requested": "0.1.0-alpha.1",
+          "resolved": "0.1.0-alpha.1"
+        }
+      },
+      "exampleFile": "README.md",
+      "sourceSha256": "18fa816fdb9b836c2cc1a2e08312f1916df93b7d105271da4d6dd45d60db51e7",
+      "expected": "Wait…\n",
+      "actual": "Wait…\n",
+      "status": "passed"
+    }
+  ]
+}

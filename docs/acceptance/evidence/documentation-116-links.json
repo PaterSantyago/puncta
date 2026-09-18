@@ -1,0 +1,438 @@
+{
+  "checkedAt": "2026-09-18T16:35:55.099744+00:00",
+  "scope": "Current reader pages and package entries; historical acceptance reports excluded. GitHub fragment targets additionally checked from the referenced Git object.",
+  "results": [
+    {
+      "url": "https://github.com/nvm-sh/nvm",
+      "sources": ["CONTRIBUTING.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/nvm-sh/nvm",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/main/docs/getting-started/installation.md",
+      "sources": [
+        "packages/core/README.md",
+        "packages/with-react/README.md",
+        "packages/with-es-es/README.md",
+        "packages/with-en-gb/README.md"
+      ],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/main/docs/getting-started/installation.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/getting-started/text-and-html.md",
+      "sources": ["packages/core/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/getting-started/text-and-html.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/README.md",
+      "sources": ["packages/core/README.md", "docs/compatibility.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/README.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/guides/configuration.md",
+      "sources": ["packages/core/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/guides/configuration.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/reference/core.md",
+      "sources": ["packages/core/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/reference/core.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/reference/settings.md",
+      "sources": ["packages/core/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/reference/settings.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/reference/locales-and-rules.md",
+      "sources": ["packages/core/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/reference/locales-and-rules.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/guides/html.md",
+      "sources": ["packages/core/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/guides/html.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/guides/protection.md",
+      "sources": ["packages/core/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/guides/protection.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/guides/hyphenation.md",
+      "sources": ["packages/core/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/guides/hyphenation.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/reference/diagnostics.md",
+      "sources": ["packages/core/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/reference/diagnostics.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/troubleshooting.md",
+      "sources": ["packages/core/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/troubleshooting.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/guides/configuration.md#enable-digit-grouping",
+      "sources": ["packages/core/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/guides/configuration.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/reference/locales-and-rules.md#digit-grouping",
+      "sources": ["packages/core/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/reference/locales-and-rules.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/guides/html.md#group-digits-across-inline-elements",
+      "sources": ["packages/core/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/guides/html.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/reference/diagnostics.md#digit-grouping",
+      "sources": ["packages/core/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/reference/diagnostics.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/main/docs/compatibility.md",
+      "sources": ["packages/core/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/main/docs/compatibility.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/getting-started/react.md",
+      "sources": ["packages/with-react/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/getting-started/react.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/react.md",
+      "sources": ["packages/with-react/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/react.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/reference/react.md",
+      "sources": ["packages/with-react/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/reference/react.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/hyphenation.md#remove-shy-from-react",
+      "sources": ["packages/with-react/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/hyphenation.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/reference/react.md#stripsofthyphensreact",
+      "sources": ["packages/with-react/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/reference/react.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/server-rendering.md",
+      "sources": ["packages/with-react/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/server-rendering.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/compatibility.md#server-environments",
+      "sources": ["packages/with-react/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/compatibility.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/examples/rsc/README.md",
+      "sources": ["packages/with-react/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/examples/rsc/README.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/configuration.md#enable-digit-grouping",
+      "sources": ["packages/with-react/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/configuration.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/reference/locales-and-rules.md#digit-grouping",
+      "sources": ["packages/with-react/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/reference/locales-and-rules.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/reference/settings.md#digit-grouping",
+      "sources": ["packages/with-react/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/reference/settings.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/react.md#group-digits-in-react",
+      "sources": [
+        "packages/with-react/README.md",
+        "packages/with-react/README.md"
+      ],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/react.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/react.md#preserve-state-during-updates",
+      "sources": ["packages/with-react/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/react.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/getting-started/text-and-html.md",
+      "sources": ["packages/with-es-es/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/getting-started/text-and-html.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/README.md",
+      "sources": ["packages/with-es-es/README.md", "docs/compatibility.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/README.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/guides/configuration.md",
+      "sources": ["packages/with-es-es/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/guides/configuration.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/reference/core.md",
+      "sources": ["packages/with-es-es/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/reference/core.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/reference/settings.md",
+      "sources": ["packages/with-es-es/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/reference/settings.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/reference/locales-and-rules.md",
+      "sources": ["packages/with-es-es/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/reference/locales-and-rules.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/guides/hyphenation.md",
+      "sources": ["packages/with-es-es/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/guides/hyphenation.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/reference/locales-and-rules.md#hyphenation",
+      "sources": ["packages/with-es-es/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/reference/locales-and-rules.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/reference/settings.md#hyphenation",
+      "sources": ["packages/with-es-es/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/reference/settings.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/reference/locales-and-rules.md#digit-grouping",
+      "sources": ["packages/with-es-es/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/reference/locales-and-rules.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/getting-started/text-and-html.md",
+      "sources": ["packages/with-en-gb/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/getting-started/text-and-html.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/README.md",
+      "sources": ["packages/with-en-gb/README.md", "docs/compatibility.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/README.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/guides/configuration.md",
+      "sources": ["packages/with-en-gb/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/guides/configuration.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/reference/core.md",
+      "sources": ["packages/with-en-gb/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/reference/core.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/reference/settings.md",
+      "sources": ["packages/with-en-gb/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/reference/settings.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/reference/locales-and-rules.md",
+      "sources": ["packages/with-en-gb/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/reference/locales-and-rules.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/guides/hyphenation.md",
+      "sources": ["packages/with-en-gb/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/guides/hyphenation.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/reference/locales-and-rules.md#hyphenation",
+      "sources": ["packages/with-en-gb/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/reference/locales-and-rules.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/reference/settings.md#hyphenation",
+      "sources": ["packages/with-en-gb/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/reference/settings.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/reference/locales-and-rules.md#digit-grouping",
+      "sources": ["packages/with-en-gb/README.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/reference/locales-and-rules.md",
+      "status": "passed",
+      "anchorVerified": true
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/README.md",
+      "sources": ["docs/compatibility.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/README.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/actions/runs/35367122861",
+      "sources": ["docs/compatibility.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/actions/runs/35367122861",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.0/packages/core/README.md",
+      "sources": ["docs/compatibility.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.0/packages/core/README.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.0/packages/with-react/README.md",
+      "sources": ["docs/compatibility.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.0/packages/with-react/README.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.0/packages/with-en-gb/README.md",
+      "sources": ["docs/compatibility.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.0/packages/with-en-gb/README.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.0/packages/with-es-es/README.md",
+      "sources": ["docs/compatibility.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.0/packages/with-es-es/README.md",
+      "status": "passed"
+    },
+    {
+      "url": "https://github.com/PaterSantyago/puncta/issues/13",
+      "sources": ["docs/compatibility.md"],
+      "httpStatus": 200,
+      "finalUrl": "https://github.com/PaterSantyago/puncta/issues/13",
+      "status": "passed"
+    }
+  ]
+}

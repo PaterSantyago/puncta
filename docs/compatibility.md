@@ -6,29 +6,37 @@ This page separates declared requirements from checked environments.
 
 ## Release status
 
-| Version                   | Status                                                                   |
-| ------------------------- | ------------------------------------------------------------------------ |
-| Public `0.1.0-alpha.0`    | Historical scaffold. It does not have the functional API in this guide.  |
-| Functional candidate      | Unreleased. Source baseline: `83b8c7acd5d6cfbe33c47f87c4c26f050628415f`. |
-| Functional public release | Versions, release tags, and public installation checks are pending.      |
+| Version         | Status                                                                           |
+| --------------- | -------------------------------------------------------------------------------- |
+| `0.1.0-alpha.1` | Published functional alpha for all four packages. Public npm/pnpm checks passed. |
+| `0.1.0-alpha.0` | Historical scaffold. It does not have the functional API in this guide.          |
 
-The functional documentation follows the current guide. Use the corresponding
-Git tag for earlier documentation. The historical scaffold is described in
-[the first alpha publication record](https://github.com/PaterSantyago/puncta/issues/13).
-The historical package tags all identify scaffold commit `01362421c190d80719932e5a878fdc99762bbd70`:
+The functional release tags identify commit `932ab23b959c92eef435cca7fb55a08ec12d93bc`:
+
+- [Core release documentation](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/README.md).
+- [React release documentation](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/README.md).
+- [British English release documentation](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.1/docs/README.md).
+- [Spanish release documentation](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.1/docs/README.md).
+
+The [successful publication run](https://github.com/PaterSantyago/puncta/actions/runs/35367122861)
+and [public-installation report](acceptance/documentation-116.md) record the checks.
+At publication, `next` selects `0.1.0-alpha.1` and `latest` selects `0.1.0-alpha.0`.
+Use the exact versions in the [current installation instructions](getting-started/installation.md).
+
+The immutable release snapshots and README files inside the published archives
+keep their original pre-publication notices and installation placeholders.
+Their API examples match `alpha.1`. This current guide corrects the notices and
+commands; it does not replace published archives or move release tags.
+
+For historical scaffold documentation, use these tags at commit
+`01362421c190d80719932e5a878fdc99762bbd70`:
 
 - [Core scaffold README](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.0/packages/core/README.md).
 - [React scaffold README](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.0/packages/with-react/README.md).
 - [British English scaffold README](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.0/packages/with-en-gb/README.md).
 - [Spanish scaffold README](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.0/packages/with-es-es/README.md).
 
-These pages describe the earlier scaffold, not the functional API.
-Functional release tag links are pending until those tags exist.
-
-The unreleased archives can carry the same manifest version as the old scaffold.
-A matching version string alone does not prove that an archive has the functional
-API. The isolated installation check exercises that API and prevents fallback to
-public scaffold packages.
+See [the scaffold publication record](https://github.com/PaterSantyago/puncta/issues/13).
 
 ## Requirements
 
@@ -41,8 +49,8 @@ public scaffold packages.
 
 | Checked environment    | Evidence or limit                                                                                                                                                 |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Node 24 consumer       | Existing isolated npm/pnpm package checks.                                                                                                                        |
-| Documentation examples | Matching local archives. See the [acceptance report](acceptance/documentation-115.md) for the exact environment and results.                                      |
+| Node 24 consumer       | Public npm/pnpm installation checks for `0.1.0-alpha.1`.                                                                                                          |
+| Documentation examples | Published packages. See the [public-installation report](acceptance/documentation-116.md) for the environment and results.                                        |
 | Browser, SSR, and RSC  | Historical reports are in the [first-version acceptance record](acceptance/first-version.md). See the current [server evidence](acceptance/documentation-113.md). |
 
 Repository tool versions are Node 24.21.0 and pnpm 12.4.1. These pins do not define
