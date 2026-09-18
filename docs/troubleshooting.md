@@ -141,3 +141,27 @@ When exact digits are necessary, supply a string or exact bigint.
 An exponential numeric representation is excluded.
 A transformed string supplied as new input has its own explicit separators.
 To recompute a React result without grouping, keep the original children as input.
+
+## No soft hyphens or no line breaks
+
+Set `hyphenation.enabled: true` and select a loaded locale.
+Check the [minima](reference/settings.md#hyphenation), [word admission](reference/locales-and-rules.md#hyphenation), and protection boundaries.
+Existing SHY prevents more insertion in that word.
+Use a detailed call to check unsupported-character, mixed-script, or Spanish `tl` warnings.
+An unchanged word without a warning can be an expected exclusion or omission.
+
+Check the result for U+00AD before you change layout settings.
+SHY marks an opportunity. Fonts, width, CSS, and the rendering environment control the line breaks.
+Use the [checked insertion examples](guides/hyphenation.md#enable-insertion) to compare text output.
+
+For resource errors, use matching functional core and locale packages.
+The public scaffold is not the functional package set.
+For an invalid minimum after a locale change, [reset the inherited field](reference/settings.md#locale-dependent-validation).
+
+## Soft hyphens remain after removal
+
+Use the removal operation for the input format.
+HTML requires `format: "html"`. React requires the pure removal function and an explicit instance.
+Check protected text, automatic technical tokens, attributes, disabled scopes, unavailable languages, and opaque React components.
+These regions keep SHY. A child cannot cancel inherited protection.
+See [separate removal examples](guides/hyphenation.md#remove-shy-from-text).

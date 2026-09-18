@@ -133,10 +133,41 @@ Detailed coordinate walkthroughs and the full diagnostic catalog are pending.
 
 ## stripSoftHyphensReact
 
-This pure export removes accessible U+00AD without typography processing.
-It uses `ReactTransformOptions` and the same ordinary/detailed/boolean overload forms as `transformReact`.
-The SHY-removal guide and full operation-specific reference are pending in the hyphenation documentation slice.
-Current removal details are in the [package instructions](../../packages/with-react/README.md#soft-hyphen-removal).
+Import this function from `@use-puncta/with-react/pure`.
+Call it synchronously with a `ReactNode` and `ReactTransformOptions`, including an explicit instance.
+It removes accessible U+00AD without typography or digit grouping.
+It does not read Context, install a Provider, or mutate the input tree.
+
+```ts
+function stripSoftHyphensReact(
+  children: ReactNode,
+  options: ReactTransformOptions & { detailed: true },
+): ReactResult;
+function stripSoftHyphensReact(
+  children: ReactNode,
+  options: ReactTransformOptions & { detailed?: false },
+): ReactNode;
+function stripSoftHyphensReact(
+  children: ReactNode,
+  options: ReactTransformOptions,
+): ReactNode | ReactResult;
+```
+
+`detailed` defaults to `false`. A boolean variable gives `ReactNode | ReactResult`.
+All [ReactTransformOptions fields and validation](#reacttransformoptions) apply.
+`format`, `mode`, `context`, `protect`, and a nested `options` field are invalid.
+Missing or invalid instances throw `instance.missing`.
+Invalid call settings throw the applicable core configuration error.
+
+No insertion resource is necessary, even when `hyphenation.enabled` is true.
+Removal still validates settings, locale minima, and visited nested scopes.
+Shared `enabled: false` prevents removal. `hyphenation.enabled: false` does not.
+Attributes, opaque content, protected hosts, disabled scopes, and unavailable-language regions keep SHY.
+The function does not render custom components or inspect their output.
+
+`ReactResult` contains `hyphenation.remove` deletion edits in original source coordinates.
+There is no `outputChanged` field.
+See the [checked React removal program](../guides/hyphenation.md#remove-shy-from-react).
 
 ## Check configuration failures
 

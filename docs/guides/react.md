@@ -247,7 +247,8 @@ Puncta does not inspect protected descendants to keep those bridges.
 
 See the [React API](../reference/react.md), [protection guide](protection.md), and
 [browser acceptance procedure](../../tests/browser/README.md).
-Server rendering and SHY removal guides are pending.
+Use the [SHY removal guide](hyphenation.md#remove-shy-from-react) for export.
+The server rendering guide is pending.
 
 ## Group digits in React
 

@@ -20,7 +20,9 @@
     "docs/reference/react.md",
     "docs/acceptance/documentation-110.md",
     "docs/reference/diagnostics.md",
-    "docs/acceptance/documentation-111.md"
+    "docs/acceptance/documentation-111.md",
+    "docs/guides/hyphenation.md",
+    "docs/acceptance/documentation-112.md"
   ],
   "examples": [
     {
@@ -281,6 +283,71 @@
       "id": "grouping-positions",
       "file": "docs/reference/diagnostics.md",
       "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "hyphenation-insert",
+      "file": "docs/guides/hyphenation.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-es-es"
+      ]
+    },
+    {
+      "id": "hyphenation-exclusions",
+      "file": "docs/guides/hyphenation.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-es-es"
+      ]
+    },
+    {
+      "id": "hyphenation-trees",
+      "file": "docs/guides/hyphenation.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-es-es",
+        "@use-puncta/with-react"
+      ]
+    },
+    {
+      "id": "hyphenation-remove-text",
+      "file": "docs/guides/hyphenation.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-es-es"
+      ]
+    },
+    {
+      "id": "hyphenation-remove-html",
+      "file": "docs/guides/hyphenation.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-es-es"
+      ]
+    },
+    {
+      "id": "hyphenation-remove-react",
+      "file": "docs/guides/hyphenation.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-es-es",
+        "@use-puncta/with-react"
+      ]
+    },
+    {
+      "id": "hyphenation-removal-types",
+      "file": "docs/reference/core.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-react"
+      ]
     }
   ],
   "coverage": [
@@ -409,9 +476,25 @@
     },
     {
       "id": "hyphenation",
-      "status": "pending",
+      "status": "covered",
       "issue": 112,
-      "scope": "Insertion and text/HTML/React removal, minima, resources and language evidence."
+      "scope": "Insertion and text/HTML/React removal, minima, resources and language evidence.",
+      "pages": [
+        "docs/guides/hyphenation.md",
+        "docs/reference/settings.md",
+        "docs/reference/core.md",
+        "docs/reference/react.md",
+        "docs/reference/locales-and-rules.md"
+      ],
+      "examples": [
+        "hyphenation-insert",
+        "hyphenation-exclusions",
+        "hyphenation-trees",
+        "hyphenation-remove-text",
+        "hyphenation-remove-html",
+        "hyphenation-remove-react",
+        "hyphenation-removal-types"
+      ]
     },
     {
       "id": "server-rendering",
@@ -523,7 +606,7 @@
       "file": "packages/with-react/src/pure.ts",
       "name": "stripSoftHyphensReact",
       "sha256": "f084c079873c64fa17885e99723f35d78d431600f845aefc46892d9f0b0ad609",
-      "status": "pending",
+      "status": "covered",
       "issue": 112,
       "target": "docs/reference/react.md#stripsofthyphensreact"
     },
@@ -531,7 +614,7 @@
       "file": "packages/with-react/src/pure.ts",
       "name": "stripSoftHyphensReact",
       "sha256": "c747ebec807a0deaf99d508451bb556dcb41ff11fb4817f94326a9c659958679",
-      "status": "pending",
+      "status": "covered",
       "issue": 112,
       "target": "docs/reference/react.md#stripsofthyphensreact"
     },
@@ -539,7 +622,7 @@
       "file": "packages/with-react/src/pure.ts",
       "name": "stripSoftHyphensReact",
       "sha256": "b211fddf020b979bb1636c905494f1a217ad80986db55ad2e79a304017f6dca9",
-      "status": "pending",
+      "status": "covered",
       "issue": 112,
       "target": "docs/reference/react.md#stripsofthyphensreact"
     },
@@ -547,7 +630,7 @@
       "file": "packages/with-react/src/pure.ts",
       "name": "stripSoftHyphensReact",
       "sha256": "5ed614a5f943e8af3e80302dff4f9309a89b1ebe4da724d2ddca2cd8fee54d12",
-      "status": "pending",
+      "status": "covered",
       "issue": 112,
       "target": "docs/reference/react.md#stripsofthyphensreact"
     },
@@ -587,8 +670,8 @@
       "file": "packages/core/src/types.ts",
       "name": "HyphenationOptions",
       "sha256": "ff92969e4cead319ac78cbca83c3a50a8295e1978a0182eed396171ed51c9396",
-      "target": "docs/reference/settings.md#locale-dependent-validation",
-      "status": "partial",
+      "target": "docs/reference/settings.md#hyphenation",
+      "status": "covered",
       "issue": 112
     },
     {
@@ -627,24 +710,24 @@
       "file": "packages/core/src/types.ts",
       "name": "StripTextOptions",
       "sha256": "e212bc0c7dd5b29b36005dc61aa7605ae15760c8805f922e932414b79bd815b3",
-      "target": "docs/reference/core.md#public-type-index",
-      "status": "pending",
+      "target": "docs/reference/core.md#stripsofthyphens",
+      "status": "covered",
       "issue": 112
     },
     {
       "file": "packages/core/src/types.ts",
       "name": "StripHtmlOptions",
       "sha256": "a660daec42648d48cad1b0b64e3f40d99ee929d703992d859d414594aa7bbb5c",
-      "target": "docs/reference/core.md#public-type-index",
-      "status": "pending",
+      "target": "docs/reference/core.md#stripsofthyphens",
+      "status": "covered",
       "issue": 112
     },
     {
       "file": "packages/core/src/types.ts",
       "name": "StripSoftHyphensOptions",
       "sha256": "f0d0ac3b7bec52226cc3e10f4d805f801ff41e0bd69547d4f0ac932fad50483a",
-      "target": "docs/reference/core.md#public-type-index",
-      "status": "pending",
+      "target": "docs/reference/core.md#stripsofthyphens",
+      "status": "covered",
       "issue": 112
     },
     {
@@ -740,7 +823,7 @@
       "name": "PunctaInstance",
       "sha256": "f1841187123e27f3f1b9468ce50365cc5d9274d71b025b52180231a95469f69d",
       "target": "docs/reference/core.md#instance-methods",
-      "status": "partial",
+      "status": "covered",
       "issue": 112
     },
     {
@@ -811,8 +894,8 @@
       "file": "packages/core/src/settings.ts",
       "name": "hyphenationDefaults",
       "sha256": "4a6f49f338023aa91c7c6c1847c3ef056ae90b9957a7022090e5e3af5b3d1b47",
-      "target": "docs/reference/settings.md#locale-dependent-validation",
-      "status": "partial",
+      "target": "docs/reference/settings.md#hyphenation",
+      "status": "covered",
       "issue": 112
     },
     {

@@ -47,8 +47,7 @@ These sections contain reference material until the separate reference pages are
 complete. Its migration and full documentation review are pending.
 
 Shared settings and all eleven rule groups now have canonical definitions
-in the references above. The material below covers pending diagnostics and
-hyphenation slices.
+in the references above. The material below covers the pending diagnostics slice.
 
 HTML and protection have their own guides:
 
@@ -61,41 +60,9 @@ tree, with comments and elements inserted by the parser. Entity/CRLF decoding
 and astral characters retain UTF-16 provenance. Unmappable parser repairs report
 `accuracy: "unavailable"` with a reason.
 
-`stripSoftHyphens(source, options?)` removes author and previously inserted U+00AD
-without typography. `format` defaults to `"text"`; explicit `"html"` uses the same
-fragment/document modes and context options as `html()`. Text accepts `protect`; HTML accepts
-`mode`/`context`; options from the other format are rejected. Shared options and
-`detailed` work as usual, with `hyphenation.remove` deletions in original UTF-16
-coordinates. Protection, attributes, disabled and unavailable-language regions
-retain SHY. Disabling insertion does not disable removal.
-
-Removal validates settings and language minima without needing an insertion
-resource, including nested scopes.
-
-Algorithmic SHY insertion is available with either installed locale and
-`hyphenation: { enabled: true }`. It runs after typography while retaining
-original source coordinates. Transparent leaves share word admission and seam
-insertions belong to the left leaf. Missing or incompatible resources produce
-`hyphenation.resource-unavailable` or `hyphenation.resource-incompatible` before
-a result is returned. Separate SHY removal needs no insertion resource.
-
-Hyphenation admits lowercase or initial-capital words of at least six letters.
-English admits a–z; Spanish also admits á, é, í, ó, ú, ü and ñ, including
-unambiguously equivalent decomposed graphemes. The minimum left part is two
-letters; the minimum right part is three in en-gb and two in es-es. These minima
-can be raised. ALL CAPS, mixed case, digits, apostrophes, hyphens and existing SHY
-cause whole-word skips. Unsupported graphemes and mixed scripts preserve the
-word with diagnostics; Spanish words containing `tl` are skipped with
-`hyphenation.language-ambiguity`. No English pronunciation detector is promised.
-Opaque/protected/scope edges conservatively skip adjoining word fragments.
-
-Partial example: use the `puncta` instance from the Start example above.
-
-```ts
-const hyphenated = puncta.with({ hyphenation: { enabled: true } });
-hyphenated.text("backbone"); // "back\u00adbone"
-hyphenated.stripSoftHyphens("back\u00adbone"); // "backbone"
-```
+Use the [hyphenation guide](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/hyphenation.md) for insertion and text, HTML, or React removal.
+The [core removal reference](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/core.md#stripsofthyphens) defines all format options and overloads.
+The [locale reference](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#hyphenation) defines word admission and language limits.
 
 These are selected editorial profiles: en-gb follows an Oxford-style quotation
 choice; es-es follows the agreed RAE-oriented profile. They do not exhaust valid

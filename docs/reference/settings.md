@@ -4,27 +4,26 @@
 
 This page defines shared settings and all eleven typography rule groups.
 The [configuration guide](../guides/configuration.md) shows complete examples.
-The hyphenation guide is pending.
-Their current details remain in the [core package instructions](../../packages/core/README.md).
+See the [hyphenation guide](../guides/hyphenation.md) for insertion and removal examples.
 
 ## Configuration surfaces
 
-| Surface                     | Accepted settings                                              | Limits                                                      |
-| --------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------- |
-| `createPuncta`              | `locales`, plus all `PunctaOptions` fields                     | `locales` and `locale` required                             |
-| `instance.with`             | `PunctaOptions`                                                | Cannot change `locales`                                     |
-| `instance.text`             | `TextOptions`: shared fields, `protect`, `detailed`            | String input, protection applies only to this call          |
-| `instance.html`             | `HtmlOptions`: shared fields, `mode`, `context`, `detailed`    | No `protect`                                                |
-| `instance.stripSoftHyphens` | `StripSoftHyphensOptions`: text or HTML options, plus `format` | Format selects valid options. See pending removal reference |
-| React pure calls            | `instance`, shared fields, `detailed`                          | No `protect`, `mode`, `context`, or `format`                |
-| React components            | `locale`, `enabled`, `options: { rules, hyphenation }`         | Root instance required, no `detailed`                       |
-| HTML markers                | `data-puncta`, `data-puncta-locale`, `data-puncta-options`     | JSON options accept only `rules` and `hyphenation`          |
+| Surface                     | Accepted settings                                              | Limits                                                                          |
+| --------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `createPuncta`              | `locales`, plus all `PunctaOptions` fields                     | `locales` and `locale` required                                                 |
+| `instance.with`             | `PunctaOptions`                                                | Cannot change `locales`                                                         |
+| `instance.text`             | `TextOptions`: shared fields, `protect`, `detailed`            | String input, protection applies only to this call                              |
+| `instance.html`             | `HtmlOptions`: shared fields, `mode`, `context`, `detailed`    | No `protect`                                                                    |
+| `instance.stripSoftHyphens` | `StripSoftHyphensOptions`: text or HTML options, plus `format` | Format selects valid options. See [removal reference](core.md#stripsofthyphens) |
+| React pure calls            | `instance`, shared fields, `detailed`                          | No `protect`, `mode`, `context`, or `format`                                    |
+| React components            | `locale`, `enabled`, `options: { rules, hyphenation }`         | Root instance required, no `detailed`                                           |
+| HTML markers                | `data-puncta`, `data-puncta-locale`, `data-puncta-options`     | JSON options accept only `rules` and `hyphenation`                              |
 
 `locales` is a readonly array of imported `Locale` modules.
 It defines the registry at creation. A call cannot add a locale.
 See [locale exports](locales-and-rules.md#locale-exports).
 See [text/HTML parameters](core.md#format-parameters) and [HTML procedures](../guides/html.md).
-React and removal procedures stay in their pending slices.
+See [React procedures](../guides/react.md) and [SHY removal](../guides/hyphenation.md#remove-shy-from-text).
 
 ## Shared fields
 
@@ -99,17 +98,39 @@ These rules apply at creation, in variants, in calls, and in active nested scope
 Later caller mutations cannot change the settings in an instance.
 See the [checked examples](../guides/configuration.md).
 
-## Locale-dependent validation
+## Hyphenation
 
-`HyphenationOptions` has optional readonly nullable fields:
-`enabled: boolean`, `minWordLength: number`, `minLeft: number`, and `minRight: number`.
-The default is `{ enabled: false, minWordLength: 6, minLeft: 2, minRight: 3 }` in en-gb.
-In es-es, `minRight` defaults to `2`.
-Minima must be integers at least as large as the current locale default.
+`HyphenationOptions` has four optional readonly fields.
+Each field accepts its listed type or `null`.
+
+| Field           | Type      | en-gb default | es-es default | Allowed values                               |
+| --------------- | --------- | ------------- | ------------- | -------------------------------------------- |
+| `enabled`       | `boolean` | `false`       | `false`       | `true` or `false`                            |
+| `minWordLength` | `number`  | `6`           | `6`           | Integer at least 6                           |
+| `minLeft`       | `number`  | `2`           | `2`           | Integer at least 2                           |
+| `minRight`      | `number`  | `3`           | `2`           | Integer at least the selected locale default |
+
+Minima count letters as graphemes, not UTF-16 units.
+They limit word length and the letters on each side of an insertion position.
+Higher minima can remove all opportunities. They do not add a position or enable insertion.
+Fractions, `NaN`, infinity, lower values, and non-number minima are invalid.
+Unknown fields, arrays, and non-object groups other than `null` are invalid.
+
+Use `hyphenation` in shared instance/call options, component `options`, or `data-puncta-options` JSON.
+An omitted field or `undefined` inherits. A field set to `null` resets to the current locale default.
+`hyphenation: null` resets all fields, including `enabled` to `false`.
+An empty object keeps inherited fields. See [merge rules](#inheritance-and-reset).
+
+Insertion requires the selected locale's compatible resource when `hyphenation.enabled` is true.
+Resource validation also applies when shared `enabled` is false.
+Removal bypasses insertion resource validation but still validates settings and minima, including nested scopes.
+The [hyphenation guide](../guides/hyphenation.md#resources-and-validation) describes resource failures and removal.
+
+## Locale-dependent validation
 
 A locale change revalidates explicit inherited minima, even when insertion is off.
 Reset an invalid inherited minimum before the locale change, or in the same override.
-The hyphenation slice will explain insertion resources and word limits.
+See [word admission](locales-and-rules.md#hyphenation) for language and case limits.
 
 <!-- puncta:example settings-validation -->
 

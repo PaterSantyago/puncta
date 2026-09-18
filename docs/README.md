@@ -23,7 +23,9 @@ For React, follow the [React quick start](getting-started/react.md).
 
 - [Process React children and nested scopes](guides/react.md).
 
-The server rendering and hyphenation guides are pending.
+- [Insert and remove soft hyphens](guides/hyphenation.md).
+
+The server rendering guide is pending.
 Existing details remain in the [core package instructions](../packages/core/README.md)
 and [React package instructions](../packages/with-react/README.md).
 
@@ -37,7 +39,7 @@ and [React package instructions](../packages/with-react/README.md).
 
 The [grouping diagnostics](reference/diagnostics.md#digit-grouping) are available.
 The full diagnostic catalog is pending.
-Core format-specific and diagnostic definitions remain partly pending.
+Some diagnostic definitions remain pending.
 
 ## Solve a problem
 

@@ -5,7 +5,7 @@
 Import public values and types from `@use-puncta/core`.
 All operations are synchronous. Core operates without React or a browser DOM.
 This page covers instance configuration, text/HTML parameters, and return overloads.
-Detailed source coordinates and SHY removal have pending slices.
+Full source-coordinate definitions remain in the pending diagnostics slice.
 
 ## Runtime exports
 
@@ -262,9 +262,138 @@ Full location definitions are pending in the diagnostics slice.
 
 ### stripSoftHyphens
 
-This method removes U+00AD independently of typography.
-Its format-specific overloads and complete behavior belong to the pending hyphenation slice.
-See [existing removal instructions](../../packages/core/README.md).
+Call `instance.stripSoftHyphens(source, options?)` synchronously with a string.
+It removes accessible U+00AD without typography or digit grouping.
+`format` defaults to `"text"`. The method returns a string unless `detailed` is true.
+These declarations show all six overloads:
+
+```ts
+stripSoftHyphens(source: string, options: StripHtmlOptions & { detailed: true }): HtmlResult;
+stripSoftHyphens(source: string, options: StripTextOptions & { detailed: true }): TextResult;
+stripSoftHyphens(source: string, options?: StripSoftHyphensOptions & { detailed?: false }): string;
+stripSoftHyphens(source: string, options: StripHtmlOptions): string | HtmlResult;
+stripSoftHyphens(source: string, options: StripTextOptions): string | TextResult;
+stripSoftHyphens(source: string, options: StripSoftHyphensOptions): string | TextResult | HtmlResult;
+```
+
+A boolean `detailed` value gives the format-specific union.
+If the options type permits both formats, the return type also permits both report types.
+The options types have these fields:
+
+| Type                      | Fields and defaults                                                                                                               |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `StripTextOptions`        | All `TextOptions` fields plus optional readonly `format: "text"`. Accepts `protect` and `detailed`. Rejects `mode` and `context`. |
+| `StripHtmlOptions`        | All `HtmlOptions` fields plus required readonly `format: "html"`. Accepts `mode`, `context`, and `detailed`. Rejects `protect`.   |
+| `StripSoftHyphensOptions` | Union of the two types above. `format` selects the applicable type.                                                               |
+
+Both formats inherit shared settings from the instance.
+See [format parameters](#format-parameters) for mode, context, protection, and detailed defaults and validation.
+A missing options object means `{}`. An object set to `null`, unknown fields, and invalid format values are invalid.
+Settings and locale minima validation apply even when removal is disabled.
+Invalid options throw `PunctaConfigError` with `config.invalid-option` or the applicable locale/protection code.
+
+Removal needs no insertion resource and does not depend on `hyphenation.enabled`.
+Shared `enabled: false` prevents removal.
+Protected text, technical tokens, HTML attributes, disabled scopes, and unavailable-language regions keep SHY.
+The HTML parser and serializer still operate.
+See [text and HTML removal examples](../guides/hyphenation.md#remove-shy-from-text).
+
+Reports use `hyphenation.remove` deletion edits with original UTF-16 ranges.
+`hasEdits` includes these deletions. `outputChanged` compares the result with the input string.
+HTML serialization can change the output without a removal edit.
+Insertion through `text()` or `html()` instead uses `hyphenation.insert` edits after typography.
+An insertion at a transparent leaf boundary belongs to the left leaf.
+
+### Check removal types and validation
+
+This full program checks ordinary, detailed, and boolean result forms through public declarations.
+It also checks invalid format options and minima with removal disabled.
+
+<!-- puncta:example hyphenation-removal-types -->
+
+```ts
+import {
+  createPuncta,
+  PunctaConfigError,
+  type TextResult,
+  type HtmlResult,
+  type StripTextOptions,
+  type StripHtmlOptions,
+  type StripSoftHyphensOptions,
+} from "@use-puncta/core";
+import { enGb } from "@use-puncta/with-en-gb";
+import {
+  stripSoftHyphensReact,
+  type ReactResult,
+} from "@use-puncta/with-react/pure";
+import type { ReactNode } from "react";
+
+const instance = createPuncta({ locales: [enGb], locale: enGb.id });
+const source = "back\u00adbone";
+const ordinary: string = instance.stripSoftHyphens(source);
+const text: TextResult = instance.stripSoftHyphens(source, { detailed: true });
+const html: HtmlResult = instance.stripSoftHyphens(source, {
+  format: "html",
+  detailed: true,
+});
+const detailed: boolean = source.length > 0;
+const textOptions: StripTextOptions = { detailed };
+const htmlOptions: StripHtmlOptions = { format: "html", detailed };
+const options: StripSoftHyphensOptions = detailed ? textOptions : htmlOptions;
+const textUnion: string | TextResult = instance.stripSoftHyphens(
+  source,
+  textOptions,
+);
+const htmlUnion: string | HtmlResult = instance.stripSoftHyphens(
+  source,
+  htmlOptions,
+);
+const union: string | TextResult | HtmlResult = instance.stripSoftHyphens(
+  source,
+  options,
+);
+const node: ReactNode = stripSoftHyphensReact(source, { instance });
+const react: ReactResult = stripSoftHyphensReact(source, {
+  instance,
+  detailed: true,
+});
+const reactUnion: ReactNode | ReactResult = stripSoftHyphensReact(source, {
+  instance,
+  detailed,
+});
+console.log(ordinary, text.result, html.result, node, react.result);
+console.log(
+  typeof textUnion,
+  typeof htmlUnion,
+  typeof union,
+  typeof reactUnion,
+);
+for (const invalid of [
+  { format: "xml" },
+  { format: "text", mode: "document" },
+  { format: "html", protect: [] },
+  { enabled: false, hyphenation: { enabled: false, minRight: 2 } },
+]) {
+  try {
+    instance.stripSoftHyphens(source, invalid as StripSoftHyphensOptions);
+    throw new Error("Expected a configuration error");
+  } catch (error) {
+    if (!(error instanceof PunctaConfigError)) throw error;
+    console.log(error.code, error.optionPath.join("."));
+  }
+}
+```
+
+<!-- puncta:output hyphenation-removal-types -->
+
+```text
+backbone backbone backbone backbone backbone
+object object object object
+config.invalid-option format
+config.invalid-option mode
+config.invalid-option protect
+config.invalid-option hyphenation.minRight
+```
 
 ## Public type index
 
@@ -276,11 +405,11 @@ A pending definition is not complete coverage.
 | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `LocaleId`, `Locale`                                              | [Locale exports](locales-and-rules.md#locale-exports)                                                                                         |
 | `PunctaOptions`                                                   | [Shared fields](settings.md#shared-fields)                                                                                                    |
-| `RuleOptions`, `RulesOptions`                                     | [Rule fields](settings.md#rule-fields-and-defaults), grouping details pending                                                                 |
-| `HyphenationOptions`                                              | [Locale validation](settings.md#locale-dependent-validation), insertion details pending                                                       |
-| `PunctaInstance`                                                  | [Creation](#createpuncta) and [methods](#instance-methods), removal overloads pending                                                         |
+| `RuleOptions`, `RulesOptions`                                     | [Rule fields](settings.md#rule-fields-and-defaults)                                                                                           |
+| `HyphenationOptions`                                              | [Hyphenation settings](settings.md#hyphenation)                                                                                               |
+| `PunctaInstance`                                                  | [Creation](#createpuncta) and [methods](#instance-methods)                                                                                    |
 | `TextOptions`, `HtmlOptions`                                      | [Format parameters](#format-parameters)                                                                                                       |
-| `StripTextOptions`, `StripHtmlOptions`, `StripSoftHyphensOptions` | Pending removal slice, [source declaration](../../packages/core/src/types.ts)                                                                 |
+| `StripTextOptions`, `StripHtmlOptions`, `StripSoftHyphensOptions` | [Removal options](#stripsofthyphens)                                                                                                          |
 | `ProtectedRange`                                                  | [Original-source range](#protectedrange)                                                                                                      |
 | `RuleId`                                                          | Rule identifier union: ten [standard groups](locales-and-rules.md#rule-examples), `digitGrouping`, `hyphenation.insert`, `hyphenation.remove` |
 | `TextResult`, `HtmlResult`                                        | [Reports](#reports), detailed coordinates pending                                                                                             |

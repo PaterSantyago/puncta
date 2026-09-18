@@ -51,13 +51,8 @@ At release, the links must point to the matching release.
 
 ## Soft-hyphen removal
 
-The hyphenation slice will move this section to its canonical guide and reference.
-
-`stripSoftHyphensReact(children, { instance, ...options })` from `/pure` removes
-all accessible U+00AD without typography processing. It uses the same options and
-ordinary/detailed result forms as `transformReact`. It rejects `format`, `mode`, `context`, and `protect`.
-Protection, unavailable language, disabled scopes, attributes, and opaque content keep SHY.
-Removal operates without an insertion resource. Options and language minima are still validated.
+Use the [React removal example](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/hyphenation.md#remove-shy-from-react)
+and [pure removal reference](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/react.md#stripsofthyphensreact).
 
 ## Server integration
 

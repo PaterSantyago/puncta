@@ -30,7 +30,7 @@ See [installation](../getting-started/installation.md) and
 
 All ten groups below are on by default in both locales.
 Optional [digit grouping](#digit-grouping) is off.
-Hyphenation insertion and removal are different operations. Their guide is pending.
+Hyphenation insertion and removal are different operations. See the [hyphenation guide](../guides/hyphenation.md).
 
 This complete example runs the same input through both locales.
 The output has columns for the group, en-gb, and es-es.
@@ -472,3 +472,32 @@ With grouping enabled, repeated group spaces, tabs, and line breaks keep their s
 Space cleanup keeps malformed candidate spelling and normalized groups.
 With grouping disabled, ordinary spacing rules apply.
 See [grouping diagnostics](diagnostics.md#digit-grouping) for checked warnings and source positions.
+
+## Hyphenation
+
+Hyphenation is opt-in for both locales. See [settings and minima](settings.md#hyphenation).
+Each locale includes an immutable Liang pattern resource with a conservative Puncta refinement and no whole-word exception table.
+The locale package's `hyphenation-manifest.json` identifies the resource and refinement.
+Its `NOTICE.md` identifies upstream sources and licenses.
+
+| Locale  | Supported letters and case                                           |
+| ------- | -------------------------------------------------------------------- |
+| `en-gb` | Latin a–z, lowercase or one initial capital                          |
+| `es-es` | Latin a–z plus á, é, í, ó, ú, ü, ñ, lowercase or one initial capital |
+
+Spanish permits equivalent decomposed graphemes without a change to their source spelling.
+All capitals, mixed case, digits, apostrophes, ordinary hyphens, and existing SHY cause whole-word exclusion.
+Unsupported graphemes and mixed scripts keep the word unchanged and can produce detailed warnings.
+Protected text produces no insertion warnings.
+Opaque, protected, and scope boundaries prevent insertion in adjacent incomplete words.
+
+Spanish words with `tl` stay unchanged with `hyphenation.language-ambiguity`.
+Regional pronunciation differences make the division ambiguous.
+Puncta has no English pronunciation detector.
+The algorithm can omit permitted positions. Evidence from a fixed corpus does not establish accuracy for all words.
+
+The [English corpus record](../acceptance/en-gb-hyphenation-corpus.md) and [Spanish corpus record](../acceptance/es-es-hyphenation-corpus.md) document language evidence selected before engine comparison.
+English `back|bone` follows compound construction and pronunciation.
+Spanish `ca|mi|no` follows the RAE syllable-division rules.
+The [checked programs](../guides/hyphenation.md#enable-insertion) show these results and excluded forms.
+A permitted position does not require a rendered line break.

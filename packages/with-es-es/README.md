@@ -46,21 +46,9 @@ Release-specific URLs are pending. These links point to the documentation branch
 These sections contain reference material until the separate reference pages are
 complete. Its migration and full documentation review are pending.
 
-Core is a peer dependency. The locale includes a static Spanish Liang resource;
-opt in with `hyphenation: { enabled: true }` to obtain `ca\u00admi\u00adno` from
-`camino`. Defaults are six letters and two letters on each side. Only lowercase
-and one initial capital are admitted, using a–z, á/é/í/ó/ú/ü/ñ. Decomposed accents
-are supported without changing their original spelling.
-
-Whole words containing `tl` are conservatively skipped with
-`hyphenation.language-ambiguity` in detailed mode. Existing SHY, protection,
-unsupported alphabets and expected skip policies remain authoritative. Results
-are computed synchronously and do not promise perfect division of arbitrary
-text or control actual rendered line breaks.
-
-`hyphenation-manifest.json` identifies the fixed input, baseline and versioned
-Puncta refinement. `NOTICE.md` contains the full upstream attribution and licence.
-No whole-word exception table is included.
+Use the [hyphenation guide](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/hyphenation.md) for insertion and removal.
+See [locale admission and evidence](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#hyphenation) and [minima and resets](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md#hyphenation).
+`NOTICE.md` contains upstream attribution and licenses.
 
 MIT licensed. Public publication is separate work.
 

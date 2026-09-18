@@ -46,22 +46,9 @@ Release-specific URLs are pending. These links point to the documentation branch
 These sections contain reference material until the separate reference pages are
 complete. Its migration and full documentation review are pending.
 
-Enable algorithmic soft hyphens explicitly with
-`puncta.with({ hyphenation: { enabled: true } })`. The default minimum word length
-is 6, with at least 2 letters before and 3 after each position; these minima can
-be raised. The alphabet is a–z, with lowercase or one initial capital. Existing
-SHY, digits, apostrophes, real hyphens, other case forms and protected text prevent
-automatic insertion in the complete word. Unsupported characters and mixed
-scripts are preserved with warnings only in detailed results.
-
-The packaged immutable resource uses Liang patterns without whole-word
-exceptions. Its conservative refinement can omit valid positions; no universal
-linguistic accuracy or pronunciation inference is claimed. Ordinary words span
-transparent leaves; an opaque or locale boundary conservatively prevents
-insertion in an adjoining partial word. Each new SHY is an original-coordinate
-`hyphenation.insert` edit. Reprocessing does not add more SHY. Use
-`stripSoftHyphens` for a separate clean export. See `NOTICE.md` for code/data
-attribution.
+Use the [hyphenation guide](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/hyphenation.md) for insertion and removal.
+See [locale admission and evidence](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#hyphenation) and [minima and resets](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md#hyphenation).
+`NOTICE.md` contains upstream attribution and licenses.
 
 MIT licensed. Public publication is separate work.
 
