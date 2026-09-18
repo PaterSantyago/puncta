@@ -1,5 +1,13 @@
 # @use-puncta/core
 
+## 0.1.0-alpha.1
+
+### Patch Changes
+
+- Implement the first synchronous ellipsis slice across text, HTML and React (#39)
+
+- Avoid repeated full-text scans during typography while preserving output and diagnostics
+
 ## 0.1.0-alpha.0
 
 ### Minor Changes

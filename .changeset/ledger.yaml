@@ -2,15 +2,32 @@
   dir: packages/core
   intents:
     - vast-dodos-give
+"@use-puncta/core@0.1.0-alpha.1":
+  dir: packages/core
+  intents:
+    - giant-dragons-teach
+    - loud-dogs-hug
 "@use-puncta/with-en-gb@0.1.0-alpha.0":
   dir: packages/with-en-gb
   intents:
     - vast-dodos-give
+"@use-puncta/with-en-gb@0.1.0-alpha.1":
+  dir: packages/with-en-gb
+  intents:
+    - giant-dragons-teach
 "@use-puncta/with-es-es@0.1.0-alpha.0":
   dir: packages/with-es-es
   intents:
     - vast-dodos-give
+"@use-puncta/with-es-es@0.1.0-alpha.1":
+  dir: packages/with-es-es
+  intents:
+    - giant-dragons-teach
 "@use-puncta/with-react@0.1.0-alpha.0":
   dir: packages/with-react
   intents:
     - vast-dodos-give
+"@use-puncta/with-react@0.1.0-alpha.1":
+  dir: packages/with-react
+  intents:
+    - giant-dragons-teach
