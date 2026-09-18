@@ -54,7 +54,7 @@ The full run used the existing installed consumers for the final example and dec
 No library test or duplicate example runner was added to the repository.
 An independent review of revision `71dd89aec7b17043b88dd8a5290117bcad583c51` found no factual, navigation, or coverage defects.
 The review found two groups of language issues.
-The corrections below await an independent recheck.
+The final factual and language recheck passed.
 
 ## Language and limits
 
@@ -83,4 +83,8 @@ Public functional installation and release-specific URLs are still pending until
 Focused documentation and formatting checks passed after these prose corrections.
 The author did not run the full suite again.
 The full-suite result above applies to the unchanged examples and library source.
-The final independent factual and language recheck is pending.
+
+A different agent checked factual accuracy, navigation, coverage, and ASD-STE100 Issue 9
+at revision `89e34c94c841b028620e42c638a1db7b86321faf` against implementation base
+`8ae05007a58a04ab1af78c948f2b87f62453bea8`. All findings are resolved.
+The reviewer confirmed that the displayed code and expected outputs are unchanged.
