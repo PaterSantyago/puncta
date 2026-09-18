@@ -41,51 +41,27 @@ Release-specific URLs are pending. These links point to the documentation branch
 - [Settings and defaults](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md).
 - [Locale rules](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md).
 
-## Existing reference material
-
-These sections contain reference material until the separate reference pages are
-complete. Its migration and full documentation review are pending.
-
-Shared settings and all eleven rule groups now have canonical definitions
-in the references above. The material below covers the pending diagnostics slice.
-
-HTML and protection have their own guides:
-
-- [HTML modes, scopes, inline context, and serialization](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/html.md).
-- [Text ranges, technical tokens, and protected markup](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/protection.md).
-- [Format parameters and validation](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/core.md#format-parameters).
-
-Detailed source-coordinate definitions are pending. Source paths index the parsed
-tree, with comments and elements inserted by the parser. Entity/CRLF decoding
-and astral characters retain UTF-16 provenance. Unmappable parser repairs report
-`accuracy: "unavailable"` with a reason.
-
-Use the [hyphenation guide](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/hyphenation.md) for insertion and text, HTML, or React removal.
-The [core removal reference](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/core.md#stripsofthyphens) gives all format options and overloads.
-The [locale reference](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#hyphenation) gives word admission and language limits.
-
-These are selected editorial profiles: en-gb follows an Oxford-style quotation
-choice; es-es follows the agreed RAE-oriented profile. They do not exhaust valid
-editorial conventions. Frozen linguistic examples establish bounded evidence,
-not universal accuracy; optional valid hyphenation positions can be omitted.
-Actual line breaks depend on fonts, width, CSS and the rendering environment.
-Puncta inserts opportunities rather than laying out text. HTML is not sanitized.
-
-The repository's `docs/acceptance/first-version.md` records exact tested versions,
-all acceptance commands, corpus/resource identities and measured sizes/timings.
-Unsupported call options are rejected.
-
-MIT licensed, with ISC kernel attribution and Unicode data licensing in `NOTICE.md`.
-The API remains experimental; public publication is separate work.
+- [HTML modes, scopes, and serialization](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/html.md).
+- [Text and markup protection](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/protection.md).
+- [Soft-hyphen insertion and removal](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/hyphenation.md).
+- [Reports, errors, warnings, and source coordinates](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/diagnostics.md).
+- [Troubleshooting](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/troubleshooting.md).
 
 ## Opt-in digit grouping
 
 Use the [grouping guide](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/configuration.md#enable-digit-grouping)
-and [notation, bonds, ranges, and exclusions](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#digit-grouping).
-The [settings reference](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md#digit-grouping)
-defines defaults, validation, inheritance, and reset.
+and [notation and exclusions](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#digit-grouping).
 
 ### Grouping in nested scopes and source reports
 
 See [HTML scope boundaries](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/html.md#group-digits-across-inline-elements)
 and [grouping diagnostics and source positions](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/diagnostics.md#digit-grouping).
+
+## Limits and licensing
+
+The [compatibility page](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/compatibility.md) gives release status and tested environments.
+HTML is not sanitized. SHY marks a line-break opportunity, not a rendered line break.
+The selected locale profiles do not include all valid editorial conventions.
+
+MIT licensed, with ISC kernel attribution and Unicode data licensing in `NOTICE.md`.
+The API is experimental. Public publication is separate work.

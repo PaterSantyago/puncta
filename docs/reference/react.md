@@ -112,24 +112,9 @@ Pure calls do not inspect protected declarative content.
 
 ## ReactResult
 
-`ReactResult` extends `Omit<TextResult, "result" | "outputChanged">`.
-All fields are readonly.
-
-| Field          | Type                       | Meaning                                                        |
-| -------------- | -------------------------- | -------------------------------------------------------------- |
-| `result`       | `ReactNode`                | Transformed input tree. Render this field for a detailed call. |
-| `hasEdits`     | `boolean`                  | `true` if typography edits occurred.                           |
-| `sources`      | `readonly Source[]`        | Original accessible source leaves.                             |
-| `edits`        | `readonly Edit[]`          | Typography edits with original source ranges.                  |
-| `appliedRules` | `readonly AppliedRule[]`   | Applied rule IDs and locale IDs.                               |
-| `warnings`     | `readonly PunctaWarning[]` | Rule and markup warnings.                                      |
-
-There is no `outputChanged` field. React reports do not compare serialized HTML.
-Paths address the original input tree, not the DOM.
-They use numeric array indices, `"children"` transitions, and `"fallback"` transitions.
-Ranges use original UTF-16 offsets in their source leaves.
-See the [core public type index](core.md#public-type-index) for shared types.
-Detailed coordinate walkthroughs and the full diagnostic catalog are pending.
+`ReactResult` extends `Omit<TextResult, "result" | "outputChanged">` with `result: ReactNode`.
+See the canonical [result fields](diagnostics.md#result-types) and [React path example](diagnostics.md#read-react-paths).
+There is no `outputChanged` field. Paths address the original input tree, not the DOM.
 
 ## stripSoftHyphensReact
 

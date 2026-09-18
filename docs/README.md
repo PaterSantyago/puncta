@@ -35,14 +35,12 @@ For React, follow the [React quick start](getting-started/react.md).
 
 - [React components, pure functions, and public types](reference/react.md).
 
-The [grouping diagnostics](reference/diagnostics.md#digit-grouping) are available.
-The full diagnostic catalog is pending.
-Some diagnostic definitions are pending.
+Use [diagnostics](reference/diagnostics.md) for report fields, codes, and source positions.
 
 ## Solve a problem
 
 Use [troubleshooting](troubleshooting.md) for installation, settings, locale changes,
-and unchanged text. Other symptom procedures are pending.
+and unchanged text. Use the diagnostic codes to find the relevant remedy.
 
 ## Contribute
 

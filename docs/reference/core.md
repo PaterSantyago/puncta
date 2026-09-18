@@ -5,7 +5,7 @@
 Import public values and types from `@use-puncta/core`.
 All operations are synchronous. Core operates without React or a browser DOM.
 This page covers instance configuration, text/HTML parameters, and return overloads.
-Full source-coordinate definitions are part of the pending diagnostics slice.
+See [diagnostics](diagnostics.md) for report fields and original source coordinates.
 
 ## Runtime exports
 
@@ -61,7 +61,7 @@ Defaults are `{}` for `details`, `[]` for `optionPath`, and
 
 For `config.invalid-option`, `details.reason` is `required`, `type`, `value`, or `unknown`.
 See the [checked error example](settings.md#locale-dependent-validation).
-The complete code and location catalogue is pending in the diagnostics slice.
+See the [error catalogue](diagnostics.md#errors) and [location union](diagnostics.md#configlocation).
 
 ## Instance methods
 
@@ -258,7 +258,7 @@ markup.invalid-config []
 The first range splits the emoji's surrogate pair.
 A range in a decomposed letter/accent grapheme also fails.
 The API and marker errors identify different configuration locations.
-Full location definitions are pending in the diagnostics slice.
+See [location definitions](diagnostics.md#configlocation).
 
 ### stripSoftHyphens
 
@@ -399,7 +399,7 @@ config.invalid-option hyphenation.minRight
 
 All types below are named type exports from `@use-puncta/core`.
 The inventory compares this index with the source exports.
-A pending definition is not complete coverage.
+Shared report types have one home in [diagnostics](diagnostics.md#result-types).
 
 | Type                                                              | Definition and status                                                                                                                         |
 | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -412,20 +412,12 @@ A pending definition is not complete coverage.
 | `StripTextOptions`, `StripHtmlOptions`, `StripSoftHyphensOptions` | [Removal options](#stripsofthyphens)                                                                                                          |
 | `ProtectedRange`                                                  | [Original-source range](#protectedrange)                                                                                                      |
 | `RuleId`                                                          | Rule identifier union: ten [standard groups](locales-and-rules.md#rule-examples), `digitGrouping`, `hyphenation.insert`, `hyphenation.remove` |
-| `TextResult`, `HtmlResult`                                        | [Reports](#reports), detailed coordinates pending                                                                                             |
-| `Source`, `InputRange`, `TextRange`, `HtmlRange`                  | Pending diagnostics slice, [source declaration](../../packages/core/src/types.ts)                                                             |
-| `Edit`, `AppliedRule`, `ConfigLocation`, `PunctaWarning`          | Pending diagnostics slice, [source declaration](../../packages/core/src/types.ts)                                                             |
+| `TextResult`, `HtmlResult`                                        | [Result types](diagnostics.md#result-types)                                                                                                   |
+| `Source`, `InputRange`, `TextRange`, `HtmlRange`                  | [Source and ranges](diagnostics.md#source-and-ranges)                                                                                         |
+| `Edit`, `AppliedRule`, `ConfigLocation`, `PunctaWarning`          | [Edits](diagnostics.md#edit-and-appliedrule), [locations](diagnostics.md#configlocation), and [warnings](diagnostics.md#punctawarning)        |
 
 ## Reports
 
-`TextResult` contains readonly `result: string`, `hasEdits: boolean`, and `outputChanged: boolean`.
-It also contains readonly arrays: `edits: Edit[]`, `sources: Source[]`,
-`appliedRules: AppliedRule[]`, and `warnings: PunctaWarning[]`.
-`HtmlResult` has the same fields, with `Edit<HtmlRange>[]` for `edits`.
-
-`hasEdits` means that typography changed source text.
-`outputChanged` compares the complete output string with the input.
-HTML serialization can change output without typography edits.
-
-Warnings can occur again when the text does not change.
-The diagnostics slice will define report fields and coordinates in full.
+Use `detailed: true` for a report instead of a string.
+The [result reference](diagnostics.md#result-types) gives all `TextResult` and `HtmlResult` fields.
+See [worked error and warning output](diagnostics.md#read-an-error-and-a-warning) and [multi-leaf HTML edits](diagnostics.md#read-an-edit-across-leaves).

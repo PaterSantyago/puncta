@@ -2,14 +2,21 @@
 
 [Documentation index](README.md)
 
-This page covers installation, settings, HTML, protection, and all eleven rule groups.
-Hyphenation and the full diagnostic procedures are pending.
+Select the symptom below. Use the [diagnostic catalogue](reference/diagnostics.md) for codes, fields, and source positions.
 
 ## The API is missing
 
 Public `0.1.0-alpha.0` is the historical scaffold, without the functional API.
 Check the [release status](compatibility.md#release-status) and
 [installation contract](getting-started/installation.md).
+
+## Packages do not agree
+
+Check that core, the adapter, and locale packages come from the same compatible functional release.
+The manifest version alone does not distinguish local functional archives from the public scaffold.
+An adapter archive can resolve an incompatible public core package.
+Install the full matching set from the [installation contract](getting-started/installation.md).
+Use the [release status](compatibility.md#release-status) before you select a version.
 
 ## Text does not change
 
@@ -41,6 +48,7 @@ For `locale.unavailable`, load the module at creation. Then select its ID.
 For `locale.duplicate`, remove the duplicate registry entry.
 For `locale.incompatible`, use the matching supported package export.
 
+For other codes, use the [error catalogue](reference/diagnostics.md#errors).
 For `config.invalid-option`, check the [valid surfaces and values](reference/settings.md).
 Wrong types, unknown fields, and whole-object null resets are invalid.
 
@@ -55,7 +63,7 @@ An unresolved quote or ambiguous interval can produce a warning on each call.
 `hasEdits: false` does not mean that `warnings` is empty.
 Correct the source when its intended role is clear.
 See [unchanged and ambiguous input](reference/locales-and-rules.md#unchanged-and-ambiguous-input).
-The complete diagnostic catalogue is pending.
+Use the [warning catalogue](reference/diagnostics.md#warnings) to identify the rule and remedy.
 
 ## HTML output has unexpected markup
 

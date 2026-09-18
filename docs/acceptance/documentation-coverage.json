@@ -24,7 +24,8 @@
     "docs/guides/hyphenation.md",
     "docs/acceptance/documentation-112.md",
     "docs/guides/server-rendering.md",
-    "docs/acceptance/documentation-113.md"
+    "docs/acceptance/documentation-113.md",
+    "docs/acceptance/documentation-114.md"
   ],
   "examples": [
     {
@@ -359,6 +360,25 @@
         "@use-puncta/with-react",
         "@use-puncta/with-en-gb"
       ]
+    },
+    {
+      "id": "diagnostics-error-warning",
+      "file": "docs/reference/diagnostics.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "diagnostics-html",
+      "file": "docs/reference/diagnostics.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "diagnostics-react",
+      "file": "docs/reference/diagnostics.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-react"
+      ]
     }
   ],
   "coverage": [
@@ -527,9 +547,17 @@
     },
     {
       "id": "diagnostics",
-      "status": "pending",
+      "status": "covered",
       "issue": 114,
-      "scope": "Complete error/warning catalogue, result/source/edit/range types, source comparison, troubleshooting."
+      "scope": "Complete error/warning catalogue, result/source/edit/range types, source comparison, troubleshooting.",
+      "pages": ["docs/reference/diagnostics.md", "docs/troubleshooting.md"],
+      "examples": [
+        "diagnostics-error-warning",
+        "diagnostics-html",
+        "diagnostics-react",
+        "grouping-warnings",
+        "grouping-positions"
+      ]
     },
     {
       "id": "complete-acceptance",
@@ -590,8 +618,8 @@
       "name": "ReactResult",
       "sha256": "b1bd680ba3e16c9ccfea8be90aac170e4069468594d81721da5c841f52ae628f",
       "status": "covered",
-      "issue": 110,
-      "target": "docs/reference/react.md#reactresult"
+      "issue": 114,
+      "target": "docs/reference/diagnostics.md#result-types"
     },
     {
       "file": "packages/with-react/src/pure.ts",
@@ -758,87 +786,87 @@
       "name": "RuleId",
       "sha256": "55da21772e1079c85f5bcc6757d6a588629692aecdbecbee41bb7f92c300568c",
       "target": "docs/reference/core.md#public-type-index",
-      "status": "partial",
+      "status": "covered",
       "issue": 114
     },
     {
       "file": "packages/core/src/types.ts",
       "name": "Source",
       "sha256": "57c965bf9a6c155417f9f9418851934c621eac50cafa65e2f107ad10c17e1c18",
-      "target": "docs/reference/core.md#public-type-index",
-      "status": "pending",
+      "target": "docs/reference/diagnostics.md#source-and-ranges",
+      "status": "covered",
       "issue": 114
     },
     {
       "file": "packages/core/src/types.ts",
       "name": "InputRange",
       "sha256": "645be8e1cb9e22b906a3d78bad1878eda0e0c5f33c0aa39febc09e26f1f9d735",
-      "target": "docs/reference/core.md#public-type-index",
-      "status": "pending",
+      "target": "docs/reference/diagnostics.md#inputrange",
+      "status": "covered",
       "issue": 114
     },
     {
       "file": "packages/core/src/types.ts",
       "name": "TextRange",
       "sha256": "4a6ce9076eba2d9dc808be7c3e5d43ef5aa269b146756484d06ba38f1b26dcc7",
-      "target": "docs/reference/core.md#public-type-index",
-      "status": "pending",
+      "target": "docs/reference/diagnostics.md#source-and-ranges",
+      "status": "covered",
       "issue": 114
     },
     {
       "file": "packages/core/src/types.ts",
       "name": "HtmlRange",
       "sha256": "f6eb2438af7973f2fdb8ca8243dfd5cfc17f7717f150941a11c6a944c5a5b036",
-      "target": "docs/reference/core.md#public-type-index",
-      "status": "pending",
+      "target": "docs/reference/diagnostics.md#source-and-ranges",
+      "status": "covered",
       "issue": 114
     },
     {
       "file": "packages/core/src/types.ts",
       "name": "Edit",
       "sha256": "83bc7976467d5ec20dc29ee71c8dda7b2c1eab989e47e8d42e9bd9b2c16028e9",
-      "target": "docs/reference/core.md#public-type-index",
-      "status": "pending",
+      "target": "docs/reference/diagnostics.md#edit-and-appliedrule",
+      "status": "covered",
       "issue": 114
     },
     {
       "file": "packages/core/src/types.ts",
       "name": "AppliedRule",
       "sha256": "307b2de468ae854b61e55cc63c6b5279617546c1fac148bf8340caa6212d6395",
-      "target": "docs/reference/core.md#public-type-index",
-      "status": "pending",
+      "target": "docs/reference/diagnostics.md#edit-and-appliedrule",
+      "status": "covered",
       "issue": 114
     },
     {
       "file": "packages/core/src/types.ts",
       "name": "ConfigLocation",
       "sha256": "55383a927732c4d3a6648c2bfb9db3e829b7bdf5be64435f910fac5eb625754f",
-      "target": "docs/reference/core.md#public-type-index",
-      "status": "pending",
+      "target": "docs/reference/diagnostics.md#configlocation",
+      "status": "covered",
       "issue": 114
     },
     {
       "file": "packages/core/src/types.ts",
       "name": "PunctaWarning",
       "sha256": "df725f518ea785276f2defc65798c2272c115b4515175f4f615b44ff63ceee41",
-      "target": "docs/reference/core.md#public-type-index",
-      "status": "pending",
+      "target": "docs/reference/diagnostics.md#punctawarning",
+      "status": "covered",
       "issue": 114
     },
     {
       "file": "packages/core/src/types.ts",
       "name": "TextResult",
       "sha256": "d713932c8d266bafc9df8a2a8d5c2830158a7a3f341c80ad216ab8142f12f668",
-      "target": "docs/reference/core.md#reports",
-      "status": "partial",
+      "target": "docs/reference/diagnostics.md#result-types",
+      "status": "covered",
       "issue": 114
     },
     {
       "file": "packages/core/src/types.ts",
       "name": "HtmlResult",
       "sha256": "7890d5a4a9b15f03c3a57ee2937ce9269c384468c6c13b20cf4d462e8e3a31aa",
-      "target": "docs/reference/core.md#reports",
-      "status": "partial",
+      "target": "docs/reference/diagnostics.md#result-types",
+      "status": "covered",
       "issue": 114
     },
     {
@@ -854,7 +882,7 @@
       "name": "re-export:PunctaConfigError",
       "sha256": "4c705b4f1146d2b152f93a5fcafaab1562a49aba851728bab87d169c5b92b5ce",
       "target": "docs/reference/core.md#punctaconfigerror",
-      "status": "partial",
+      "status": "covered",
       "issue": 114
     },
     {
@@ -878,7 +906,7 @@
       "name": "PunctaConfigError",
       "sha256": "57fd94fc1b206973dbc08d7cf3e3f994c07cf6669c5541672da956eebe8c2a31",
       "target": "docs/reference/core.md#punctaconfigerror",
-      "status": "partial",
+      "status": "covered",
       "issue": 114
     },
     {
@@ -978,6 +1006,133 @@
       "file": "docs/guides/server-rendering.md",
       "source": "tests/browser/hydration-tree.mjs",
       "job": "browser"
+    }
+  ],
+  "diagnostics": [
+    {
+      "code": "config.invalid-option",
+      "files": [
+        "packages/core/src/config.ts",
+        "packages/shared/scopes.ts",
+        "packages/with-react/src/index.tsx"
+      ],
+      "kind": "error",
+      "target": "docs/reference/diagnostics.md#errors"
+    },
+    {
+      "code": "currency.order",
+      "files": [
+        "packages/core/src/number-bonds.ts",
+        "packages/core/src/typography.ts"
+      ],
+      "kind": "warning",
+      "target": "docs/reference/diagnostics.md#warnings"
+    },
+    {
+      "code": "html.parse",
+      "files": ["packages/core/src/html.ts"],
+      "kind": "warning",
+      "target": "docs/reference/diagnostics.md#warnings"
+    },
+    {
+      "code": "hyphenation.language-ambiguity",
+      "files": ["packages/core/src/hyphenation.ts"],
+      "kind": "warning",
+      "target": "docs/reference/diagnostics.md#warnings"
+    },
+    {
+      "code": "hyphenation.mixed-scripts",
+      "files": ["packages/core/src/hyphenation.ts"],
+      "kind": "warning",
+      "target": "docs/reference/diagnostics.md#warnings"
+    },
+    {
+      "code": "hyphenation.resource-incompatible",
+      "files": ["packages/core/src/hyphenation.ts"],
+      "kind": "error",
+      "target": "docs/reference/diagnostics.md#errors"
+    },
+    {
+      "code": "hyphenation.resource-unavailable",
+      "files": ["packages/core/src/hyphenation.ts"],
+      "kind": "error",
+      "target": "docs/reference/diagnostics.md#errors"
+    },
+    {
+      "code": "hyphenation.unsupported-characters",
+      "files": ["packages/core/src/hyphenation.ts"],
+      "kind": "warning",
+      "target": "docs/reference/diagnostics.md#warnings"
+    },
+    {
+      "code": "instance.missing",
+      "files": ["packages/shared/scopes.ts"],
+      "kind": "error",
+      "target": "docs/reference/diagnostics.md#errors"
+    },
+    {
+      "code": "instance.nested",
+      "files": ["packages/with-react/src/index.tsx"],
+      "kind": "error",
+      "target": "docs/reference/diagnostics.md#errors"
+    },
+    {
+      "code": "locale.duplicate",
+      "files": ["packages/core/src/index.ts"],
+      "kind": "error",
+      "target": "docs/reference/diagnostics.md#errors"
+    },
+    {
+      "code": "locale.incompatible",
+      "files": ["packages/core/src/index.ts"],
+      "kind": "error",
+      "target": "docs/reference/diagnostics.md#errors"
+    },
+    {
+      "code": "locale.unavailable",
+      "files": ["packages/core/src/settings.ts", "packages/shared/scopes.ts"],
+      "kind": "error",
+      "target": "docs/reference/diagnostics.md#errors"
+    },
+    {
+      "code": "markup.element-unsupported",
+      "files": ["packages/shared/elements.ts"],
+      "kind": "warning",
+      "target": "docs/reference/diagnostics.md#warnings"
+    },
+    {
+      "code": "markup.invalid-config",
+      "files": ["packages/shared/scopes.ts"],
+      "kind": "error",
+      "target": "docs/reference/diagnostics.md#errors"
+    },
+    {
+      "code": "markup.language-unavailable",
+      "files": ["packages/shared/scopes.ts"],
+      "kind": "warning",
+      "target": "docs/reference/diagnostics.md#warnings"
+    },
+    {
+      "code": "protect.invalid-range",
+      "files": ["packages/core/src/protection.ts"],
+      "kind": "error",
+      "target": "docs/reference/diagnostics.md#errors"
+    },
+    {
+      "code": "quotes.unpaired",
+      "files": ["packages/core/src/quotes.ts"],
+      "kind": "warning",
+      "target": "docs/reference/diagnostics.md#warnings"
+    },
+    {
+      "code": "typography.ambiguous",
+      "files": [
+        "packages/core/src/number-bonds.ts",
+        "packages/core/src/quotes.ts",
+        "packages/core/src/typography.ts"
+      ],
+      "kind": "warning",
+      "target": "docs/reference/diagnostics.md#warnings"
     }
   ]
 }

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readdir, readFile, mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -254,6 +254,46 @@ export async function documentationContracts() {
   return contracts;
 }
 
+// Dotted diagnostic literals are the source convention. Scan every production
+// core/adapter/shared file, not a fixed list of known emitting files or codes.
+// The two dotted rule IDs are operations, not diagnostics. Other additions must
+// receive an explicit inventory review, even if they prove to be non-diagnostics.
+export async function documentationDiagnostics() {
+  const codes = new Map();
+  async function visit(directory) {
+    for (const entry of await readdir(join(root, directory), {
+      withFileTypes: true,
+    })) {
+      const file = `${directory}/${entry.name}`;
+      if (entry.isDirectory()) await visit(file);
+      else if (/\.tsx?$/.test(entry.name)) {
+        const source = await readFile(join(root, file), "utf8");
+        for (const match of source.matchAll(
+          /["']([a-z]+\.[a-z]+(?:-[a-z]+)*)["']/g,
+        )) {
+          const code = match[1];
+          if (["hyphenation.insert", "hyphenation.remove"].includes(code))
+            continue;
+          if (!codes.has(code)) codes.set(code, new Set());
+          codes.get(code).add(file);
+        }
+      }
+    }
+  }
+  for (const directory of [
+    "packages/core/src",
+    "packages/shared",
+    "packages/with-react/src",
+  ])
+    await visit(directory);
+  return [...codes]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([code, files]) => ({
+      code,
+      files: [...files].sort(),
+    }));
+}
+
 export async function checkDocumentation() {
   const inventory = JSON.parse(
     await readFile(join(root, inventoryPath), "utf8"),
@@ -262,6 +302,36 @@ export async function checkDocumentation() {
   for (const name of await readdir(join(root, "packages"))) {
     if ((await readdir(join(root, "packages", name))).includes("README.md"))
       pages.add(`packages/${name}/README.md`);
+  }
+  const diagnostics = await documentationDiagnostics();
+  assert.deepEqual(
+    inventory.diagnostics.map(({ code, files }) => ({ code, files })),
+    diagnostics,
+    "Diagnostic codes/source locations changed: review the catalogue and its named inventory",
+  );
+  for (const diagnostic of inventory.diagnostics) {
+    assert.ok(["error", "warning"].includes(diagnostic.kind));
+    const [file, anchor] = diagnostic.target.split("#");
+    assert.ok(pages.has(file), `${diagnostic.code}: canonical page required`);
+    const markdown = await readFile(join(root, file), "utf8");
+    assert.ok(
+      headings(markdown).has(anchor),
+      `${diagnostic.code}: canonical anchor required`,
+    );
+    const section = markdown
+      .split(`## ${diagnostic.kind === "error" ? "Errors" : "Warnings"}\n`)[1]
+      ?.split("\n## ")[0];
+    assert.ok(
+      section
+        ?.split("\n")
+        .some((row) => row.split("|")[1]?.trim() === `\`${diagnostic.code}\``),
+      `${diagnostic.code}: catalogue row required`,
+    );
+    for (const source of diagnostic.files)
+      assert.ok(
+        markdown.includes(`../../${source})`),
+        `${diagnostic.code}: source link required`,
+      );
   }
   const contracts = await documentationContracts();
   assert.deepEqual(
