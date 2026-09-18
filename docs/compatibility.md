@@ -15,6 +15,14 @@ This page separates declared requirements from checked environments.
 The functional documentation follows the current guide. Use the corresponding
 Git tag for earlier documentation. The historical scaffold is described in
 [the first alpha publication record](https://github.com/PaterSantyago/puncta/issues/13).
+The historical package tags all identify scaffold commit `01362421c190d80719932e5a878fdc99762bbd70`:
+
+- [Core scaffold README](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.0/packages/core/README.md).
+- [React scaffold README](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.0/packages/with-react/README.md).
+- [British English scaffold README](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-en-gb%400.1.0-alpha.0/packages/with-en-gb/README.md).
+- [Spanish scaffold README](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-es-es%400.1.0-alpha.0/packages/with-es-es/README.md).
+
+These pages describe the earlier scaffold, not the functional API.
 Functional release tag links are pending until those tags exist.
 
 The unreleased archives can carry the same manifest version as the old scaffold.
@@ -31,11 +39,11 @@ public scaffold packages.
 | React adapter        | React peer range `^19.3.0`; add core directly if application code imports it. |
 | Node                 | Public package manifests declare no minimum Node version.                     |
 
-| Checked environment    | Evidence or limit                                                                                                                                                  |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Node 24 consumer       | Existing isolated npm/pnpm package checks.                                                                                                                         |
-| Documentation examples | Matching local archives; exact environment and results in the [slice report](acceptance/documentation-107.md).                                                     |
-| Browser, SSR, and RSC  | Existing reports remain in the [first-version acceptance record](acceptance/first-version.md). See the current [server evidence](acceptance/documentation-113.md). |
+| Checked environment    | Evidence or limit                                                                                                                                                 |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node 24 consumer       | Existing isolated npm/pnpm package checks.                                                                                                                        |
+| Documentation examples | Matching local archives; exact environment and results in the [acceptance report](acceptance/documentation-115.md).                                               |
+| Browser, SSR, and RSC  | Historical reports are in the [first-version acceptance record](acceptance/first-version.md). See the current [server evidence](acceptance/documentation-113.md). |
 
 Repository tool versions are Node 24.21.0 and pnpm 12.4.1. These pins do not define
 application runtime requirements. Support for CommonJS and untested environments is not
@@ -48,9 +56,10 @@ Markdown or translate text. HTML parsing is not sanitization. HTML serialization
 can change notation even without typography edits. React processing does not
 inspect the output of a custom component.
 
-The full feature limits and integration environments with test evidence are
-pending until their guide and reference sections are complete. See the
-[coverage record](acceptance/documentation-coverage.json) for pending work.
+See the [HTML limits](guides/html.md#understand-serialization),
+[React boundaries](guides/react.md#understand-child-boundaries), and
+[hyphenation limits](reference/locales-and-rules.md#hyphenation).
+The [acceptance report](acceptance/documentation-115.md) records the candidate checks and review.
 
 ## Server environments
 

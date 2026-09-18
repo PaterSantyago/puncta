@@ -12,9 +12,9 @@ The functional version is **unreleased**. The historical public version,
 moving npm tag as a substitute for the functional release.
 
 The commands below are templates for the functional release. Replace each
-uppercase version field with its actual compatible release version when that
+uppercase version field with its compatible release version when that
 release is available. The fields can have different values. These public
-installation commands remain pending until publication.
+installation commands stay pending until publication.
 
 ## npm
 

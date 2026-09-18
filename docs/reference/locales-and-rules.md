@@ -20,7 +20,7 @@ Use `locale.id`. The functional API does not expose the scaffold field `localeId
 
 The object is immutable and opaque: import it from its package. Do not construct one.
 
-Each module is ready synchronously after import, including its hyphenation resource.
+Each module is ready synchronously after import, with its hyphenation resource.
 No global registration or automatic locale download occurs.
 Core and each required locale must be direct dependencies.
 See [installation](../getting-started/installation.md) and
@@ -32,7 +32,7 @@ All ten groups below are on by default in both locales.
 Optional [digit grouping](#digit-grouping) is off.
 Hyphenation insertion and removal are different operations. See the [hyphenation guide](../guides/hyphenation.md).
 
-This complete example runs the same input through both locales.
+This full example runs the same input through both locales.
 The output has columns for the group, en-gb, and es-es.
 The `visible` function writes each U+00A0 as `\u00a0` so that bonds are explicit.
 Actual results contain NBSP characters, not six-character escape strings.
@@ -107,7 +107,7 @@ Protected text does not supply quote signs.
 
 Punctuation apostrophes become U+2019 `’`.
 Letter apostrophe U+02BC `ʼ` stays unchanged.
-A disabled apostrophe rule still recognizes apostrophe roles inside quotations.
+A disabled apostrophe rule still recognizes apostrophe roles in quotations.
 Puncta does not guess feet/inches or unresolved quote roles.
 
 ### Spaces
@@ -153,7 +153,7 @@ Known case-sensitive units use a U+00A0 NBSP bond with the number.
 Composite units include `km/h` and `m²`.
 The angle degree attaches directly, as in `30°`.
 Temperature units `°C` and `°F` use NBSP.
-Unknown unit suffixes stay unchanged unless `additional` supplies the complete designation.
+Unknown unit suffixes stay unchanged unless `additional` supplies the full designation.
 See [additional units and array replacement](../guides/configuration.md#add-units-and-replace-an-array).
 
 New bonds do not cross line breaks, opaque fragments, or typography scope boundaries.

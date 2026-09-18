@@ -7,7 +7,7 @@ For React examples, also install the adapter, React, and React DOM.
 Each example is a full program. The `visible` helper prints SHY as `\u00ad`.
 The result strings contain U+00AD, not the escape notation.
 
-A soft hyphen (SHY) marks a permitted word-break opportunity inside a word.
+A soft hyphen (SHY) marks a permitted word-break opportunity in a word.
 It is not an ordinary hyphen or an explicit line break.
 Fonts, width, CSS, and the rendering environment control rendered line breaks.
 Puncta does not control layout.

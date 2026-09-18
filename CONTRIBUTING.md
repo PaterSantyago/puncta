@@ -166,3 +166,16 @@ that the first public npm release has happened.
 ## Release workflow
 
 See [independent alpha releases](docs/releases.md) for native pnpm change intents, the automated release PR, required head checks and verified artifact retrieval. npm publication is a separate task.
+
+## Documentation changes
+
+When public behavior changes, update its user documentation and checks in the same change.
+This applies to exports, public types, settings, defaults, rules, diagnostics, and displayed examples.
+If no user documentation change is necessary, explain why in the change description.
+
+The [coverage inventory](docs/acceptance/documentation-coverage.json) maps source contracts to canonical pages.
+`pnpm docs:check` detects missing exports, diagnostic codes, source changes, and broken local links.
+A matching source hash does not establish semantic coverage. Review the definitions and examples as well.
+`pnpm check` compiles and runs displayed examples in both installed consumers.
+Run `pnpm test:browser` and `pnpm test:rsc` separately when rendering or integration claims change.
+See [documentation acceptance](docs/acceptance/documentation-115.md) for release checks and the publication handoff.

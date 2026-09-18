@@ -51,7 +51,7 @@ Output:
 
 HTML parsing does not sanitize input. Use a separate sanitizer for untrusted HTML.
 The output can change its HTML notation because the parser serializes the result.
-Puncta does not preserve HTML byte for byte.
+Puncta does not keep HTML byte for byte.
 
 ## Next steps
 
@@ -59,4 +59,4 @@ See [configuration](../guides/configuration.md) to change rules or locales,
 and [core signatures](../reference/core.md) for return types.
 Use the [HTML guide](../guides/html.md) for modes, contexts, and scopes.
 Use the [protection guide](../guides/protection.md) for text ranges and protected markup.
-Before you select another environment, read [compatibility](../compatibility.md).
+Before you select a different environment, read [compatibility](../compatibility.md).

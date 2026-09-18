@@ -44,7 +44,7 @@ Wait…
 The context tells the parser how to interpret a fragment.
 It adds no output wrapper and no protected ancestor.
 Thus, `context: "code"` does not protect the supplied text.
-An actual `<code>` element in the source does protect its contents.
+A `<code>` element in the source does protect its contents.
 
 A `table` context permits table rows and can add a `tbody` element.
 A `title` context uses RCDATA: the parser decodes entities and reads tags as text.
@@ -236,7 +236,7 @@ The script and event attribute stay in the result: parsing is not sanitization.
 Parser warnings use `html.parse`, with the parser code in `details.parserCode`.
 Protection does not stop parser warnings.
 No warnings does not prove valid HTML or the absence of parser repairs.
-An input with an actual `plaintext` element keeps its original markup structure during text changes.
+An input with a `plaintext` element keeps its original markup structure during text changes.
 With this special case, a later parse does not read new closing tags as plaintext.
 
 Related: [Protection](protection.md), [core API](../reference/core.md),

@@ -12,7 +12,7 @@ The functional API is unreleased.
 
 Core text and HTML calls return their results synchronously.
 They need explicit locale modules and settings, but no DOM or initialization step.
-This complete TSX program uses public imports.
+This full TSX program uses public imports.
 It prints a core result and the HTML from `renderToString`.
 
 <!-- puncta:example server-sync -->
@@ -46,7 +46,7 @@ Wait…
 For HTML strings, use the [HTML guide](html.md) and [core reference](../reference/core.md).
 For React elements, the adapter processes children that it can access during the render.
 It does not need an effect or a later DOM repair step.
-A Provider supplies settings but does not transform text directly inside it.
+A Provider supplies settings but does not transform text directly in it.
 
 ## Hydration and ownership
 
@@ -59,8 +59,8 @@ See [React updates](react.md#preserve-state-during-updates).
 The [HTTP integration](../../tests/browser/hydration-server.mjs) shares its
 [tree source](../../tests/browser/hydration-tree.mjs) with the
 [hydration client](../../tests/browser/hydration-client.mjs).
-These excerpts are parts of the integration source. They are not complete programs.
-Use the complete files and [browser prerequisites](../../tests/browser/README.md) to run them.
+These excerpts are parts of the integration source. They are not full programs.
+Use the full files and [browser prerequisites](../../tests/browser/README.md) to run them.
 The check compares each displayed excerpt with the same source before the browser run.
 
 The synchronous route calls `renderToString` with the shared document tree:
@@ -105,6 +105,7 @@ For both streaming modes, they check fallback text before content is released.
 They then check resolved content after hydration and check that the shell/content nodes are the same.
 They also check shell child identity and no hydration errors.
 This includes NBSP, NNBSP, SHY, locale scopes, and protected text.
+
 The shared tree file gives these expected text values.
 JavaScript escapes identify NBSP, NNBSP, and SHY.
 The browser checks shell, content, and protected values in all three SSR modes.
@@ -132,7 +133,7 @@ The API names do not give a support guarantee for an untested edge runtime.
 These excerpts are from the same HTTP handler as the synchronous route.
 `app` is the shared document tree, and `response` is the Node HTTP response.
 The handler creates `options`, records abort callbacks, and releases its test gate only after the browser finds the shell.
-The complete source includes error and cleanup paths.
+The full source includes error and cleanup paths.
 
 <!-- puncta:integration server-pipeable -->
 
@@ -164,7 +165,7 @@ response.end();
 
 Suspense content and fallback have separate recognition contexts.
 Text on opposite sides of the boundary cannot form one word or number bond.
-Put `Puncta` inside an opaque custom component to process its output.
+Put `Puncta` in an opaque custom component to process its output.
 See [React child boundaries](react.md#understand-child-boundaries).
 
 The browser check detects transformed shell and fallback text before it releases content.
@@ -186,10 +187,10 @@ Client ownership also applies when the framework renders the client module durin
 
 The [runnable Next integration](../../examples/rsc/README.md#run) gives the build and server commands.
 It uses the public package exports without source aliases.
-These excerpts are from its complete, type-checked source files.
+These excerpts are from its full, type-checked source files.
 The RSC job checks their source relation and runs the production build in all three browsers.
 
-In [app/page.tsx](../../examples/rsc/app/page.tsx), `ServerText` processes Spanish text explicitly:
+In [app/page.tsx](../../examples/rsc/app/page.tsx), `ServerText` processes Spanish text:
 
 <!-- puncta:integration rsc-server -->
 
@@ -233,7 +234,7 @@ const instance = createPuncta({ locales: [enGb, esEs], locale: enGb.id });
 ```
 
 The same component supplies its local instance and state to the Provider.
-`locale`, `hyphenation`, and `grouping` are client state values in the complete file:
+`locale`, `hyphenation`, and `grouping` are client state values in the full file:
 
 <!-- puncta:integration rsc-provider -->
 
@@ -264,8 +265,8 @@ The package keeps `"use client"` for this boundary.
 That reference can receive the client Provider's Context.
 It is not a server Provider or a server JSX adapter.
 
-Neither an outer `Puncta` nor `/pure` can inspect arbitrary RSC component output.
-Use explicit server text calls or processing inside the client component that owns the text.
+An outer `Puncta` and `/pure` cannot inspect arbitrary RSC component output.
+Use explicit server text calls or processing in the client component that owns the text.
 See [opaque components](react.md#process-a-custom-component) and [pure calls](../reference/react.md#transformreact).
 
 ## Run the checks

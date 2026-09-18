@@ -85,7 +85,7 @@ function transformReact(
 ```
 
 A boolean variable gives the union result type.
-The [pure example](../guides/react.md#use-the-pure-entry) shows an independent transformation and later Context use.
+The [pure example](../guides/react.md#use-the-pure-entry) shows a transformation that operates independently and later Context use.
 The function does not mutate the original input tree.
 
 ## ReactTransformOptions

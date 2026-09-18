@@ -3,7 +3,7 @@
 [Documentation index](../README.md)
 
 This page defines shared settings and all eleven typography rule groups.
-The [configuration guide](../guides/configuration.md) shows complete examples.
+The [configuration guide](../guides/configuration.md) shows full examples.
 See the [hyphenation guide](../guides/hyphenation.md) for insertion and removal examples.
 
 ## Configuration surfaces
@@ -40,7 +40,7 @@ Unknown option names cause an error, even when their value is `undefined`.
 Puncta rejects whole options objects that are `null`, arrays, or non-objects.
 It also rejects `rules: null`, `locale: null`, and `enabled: null`.
 Rule groups do not accept boolean shorthand.
-Use `{ enabled: false }` inside a rule group.
+Use `{ enabled: false }` in a rule group.
 
 ## Rule fields and defaults
 
@@ -68,7 +68,7 @@ It still converts straight quotes or explicit double-hyphen markers.
 Use `standalone: true` for numeric ranges without a known unit.
 `space` controls the number/percentage interval: no space or U+00A0 NBSP.
 
-`additional` adds literal, case-sensitive, complete unit designations.
+`additional` adds literal, case-sensitive, full unit designations.
 Each string must be nonempty, without edge whitespace or control characters.
 Puncta removes exact duplicates. A new array replaces inherited additions.
 Built-in units stay available. An empty array removes additions only.
@@ -82,17 +82,17 @@ Puncta stores explicit values independently of locale defaults.
 The effective value comes from the nearest explicit setting, or the current locale default.
 A locale change keeps explicit values.
 
-| Input                                           | Effect                                                     |
-| ----------------------------------------------- | ---------------------------------------------------------- |
-| Field or group omitted                          | Inherit explicit parent settings                           |
-| Field or group `undefined`                      | Same as omission                                           |
-| Field `null`, such as `percentages.space: null` | Remove that explicit field. Use the current locale default |
-| Group `null`, such as `ellipsis: null`          | Remove all explicit fields in that group                   |
-| `hyphenation: null`                             | Remove all explicit hyphenation fields                     |
-| `rules: {}`                                     | Inherit, does not reset all rules                          |
-| `rules: null`                                   | Invalid whole-object reset                                 |
-| `additional: []`                                | Replace inherited additions with an empty array            |
-| `additional: null`                              | Reset additions to the default empty array                 |
+| Input                                               | Effect                                                     |
+| --------------------------------------------------- | ---------------------------------------------------------- |
+| Field or group omitted                              | Inherit explicit parent settings                           |
+| Field or group `undefined`                          | Same as omission                                           |
+| Field `null`, for example `percentages.space: null` | Remove that explicit field. Use the current locale default |
+| Group `null`, for example `ellipsis: null`          | Remove all explicit fields in that group                   |
+| `hyphenation: null`                                 | Remove all explicit hyphenation fields                     |
+| `rules: {}`                                         | Inherit, does not reset all rules                          |
+| `rules: null`                                       | Invalid whole-object reset                                 |
+| `additional: []`                                    | Replace inherited additions with an empty array            |
+| `additional: null`                                  | Reset additions to the default empty array                 |
 
 These rules apply at creation, in variants, in calls, and in active nested scopes.
 Later caller mutations cannot change the settings in an instance.

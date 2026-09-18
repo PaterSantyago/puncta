@@ -1,6 +1,6 @@
 # @use-puncta/core
 
-Synchronous text and HTML typography with an explicitly selected locale.
+Synchronous text and HTML typography with an selected locale.
 
 **Unreleased functional version.** Public `0.1.0-alpha.0` is the historical
 scaffold and does not have this API.

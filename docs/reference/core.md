@@ -31,7 +31,7 @@ Caller mutations cannot change it. No global registry exists.
 
 Invalid modules cause `locale.incompatible`. Duplicate IDs cause `locale.duplicate`.
 A selected ID missing from the registry causes `locale.unavailable`.
-Missing fields, wrong types, unknown keys, and invalid values cause `config.invalid-option`.
+Missing fields, incorrect types, unknown keys, and invalid values cause `config.invalid-option`.
 Enabled insertion also validates its locale resource.
 
 Import supported locale modules. Arbitrary locale objects and plugins are unsupported.
@@ -69,7 +69,7 @@ See the [error catalog](diagnostics.md#errors) and [location union](diagnostics.
 
 Signature: `with(overrides: PunctaOptions): PunctaInstance`.
 
-Supply an object, including `{}` for a variant with no changed settings.
+Supply an object. Use `{}` for a variant with no changed settings.
 The method returns an instance that operates independently with the same registry.
 It does not change its parent. It cannot add locale modules.
 Settings merge by field and receive validation immediately.
@@ -178,7 +178,7 @@ Unknown fields are invalid. This also applies to fields from a different format.
 
 For `context`, use a supported HTML name. Examples are `div`, `table`, `tbody`, `tr`, `title`, and `code`.
 The [element lists](../guides/html.md#supported-element-names) define all supported names.
-The context affects parsing only, without a wrapper or inherited protection.
+The context controls parsing only, without a wrapper or inherited protection.
 Unknown or custom names, uppercase names, `svg`, and `math` are invalid.
 
 An explicit `context` is invalid in document mode, even `"div"`.

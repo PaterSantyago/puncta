@@ -138,7 +138,7 @@ HTML uses `data-puncta-options` for `rules` and `hyphenation` overrides.
 React uses the `options` prop for those groups.
 A protected or disabled subtree stays protected. Descendants cannot enable it.
 
-This example resets an inherited percentage override inside a Spanish scope.
+This example resets an inherited percentage override in a Spanish scope.
 The outer text keeps the explicit `"none"` setting. The inner scope uses the Spanish default.
 
 <!-- puncta:example configuration-scopes -->
@@ -168,9 +168,7 @@ Output (the HTML entity `&nbsp;` represents U+00A0):
 <div data-puncta-locale="es-es">10% <span data-puncta-options="{&quot;rules&quot;:{&quot;percentages&quot;:{&quot;space&quot;:null}}}">10&nbsp;%</span></div>
 ```
 
-The HTML and React guides will give the complete scope procedures.
-For now, see the [existing HTML instructions](../../packages/core/README.md)
-and [React instructions](../../packages/with-react/README.md).
+See the [HTML scope procedures](html.md#use-markers-and-languages) and [React scope procedures](react.md#use-nested-scopes-and-protection).
 
 ## Next steps
 

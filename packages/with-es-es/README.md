@@ -43,23 +43,9 @@ Release-specific URLs are pending. These links point to the documentation branch
 
 ## Existing reference material
 
-These sections contain reference material until the separate reference pages are
-complete. Its migration and full documentation review are pending.
-
 Use the [hyphenation guide](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/hyphenation.md) for insertion and removal.
 See [locale admission and evidence](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#hyphenation) and [minima and resets](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md#hyphenation).
+Use the [digit-grouping reference](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#digit-grouping) for notation, examples, and exclusions.
 `NOTICE.md` contains upstream attribution and licenses.
 
 MIT licensed. Public publication is separate work.
-
-Optional `rules.digitGrouping` defaults to
-`{ enabled: false, minDigits: 5, normalizeExisting: true }`. Standalone ASCII
-integers and `,` or `.` decimals use U+202F, for example `12345,6700` →
-`12\u202f345,6700`. The decimal sign and fraction remain literal; `1,234` is a
-decimal. Valid groups using SPACE/NBSP/THIN SPACE/NNBSP normalize above the threshold.
-Malformed groups and conflicting punctuation such as `1.234,50` retain their
-spelling with a grouping warning. `normalizeExisting: false` retains all existing
-groups. Known units, currencies and percentages admit the same grouping; internal U+202F
-remains distinct from exterior bonds. Eligible ranges require two valid endpoints;
-ASCII hyphens need a known unit or standalone-range recognition. See
-[the core API and limits](../core/README.md#opt-in-digit-grouping).

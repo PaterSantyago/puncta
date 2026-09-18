@@ -20,7 +20,7 @@ Use the [release status](compatibility.md#release-status) before you select a ve
 
 ## Text does not change
 
-Check `enabled`, the relevant rule group, and inherited overrides.
+Check `enabled`, the related rule group, and inherited overrides.
 A call override changes one call. A variant does not change its parent.
 Use a [null reset](reference/settings.md#inheritance-and-reset) to remove an explicit override.
 Then compare the input with the [rule limits](reference/locales-and-rules.md#unchanged-and-ambiguous-input).
@@ -31,7 +31,7 @@ Protected text does not receive typography changes.
 
 ## A locale change keeps the previous style
 
-A locale change keeps explicit values. Reset the relevant field or group with `null`.
+A locale change keeps explicit values. Reset the related field or group with `null`.
 An omitted field or `undefined` inherits. It does not reset.
 See the [checked locale example](guides/configuration.md#change-locale-and-reset-a-field).
 
@@ -39,7 +39,7 @@ See the [checked locale example](guides/configuration.md#change-locale-and-reset
 
 Each new `additional` array replaces inherited additions.
 Supply all the custom designations for use in the variant.
-Built-in units remain available. See [the unit example](guides/configuration.md#add-units-and-replace-an-array).
+Built-in units stay available. See [the unit example](guides/configuration.md#add-units-and-replace-an-array).
 
 ## Configuration fails
 
@@ -50,9 +50,9 @@ For `locale.incompatible`, use the matching supported package export.
 
 For other codes, use the [error catalog](reference/diagnostics.md#errors).
 For `config.invalid-option`, check the [valid surfaces and values](reference/settings.md).
-Wrong types, unknown fields, and whole-object null resets are invalid.
+Incorrect types, unknown fields, and whole-object null resets are invalid.
 
-An inherited hyphenation minimum can become invalid in another locale.
+An inherited hyphenation minimum can become invalid in a different locale.
 Reset or increase it in the same locale override.
 Disabled processing does not stop explicit argument validation.
 See [the checked failure and correction](reference/settings.md#locale-dependent-validation).

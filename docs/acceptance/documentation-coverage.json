@@ -25,7 +25,8 @@
     "docs/acceptance/documentation-112.md",
     "docs/guides/server-rendering.md",
     "docs/acceptance/documentation-113.md",
-    "docs/acceptance/documentation-114.md"
+    "docs/acceptance/documentation-114.md",
+    "docs/acceptance/documentation-115.md"
   ],
   "examples": [
     {
@@ -405,7 +406,7 @@
       "id": "core-settings-locales",
       "status": "covered",
       "issue": 108,
-      "scope": "Issue 108: instance creation/variants/snapshots; shared settings and reset; text/HTML return overloads; both locales and ten non-grouping rules. Source contracts mark deferred definitions partial or pending; grouping, removal, HTML/protection and complete diagnostics remain separate slices.",
+      "scope": "Issue 108: instance creation/variants/snapshots; shared settings and reset; text/HTML return overloads; both locales and ten non-grouping rules. Later accepted slices cover grouping, removal, HTML/protection, and diagnostics.",
       "pages": [
         "docs/guides/configuration.md",
         "docs/reference/core.md",
@@ -890,7 +891,7 @@
       "name": "re-export:type *",
       "sha256": "1543ddd72aad2c0e6b176b72d292dd0064eebf8c3c568b49f77c384515261e10",
       "target": "docs/reference/core.md#public-type-index",
-      "status": "partial",
+      "status": "covered",
       "issue": 115
     },
     {
