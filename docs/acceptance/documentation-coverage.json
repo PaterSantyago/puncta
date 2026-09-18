@@ -11,7 +11,10 @@
     "docs/reference/settings.md",
     "docs/reference/locales-and-rules.md",
     "docs/troubleshooting.md",
-    "docs/acceptance/documentation-108.md"
+    "docs/acceptance/documentation-108.md",
+    "docs/guides/html.md",
+    "docs/guides/protection.md",
+    "docs/acceptance/documentation-109.md"
   ],
   "examples": [
     {
@@ -107,6 +110,50 @@
         "@use-puncta/with-en-gb",
         "@use-puncta/with-es-es"
       ]
+    },
+    {
+      "id": "html-modes",
+      "file": "docs/guides/html.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "html-scopes",
+      "file": "docs/guides/html.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-es-es"
+      ]
+    },
+    {
+      "id": "html-joins",
+      "file": "docs/guides/html.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "html-serialization",
+      "file": "docs/guides/html.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "protection-ranges",
+      "file": "docs/guides/protection.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "protection-technical",
+      "file": "docs/guides/protection.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "protection-markup",
+      "file": "docs/guides/protection.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "core-format-validation",
+      "file": "docs/reference/core.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
     }
   ],
   "coverage": [
@@ -166,9 +213,26 @@
     },
     {
       "id": "html-protection",
-      "status": "pending",
+      "status": "covered",
       "issue": 109,
-      "scope": "HTML modes/context/markers and UTF-16/grapheme protection."
+      "scope": "HTML modes/context, markers/lang, scopes/boundaries, source-leaf edits, serialization/security limits; original UTF-16/grapheme text protection, automatic tokens, protected and opaque HTML, validation.",
+      "pages": [
+        "docs/guides/html.md",
+        "docs/guides/protection.md",
+        "docs/reference/core.md",
+        "docs/reference/settings.md",
+        "docs/troubleshooting.md"
+      ],
+      "examples": [
+        "html-modes",
+        "html-scopes",
+        "html-joins",
+        "html-serialization",
+        "protection-ranges",
+        "protection-technical",
+        "protection-markup",
+        "core-format-validation"
+      ]
     },
     {
       "id": "react",
@@ -266,24 +330,24 @@
       "file": "packages/core/src/types.ts",
       "name": "ProtectedRange",
       "sha256": "9e2851cbb3dd2772f7740657d7b61b16a15aa6d866ed01c4c88800251ece762b",
-      "target": "docs/reference/core.md#public-type-index",
-      "status": "pending",
+      "target": "docs/reference/core.md#protectedrange",
+      "status": "covered",
       "issue": 109
     },
     {
       "file": "packages/core/src/types.ts",
       "name": "TextOptions",
       "sha256": "42c29b9bdaaa002edc8fe449f25970708d2aa7f370ba5e96208b32da28f51b75",
-      "target": "docs/reference/core.md#text-and-html",
-      "status": "partial",
+      "target": "docs/reference/core.md#format-parameters",
+      "status": "covered",
       "issue": 109
     },
     {
       "file": "packages/core/src/types.ts",
       "name": "HtmlOptions",
       "sha256": "9661fe86886a4989c82152b2a28de1fc5ba63c703ec446c076dd9cf353875758",
-      "target": "docs/reference/core.md#text-and-html",
-      "status": "partial",
+      "target": "docs/reference/core.md#format-parameters",
+      "status": "covered",
       "issue": 109
     },
     {

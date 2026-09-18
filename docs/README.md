@@ -18,8 +18,10 @@ The separate React quick start is pending.
 
 - [Configure settings, variants, and locales](guides/configuration.md).
 - [Compare locale rules](reference/locales-and-rules.md).
+- [Process HTML fragments and documents](guides/html.md).
+- [Protect text ranges and markup](guides/protection.md).
 
-The HTML, protection, React, server rendering, and hyphenation guides are pending.
+The React, server rendering, and hyphenation guides are pending.
 Existing details remain in the [core package instructions](../packages/core/README.md)
 and [React package instructions](../packages/with-react/README.md).
 

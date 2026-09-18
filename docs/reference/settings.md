@@ -23,7 +23,8 @@ Their current details remain in the [core package instructions](../../packages/c
 `locales` is a readonly array of imported `Locale` modules.
 It defines the registry at creation. A call cannot add a locale.
 See [locale exports](locales-and-rules.md#locale-exports).
-The HTML, React, protection, and removal slices will complete their format-specific procedures.
+See [text/HTML parameters](core.md#format-parameters) and [HTML procedures](../guides/html.md).
+React and removal procedures remain in their pending slices.
 
 ## Shared fields
 
@@ -159,3 +160,39 @@ The same applies to fields in disabled rule groups.
 Protected or disabled markup subtrees skip their declarative configuration parsing.
 This differs from an explicit API argument.
 See [configuration failures](../troubleshooting.md#configuration-fails).
+
+## HTML markers
+
+These attributes apply to active HTML elements.
+Each explicit marker starts a new scope, with inherited explicit settings and the selected locale defaults.
+Each attribute can operate without a `data-puncta=""` marker.
+
+| Attribute             | Valid values                                    | Effect                                                                |
+| --------------------- | ----------------------------------------------- | --------------------------------------------------------------------- |
+| `data-puncta`         | Empty string or `"off"`                         | Empty string starts a scope. `"off"` protects the full subtree        |
+| `data-puncta-locale`  | Loaded `"en-gb"` or `"es-es"` ID                | Selects the locale, with priority over `lang`                         |
+| `data-puncta-options` | JSON object with only `rules` and `hyphenation` | Applies the shared merge, reset, and validation rules                 |
+| `lang`                | Language tag                                    | Selects a supported loaded locale, or stops typography with a warning |
+
+`data-puncta="on"` and `data-puncta="true"` are invalid.
+The JSON object cannot contain `locale`, `enabled`, `detailed`, or format parameters.
+Malformed JSON causes `markup.invalid-config`.
+JSON scalars, arrays, `null`, unknown fields, or invalid option values cause `config.invalid-option`.
+The empty object `{}` is valid and keeps inherited explicit settings.
+
+`lang` accepts `en` and `en-gb` for en-gb, or `es` and `es-es` for es-es.
+These aliases are not case-sensitive. They do not load a locale module.
+Other valid tags, including `en-US`, have no locale alias.
+Empty, invalid, unsupported, or unloaded language values leave that region's text unchanged.
+They produce `markup.language-unavailable`, with reason `empty`, `invalid`, `unsupported`, or `not-loaded`.
+
+A supported nested language can start typography again inside an unavailable-language region.
+Invalid explicit settings there still cause configuration errors.
+A `lang` attribute alone that selects the current locale keeps inline context.
+An explicit marker creates an independent scope even when the effective settings do not change.
+
+Protection has priority over all descendant markers.
+`data-puncta="off"` also has priority over other markers on the same element.
+Puncta does not read their JSON or locale values.
+The same exclusion applies to automatically protected elements and disabled HTML input.
+See [nested examples](../guides/html.md#use-markers-and-languages) and [protection](../guides/protection.md).

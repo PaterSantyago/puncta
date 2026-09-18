@@ -47,73 +47,19 @@ These sections contain reference material until the separate reference pages are
 complete. Its migration and full documentation review are pending.
 
 Shared settings and the ten standard rule groups now have canonical definitions
-in the references above. The material below covers pending HTML, protection,
-diagnostics, hyphenation, and digit-grouping slices.
+in the references above. The material below covers pending diagnostics,
+hyphenation, and digit-grouping slices.
 
-HTML supports `data-puncta=""`, `data-puncta="off"`, `data-puncta-locale` and
-JSON `data-puncta-options` (rules/hyphenation only). Each marker creates an independent
-scope. Explicit locale wins over lang on the same element. `lang` accepts en/en-gb
-and es/es-es without case sensitivity; repeating the current language preserves
-inline context. Unavailable language preserves text with a structured warning;
-a nested supported language resumes processing unless protected. Disabled subtrees
-and protected elements skip declarative configuration parsing.
+HTML and protection have their own guides:
 
-Plain-text calls accept `protect: [{ start, end }]` in original UTF-16 offsets.
-Ranges must end at grapheme boundaries; adjacent/overlapping ranges merge, empty
-ranges have no effect, and invalid ranges throw `protect.invalid-range`. Protection
-belongs to that call, not an instance. Recognised URLs with an explicit scheme or
-`www.`, email, IP addresses and `v1.2.3` versions are protected automatically,
-including across transparent inline joins. URL bodies conservatively retain
-punctuation that may belong to a path or query. Markdown and other technical text
-require explicit protection.
+- [HTML modes, scopes, inline context, and serialization](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/html.md).
+- [Text ranges, technical tokens, and protected markup](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/protection.md).
+- [Format parameters and validation](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/core.md#format-parameters).
 
-HTML protects code/pre/script/style, kbd/samp, form values (including standalone
-option), template/noscript, SVG/MathML/ruby and embedded/media content. The presence
-of `hidden` and editable content protect entire subtrees; `aria-hidden` alone does
-not. Protected contents and nested declarative settings are not analysed. Unknown
-elements remain opaque and produce `markup.element-unsupported` warnings.
-
-HTML uses parse5 8.0.0. `mode` defaults to `"fragment"` with explicit `"div"`
-context; `mode: "document"` parses a full document. The mode is never inferred.
-For contextual fragments, use a supported standard HTML element name such as
-`{ context: "table" }` or `{ context: "title" }`. Context names use lowercase HTML
-spelling and the shared supported-element table; unknown/custom names and
-SVG/MathML contexts are rejected. `context` is forbidden in document mode.
-
-The context affects parsing only: it adds neither an output wrapper nor a
-protected ancestor. Protection applies to elements in the supplied markup.
-HTML title uses RCDATA, so entities are decoded and `<b>` inside it is text.
-Standard parser recovery defines the tree; typography preserves that tree and
-attribute values without sanitizing HTML. SVG/MathML subtrees remain protected,
-including integration points containing HTML descendants.
-
-Serialization can change the HTML string without typographic edits, including
-with `enabled: false`: `outputChanged` and `hasEdits` are independent. Protected
-text and attributes are preserved after parsing, without a byte-for-byte promise.
-Available parser diagnostics use `html.parse`, `source: "parser"` and
-`details.parserCode`, with original input positions or an explicit unavailable
-location. Protection does not suppress parsing diagnostics. An absence of warnings
-does not establish validity or imply that no recovery took place. Edit reports
-explain typography; they are not patches for reproducing serialized HTML.
-
-Raw-text fragment contexts retain literal entities during serialization. Inputs
-containing an actual HTML `plaintext` element retain their original markup
-scaffold, with changed text serialized through parser token origins. This avoids
-adding closing tags that a later parse would consume as plaintext, and preserves
-foster-parented table structure. The implementation's character-token integration
-is pinned to parse5 8.0.0 and covered by malformed-input regression tests.
-
-Inline elements and comments share recognition context. For example,
-`<b>.</b><em>..</em>` becomes `<b>…</b><em></em>`: a replacement belongs to the
-first affected leaf, while empty elements and untouched letters stay in place.
-A new insertion at a leaf boundary belongs to the left nonempty leaf; an existing
-space stays owned by its original leaf. Reports distinguish replace/insert/delete
-and map text warnings through the same source coordinates as edits.
-Blocks, br/wbr/hr and opaque fragments interrupt this recognition without adding
-characters. Source paths index the parsed tree, including comments and elements
-inserted by the parser. Multi-leaf edits have separate ranges without intervening
-tags. Entity/CRLF decoding and astral characters retain UTF-16 provenance;
-unmappable parser repairs report `accuracy: "unavailable"` with a reason.
+Detailed source-coordinate definitions are pending. Source paths index the parsed
+tree, including comments and elements inserted by the parser. Entity/CRLF decoding
+and astral characters retain UTF-16 provenance. Unmappable parser repairs report
+`accuracy: "unavailable"` with a reason.
 
 `stripSoftHyphens(source, options?)` removes author and previously inserted U+00AD
 without typography. `format` defaults to `"text"`; explicit `"html"` uses the same
@@ -143,6 +89,8 @@ word with diagnostics; Spanish words containing `tl` are skipped with
 `hyphenation.language-ambiguity`. No English pronunciation detector is promised.
 Opaque/protected/scope edges conservatively skip adjoining word fragments.
 
+Partial example: use the `puncta` instance from the Start example above.
+
 ```ts
 const hyphenated = puncta.with({ hyphenation: { enabled: true } });
 hyphenated.text("backbone"); // "back\u00adbone"
@@ -169,6 +117,8 @@ The API remains experimental; public publication is separate work.
 `{ enabled: false, minDigits: 5, normalizeExisting: true }` in both locales.
 `minDigits` and `normalizeExisting` alone do not enable it. The fields follow the
 same inheritance and null-reset model as other rule groups.
+
+Partial example: use the `puncta` instance from the Start example above.
 
 ```ts
 const grouped = puncta.with({ rules: { digitGrouping: { enabled: true } } });
@@ -251,6 +201,8 @@ resets all three fields, including `enabled` to false. `rules: null` is invalid.
 Turning the rule off retains explicit threshold and normalization settings for
 later re-enabling. A locale change preserves these explicit settings and resolves
 unset fields from the new locale.
+
+Partial example: use the `grouped` instance from the preceding example.
 
 ```ts
 const compact = grouped.with({

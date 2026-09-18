@@ -4,8 +4,8 @@
 
 Import public values and types from `@use-puncta/core`.
 All operations are synchronous. Core operates without React or a browser DOM.
-This page covers instance configuration and text/HTML return overloads.
-Detailed source coordinates, HTML parameters, and SHY removal have pending slices.
+This page covers instance configuration, text/HTML parameters, and return overloads.
+Detailed source coordinates and SHY removal have pending slices.
 
 ## Runtime exports
 
@@ -97,7 +97,7 @@ html(source: string, options: HtmlOptions): string | HtmlResult;
 `HtmlOptions` removes `protect` and adds `mode` and `context`.
 
 HTML defaults to fragment mode with `div` context. Parsing does not sanitize HTML.
-See the [existing HTML and protection details](../../packages/core/README.md).
+See the [HTML guide](../guides/html.md) and [protection guide](../guides/protection.md).
 Invalid source types or options cause `config.invalid-option`.
 Invalid text protection ranges cause `protect.invalid-range`.
 
@@ -143,6 +143,122 @@ Wait… object
 <p>Wait…</p> object
 ```
 
+### Format parameters
+
+Reference declarations (not executable examples):
+
+```ts
+interface ProtectedRange {
+  readonly start: number;
+  readonly end: number;
+}
+interface TextOptions extends PunctaOptions {
+  readonly protect?: readonly ProtectedRange[];
+  readonly detailed?: boolean;
+}
+interface HtmlOptions extends Omit<TextOptions, "protect"> {
+  readonly mode?: "fragment" | "document";
+  readonly context?: string;
+}
+```
+
+| Parameter  | Default            | Valid input and applicability                             |
+| ---------- | ------------------ | --------------------------------------------------------- |
+| `source`   | Required           | String for both methods, including an empty string        |
+| `detailed` | `false`            | Boolean for both methods, selects the return overload     |
+| `protect`  | No explicit ranges | Readonly array of `ProtectedRange`, plain text only       |
+| `mode`     | `"fragment"`       | `"fragment"` or `"document"`, HTML only                   |
+| `context`  | `"div"`            | Supported lowercase HTML element name, fragment mode only |
+
+The shared fields come from [PunctaOptions](settings.md#shared-fields).
+Omitted format parameters or explicit `undefined` use their defaults.
+`null` is invalid for these parameters.
+Whole call options must be an object, not `null` or an array.
+Unknown fields are invalid, including fields from another format.
+
+For `context`, use a supported HTML name such as `div`, `table`, `tbody`, `tr`, `title`, or `code`.
+The [element lists](../guides/html.md#supported-element-names) define all supported names.
+The context affects parsing only, without a wrapper or inherited protection.
+Unknown or custom names, uppercase names, `svg`, and `math` are invalid.
+An explicit `context` is invalid in document mode, including `"div"`.
+See the [mode examples](../guides/html.md#select-fragment-or-document).
+
+### ProtectedRange
+
+Each range has readonly numeric `start` and `end` fields.
+They refer to the original source in UTF-16 units.
+The interval includes `start` and excludes `end`.
+Both must be integers at grapheme boundaries, with `0 <= start <= end <= source.length`.
+Extra range fields, missing fields, and non-object entries are invalid.
+
+Puncta sorts a private copy and combines adjacent or overlapping ranges.
+Empty valid ranges have no effect. The input array stays unchanged.
+A wrong `protect` container type causes `config.invalid-option`.
+An invalid entry causes `protect.invalid-range`, with its index in `details.index` and `optionPath`.
+Validation applies even when typography is disabled.
+
+`protect` is available on `text()` and text-format `stripSoftHyphens()` calls.
+It is not available on HTML, instances, or React surfaces.
+See the [original-offset example](../guides/protection.md#protect-original-text-ranges).
+
+### Format validation
+
+Explicit source and options receive validation before typography, even for empty or protected input.
+Invalid source types, mode values, contexts, or options cause `config.invalid-option`.
+The fields in a disabled rule group must still be valid.
+The [shared validation rules](settings.md#validation-when-disabled) also apply.
+
+Active HTML markers receive validation during traversal.
+Invalid JSON causes `markup.invalid-config`.
+Invalid marker values or JSON option fields cause `config.invalid-option`.
+An explicit locale absent from the registry causes `locale.unavailable`.
+Protected elements and off subtrees skip their declarative configuration.
+An unavailable `lang` produces a warning instead of an explicit locale error.
+
+<!-- puncta:example core-format-validation -->
+
+```ts
+import { createPuncta, PunctaConfigError } from "@use-puncta/core";
+import { enGb } from "@use-puncta/with-en-gb";
+
+const puncta = createPuncta({ locales: [enGb], locale: enGb.id });
+const calls = [
+  () =>
+    puncta.text("😀 Wait...", {
+      enabled: false,
+      protect: [{ start: 1, end: 2 }],
+    }),
+  () => puncta.html("", { enabled: false, mode: "document", context: "div" }),
+  // @ts-expect-error HTML calls cannot use text protection ranges.
+  () => puncta.html("<code>Wait...</code>", { protect: [] }),
+  () => puncta.html('<span data-puncta-options="bad">Wait...</span>'),
+];
+for (const call of calls) {
+  try {
+    call();
+  } catch (error) {
+    if (!(error instanceof PunctaConfigError)) throw error;
+    console.log(error.code, JSON.stringify(error.optionPath));
+  }
+}
+```
+
+Output:
+
+<!-- puncta:output core-format-validation -->
+
+```text
+protect.invalid-range ["protect",0]
+config.invalid-option ["context"]
+config.invalid-option ["protect"]
+markup.invalid-config []
+```
+
+The first range splits the emoji's surrogate pair.
+A range inside a decomposed letter/accent grapheme also fails.
+The API and marker errors identify different configuration locations.
+Full location definitions are pending in the diagnostics slice.
+
 ### stripSoftHyphens
 
 This method removes U+00AD independently of typography.
@@ -162,9 +278,9 @@ A pending definition is not complete coverage.
 | `RuleOptions`, `RulesOptions`                                     | [Rule fields](settings.md#rule-fields-and-defaults), grouping details pending                                                                 |
 | `HyphenationOptions`                                              | [Locale validation](settings.md#locale-dependent-validation), insertion details pending                                                       |
 | `PunctaInstance`                                                  | [Creation](#createpuncta) and [methods](#instance-methods), removal overloads pending                                                         |
-| `TextOptions`, `HtmlOptions`                                      | [Text and HTML](#text-and-html), complete format parameters pending                                                                           |
+| `TextOptions`, `HtmlOptions`                                      | [Format parameters](#format-parameters)                                                                                                       |
 | `StripTextOptions`, `StripHtmlOptions`, `StripSoftHyphensOptions` | Pending removal slice, [source declaration](../../packages/core/src/types.ts)                                                                 |
-| `ProtectedRange`                                                  | Pending protection slice, [source declaration](../../packages/core/src/types.ts)                                                              |
+| `ProtectedRange`                                                  | [Original-source range](#protectedrange)                                                                                                      |
 | `RuleId`                                                          | Rule identifier union: ten [standard groups](locales-and-rules.md#rule-examples), `digitGrouping`, `hyphenation.insert`, `hyphenation.remove` |
 | `TextResult`, `HtmlResult`                                        | [Reports](#reports), detailed coordinates pending                                                                                             |
 | `Source`, `InputRange`, `TextRange`, `HtmlRange`                  | Pending diagnostics slice, [source declaration](../../packages/core/src/types.ts)                                                             |

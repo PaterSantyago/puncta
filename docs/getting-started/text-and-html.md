@@ -57,6 +57,6 @@ Puncta does not preserve HTML byte for byte.
 
 See [configuration](../guides/configuration.md) to change rules or locales,
 and [core signatures](../reference/core.md) for return types.
-The full HTML guide is pending. Current HTML details remain in the
-[core package instructions](../../packages/core/README.md).
+Use the [HTML guide](../guides/html.md) for modes, contexts, and scopes.
+Use the [protection guide](../guides/protection.md) for text ranges and protected markup.
 Before you select another environment, read [compatibility](../compatibility.md).

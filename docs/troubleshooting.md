@@ -2,8 +2,8 @@
 
 [Documentation index](README.md)
 
-This page covers installation, settings, and the ten standard rule groups.
-HTML, React, grouping, hyphenation, and detailed diagnostic procedures are pending.
+This page covers installation, settings, HTML, protection, and the ten standard rule groups.
+React, grouping, hyphenation, and detailed diagnostic procedures are pending.
 
 ## The API is missing
 
@@ -56,3 +56,38 @@ An unresolved quote or ambiguous interval can produce a warning on each call.
 Correct the source when its intended role is clear.
 See [unchanged and ambiguous input](reference/locales-and-rules.md#unchanged-and-ambiguous-input).
 The complete diagnostic catalogue is pending.
+
+## HTML output has unexpected markup
+
+Check the [mode and context](guides/html.md#select-fragment-or-document).
+Document mode can add `html`, `head`, and `body` elements.
+Use the correct table context for the rows or cells in a fragment.
+The parser can repair markup and change entity or attribute spelling.
+
+Compare `hasEdits` with `outputChanged` in a detailed result.
+A serialization change does not require a typography edit.
+Do not use edit ranges as patches to reconstruct HTML output.
+See [serialization limits](guides/html.md#understand-serialization).
+
+## Protected text does not change
+
+Check for [protected elements](guides/protection.md#protected-and-opaque-elements), `hidden`, editable content, and ancestor off markers.
+A descendant cannot cancel inherited protection.
+Check `lang` and the loaded locales if the result has `markup.language-unavailable`.
+Use a supported loaded language or an explicit locale marker for that region.
+
+For plain text, check explicit ranges against the original source.
+Do not count Unicode code points or use offsets from a previous result.
+For `protect.invalid-range`, use whole graphemes within the source bounds.
+See [range validation](reference/core.md#protectedrange).
+
+A URL can keep punctuation that looks like sentence punctuation.
+That punctuation can be part of the URL itself.
+Use the intended source delimiter and check the [technical-token limits](guides/protection.md#automatic-technical-text-protection).
+
+## An inline edit stops at an element
+
+A new scope or an opaque element stops word and bond recognition.
+A `lang` that selects the current locale keeps context, but an explicit Puncta marker starts a new scope.
+Remove an unnecessary marker when the text must share its parent's context.
+See [context boundaries](guides/html.md#context-boundaries).
