@@ -55,6 +55,8 @@ Puncta does not preserve HTML byte for byte.
 
 ## Next steps
 
-The full configuration and HTML guides are pending. For current API details,
-see the [core package instructions](../../packages/core/README.md).
+See [configuration](../guides/configuration.md) to change rules or locales,
+and [core signatures](../reference/core.md) for return types.
+The full HTML guide is pending. Current HTML details remain in the
+[core package instructions](../../packages/core/README.md).
 Before you select another environment, read [compatibility](../compatibility.md).

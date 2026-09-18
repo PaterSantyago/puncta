@@ -16,25 +16,27 @@ The separate React quick start is pending.
 
 ## Complete a task
 
-The configuration, HTML, protection, React, server rendering, and hyphenation
-guides are pending. Existing details remain in the
-[core package instructions](../packages/core/README.md) and
-[React package instructions](../packages/with-react/README.md).
+- [Configure settings, variants, and locales](guides/configuration.md).
+- [Compare locale rules](reference/locales-and-rules.md).
+
+The HTML, protection, React, server rendering, and hyphenation guides are pending.
+Existing details remain in the [core package instructions](../packages/core/README.md)
+and [React package instructions](../packages/with-react/README.md).
 
 ## Look up the API
 
-The core, React, settings, locales and rules, and diagnostics reference pages are
-pending. For now, use the package instructions:
+- [Core exports, signatures, and public type index](reference/core.md).
+- [Settings, defaults, and reset behavior](reference/settings.md).
+- [Locales and typography rules](reference/locales-and-rules.md).
 
-- [Core](../packages/core/README.md).
-- [React](../packages/with-react/README.md).
-- [British English locale](../packages/with-en-gb/README.md).
-- [Spanish locale](../packages/with-es-es/README.md).
+The React and diagnostics references are pending. Use the
+[React package instructions](../packages/with-react/README.md) for current details.
+Core format-specific and diagnostic definitions remain partly pending.
 
 ## Solve a problem
 
-Examine the [package version](compatibility.md#release-status) if `createPuncta` is
-not available. The full troubleshooting page is pending.
+Use [troubleshooting](troubleshooting.md) for installation, settings, locale changes,
+and unchanged text. Other symptom procedures are pending.
 
 ## Contribute
 

@@ -5,7 +5,13 @@
     "docs/getting-started/installation.md",
     "docs/getting-started/text-and-html.md",
     "docs/compatibility.md",
-    "docs/acceptance/documentation-107.md"
+    "docs/acceptance/documentation-107.md",
+    "docs/guides/configuration.md",
+    "docs/reference/core.md",
+    "docs/reference/settings.md",
+    "docs/reference/locales-and-rules.md",
+    "docs/troubleshooting.md",
+    "docs/acceptance/documentation-108.md"
   ],
   "examples": [
     {
@@ -37,6 +43,70 @@
       "id": "package-with-es-es",
       "file": "packages/with-es-es/README.md",
       "packages": ["@use-puncta/core", "@use-puncta/with-es-es"]
+    },
+    {
+      "id": "configuration-variants",
+      "file": "docs/guides/configuration.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-es-es"
+      ]
+    },
+    {
+      "id": "configuration-locales",
+      "file": "docs/guides/configuration.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-es-es"
+      ]
+    },
+    {
+      "id": "configuration-units",
+      "file": "docs/guides/configuration.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "settings-validation",
+      "file": "docs/reference/settings.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-es-es"
+      ]
+    },
+    {
+      "id": "core-results",
+      "file": "docs/reference/core.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "locale-rules",
+      "file": "docs/reference/locales-and-rules.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-es-es"
+      ]
+    },
+    {
+      "id": "locale-limits",
+      "file": "docs/reference/locales-and-rules.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-es-es"
+      ]
+    },
+    {
+      "id": "configuration-scopes",
+      "file": "docs/guides/configuration.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-es-es"
+      ]
     }
   ],
   "coverage": [
@@ -61,9 +131,38 @@
     },
     {
       "id": "core-settings-locales",
-      "status": "pending",
+      "status": "covered",
       "issue": 108,
-      "scope": "All public core exports/types/overloads, configuration surfaces/defaults/reset and ten non-grouping typography rules; compare source/declarations."
+      "scope": "Issue 108: instance creation/variants/snapshots; shared settings and reset; text/HTML return overloads; both locales and ten non-grouping rules. Source contracts mark deferred definitions partial or pending; grouping, removal, HTML/protection and complete diagnostics remain separate slices.",
+      "pages": [
+        "docs/guides/configuration.md",
+        "docs/reference/core.md",
+        "docs/reference/settings.md",
+        "docs/reference/locales-and-rules.md",
+        "docs/troubleshooting.md"
+      ],
+      "examples": [
+        "configuration-variants",
+        "configuration-locales",
+        "configuration-units",
+        "settings-validation",
+        "core-results",
+        "locale-rules",
+        "locale-limits",
+        "configuration-scopes"
+      ],
+      "rules": [
+        "quotes",
+        "apostrophes",
+        "spaces",
+        "ellipsis",
+        "dashes",
+        "ranges",
+        "minus",
+        "units",
+        "percentages",
+        "currencies"
+      ]
     },
     {
       "id": "html-protection",
@@ -112,6 +211,264 @@
       "status": "pending",
       "issue": 116,
       "scope": "Functional release versions/tags; npm/pnpm public installation; blocked until publication."
+    }
+  ],
+  "sourceContracts": [
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "LocaleId",
+      "sha256": "9c6f90909b90c8b86facf0e5765329ccd845ae2e2c533dc6db100d007d13ba48",
+      "target": "docs/reference/locales-and-rules.md#locale-exports",
+      "status": "covered",
+      "issue": 108
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "Locale",
+      "sha256": "1adc5235009161cf7398202e0c8fb57647aff5e1f4de037d38a3d0f28dac6313",
+      "target": "docs/reference/locales-and-rules.md#locale-exports",
+      "status": "covered",
+      "issue": 108
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "RuleOptions",
+      "sha256": "6707e129ab243c10a3a594c8e5b43095e9a51c9ad6d5f1e0618519969aa5ec62",
+      "target": "docs/reference/settings.md#rule-fields-and-defaults",
+      "status": "covered",
+      "issue": 108
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "RulesOptions",
+      "sha256": "5eea03447834cb1e1c40ef659f66de64ee2d35d36934c8365a85ebcce1dc083d",
+      "target": "docs/reference/settings.md#rule-fields-and-defaults",
+      "status": "partial",
+      "issue": 111
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "HyphenationOptions",
+      "sha256": "ff92969e4cead319ac78cbca83c3a50a8295e1978a0182eed396171ed51c9396",
+      "target": "docs/reference/settings.md#locale-dependent-validation",
+      "status": "partial",
+      "issue": 112
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "PunctaOptions",
+      "sha256": "e775b5bb80c03e1a5b5c061acab509b776033739a3b726b0f7b616e13ae1c6b9",
+      "target": "docs/reference/settings.md#shared-fields",
+      "status": "covered",
+      "issue": 108
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "ProtectedRange",
+      "sha256": "9e2851cbb3dd2772f7740657d7b61b16a15aa6d866ed01c4c88800251ece762b",
+      "target": "docs/reference/core.md#public-type-index",
+      "status": "pending",
+      "issue": 109
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "TextOptions",
+      "sha256": "42c29b9bdaaa002edc8fe449f25970708d2aa7f370ba5e96208b32da28f51b75",
+      "target": "docs/reference/core.md#text-and-html",
+      "status": "partial",
+      "issue": 109
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "HtmlOptions",
+      "sha256": "9661fe86886a4989c82152b2a28de1fc5ba63c703ec446c076dd9cf353875758",
+      "target": "docs/reference/core.md#text-and-html",
+      "status": "partial",
+      "issue": 109
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "StripTextOptions",
+      "sha256": "e212bc0c7dd5b29b36005dc61aa7605ae15760c8805f922e932414b79bd815b3",
+      "target": "docs/reference/core.md#public-type-index",
+      "status": "pending",
+      "issue": 112
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "StripHtmlOptions",
+      "sha256": "a660daec42648d48cad1b0b64e3f40d99ee929d703992d859d414594aa7bbb5c",
+      "target": "docs/reference/core.md#public-type-index",
+      "status": "pending",
+      "issue": 112
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "StripSoftHyphensOptions",
+      "sha256": "f0d0ac3b7bec52226cc3e10f4d805f801ff41e0bd69547d4f0ac932fad50483a",
+      "target": "docs/reference/core.md#public-type-index",
+      "status": "pending",
+      "issue": 112
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "RuleId",
+      "sha256": "55da21772e1079c85f5bcc6757d6a588629692aecdbecbee41bb7f92c300568c",
+      "target": "docs/reference/core.md#public-type-index",
+      "status": "partial",
+      "issue": 114
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "Source",
+      "sha256": "57c965bf9a6c155417f9f9418851934c621eac50cafa65e2f107ad10c17e1c18",
+      "target": "docs/reference/core.md#public-type-index",
+      "status": "pending",
+      "issue": 114
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "InputRange",
+      "sha256": "645be8e1cb9e22b906a3d78bad1878eda0e0c5f33c0aa39febc09e26f1f9d735",
+      "target": "docs/reference/core.md#public-type-index",
+      "status": "pending",
+      "issue": 114
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "TextRange",
+      "sha256": "4a6ce9076eba2d9dc808be7c3e5d43ef5aa269b146756484d06ba38f1b26dcc7",
+      "target": "docs/reference/core.md#public-type-index",
+      "status": "pending",
+      "issue": 114
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "HtmlRange",
+      "sha256": "f6eb2438af7973f2fdb8ca8243dfd5cfc17f7717f150941a11c6a944c5a5b036",
+      "target": "docs/reference/core.md#public-type-index",
+      "status": "pending",
+      "issue": 114
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "Edit",
+      "sha256": "83bc7976467d5ec20dc29ee71c8dda7b2c1eab989e47e8d42e9bd9b2c16028e9",
+      "target": "docs/reference/core.md#public-type-index",
+      "status": "pending",
+      "issue": 114
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "AppliedRule",
+      "sha256": "307b2de468ae854b61e55cc63c6b5279617546c1fac148bf8340caa6212d6395",
+      "target": "docs/reference/core.md#public-type-index",
+      "status": "pending",
+      "issue": 114
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "ConfigLocation",
+      "sha256": "55383a927732c4d3a6648c2bfb9db3e829b7bdf5be64435f910fac5eb625754f",
+      "target": "docs/reference/core.md#public-type-index",
+      "status": "pending",
+      "issue": 114
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "PunctaWarning",
+      "sha256": "df725f518ea785276f2defc65798c2272c115b4515175f4f615b44ff63ceee41",
+      "target": "docs/reference/core.md#public-type-index",
+      "status": "pending",
+      "issue": 114
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "TextResult",
+      "sha256": "d713932c8d266bafc9df8a2a8d5c2830158a7a3f341c80ad216ab8142f12f668",
+      "target": "docs/reference/core.md#reports",
+      "status": "partial",
+      "issue": 114
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "HtmlResult",
+      "sha256": "7890d5a4a9b15f03c3a57ee2937ce9269c384468c6c13b20cf4d462e8e3a31aa",
+      "target": "docs/reference/core.md#reports",
+      "status": "partial",
+      "issue": 114
+    },
+    {
+      "file": "packages/core/src/types.ts",
+      "name": "PunctaInstance",
+      "sha256": "f1841187123e27f3f1b9468ce50365cc5d9274d71b025b52180231a95469f69d",
+      "target": "docs/reference/core.md#instance-methods",
+      "status": "partial",
+      "issue": 112
+    },
+    {
+      "file": "packages/core/src/index.ts",
+      "name": "createPuncta",
+      "sha256": "1d3c7c22b5e3e08c10bbed20e1f1208b746a65910efc9804995e48240faaeca7",
+      "target": "docs/reference/core.md#createpuncta",
+      "status": "covered",
+      "issue": 108
+    },
+    {
+      "file": "packages/core/src/config.ts",
+      "name": "PunctaConfigError",
+      "sha256": "57fd94fc1b206973dbc08d7cf3e3f994c07cf6669c5541672da956eebe8c2a31",
+      "target": "docs/reference/core.md#punctaconfigerror",
+      "status": "partial",
+      "issue": 114
+    },
+    {
+      "file": "packages/with-en-gb/src/index.ts",
+      "name": "enGb",
+      "sha256": "1660af748f37e80239195b47af69c7c5659b0153619875f1fabefd26e8138bbb",
+      "target": "docs/reference/locales-and-rules.md#locale-exports",
+      "status": "covered",
+      "issue": 108
+    },
+    {
+      "file": "packages/with-es-es/src/index.ts",
+      "name": "esEs",
+      "sha256": "816f78c1948a20688ebd341f85c67909e2e279bac3d0e8761102630c32eccdf1",
+      "target": "docs/reference/locales-and-rules.md#locale-exports",
+      "status": "covered",
+      "issue": 108
+    },
+    {
+      "file": "packages/core/src/settings.ts",
+      "name": "sharedKeys",
+      "sha256": "20fa9c7d941b96140aef6a9aea12cb0a36cbb58c7ce9bd1a5a9f72475fb50d8b",
+      "target": "docs/reference/settings.md#shared-fields",
+      "status": "covered",
+      "issue": 108
+    },
+    {
+      "file": "packages/core/src/settings.ts",
+      "name": "ruleDefaults",
+      "sha256": "719767f0fbe073126ba1a00f6f29d7456e6006bac70c62dcde97d642e6278fbe",
+      "target": "docs/reference/settings.md#rule-fields-and-defaults",
+      "status": "partial",
+      "issue": 111
+    },
+    {
+      "file": "packages/core/src/settings.ts",
+      "name": "hyphenationDefaults",
+      "sha256": "4a6f49f338023aa91c7c6c1847c3ef056ae90b9957a7022090e5e3af5b3d1b47",
+      "target": "docs/reference/settings.md#locale-dependent-validation",
+      "status": "partial",
+      "issue": 112
+    },
+    {
+      "file": "packages/core/src/settings.ts",
+      "name": "percentageLocaleDefault",
+      "sha256": "c10f02d0f4b175e5084504599904ff5a2e200da80e4da3938b7b34710393f606",
+      "target": "docs/reference/settings.md#rule-fields-and-defaults",
+      "status": "covered",
+      "issue": 108
     }
   ]
 }

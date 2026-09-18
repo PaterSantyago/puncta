@@ -34,23 +34,18 @@ See the [quick start](https://github.com/PaterSantyago/puncta/blob/codex/user-do
 and [documentation index](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/README.md).
 Release-specific URLs are pending. These links point to the documentation branch.
 
+## Guide and reference
+
+- [Configure settings and locales](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/configuration.md).
+- [Core signatures](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/core.md).
+- [Settings and defaults](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md).
+- [Locale rules](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md).
+
 ## Existing reference material
 
 These sections contain reference material until the separate reference pages are
 complete. Its migration and full documentation review are pending.
 
-Explicitly installed es-es locale module. Named ESM export: `esEs`.
-
-```ts
-import { createPuncta } from "@use-puncta/core";
-import { esEs } from "@use-puncta/with-es-es";
-
-const puncta = createPuncta({ locales: [esEs], locale: esEs.id });
-puncta.text("Wait..."); // "Wait…"
-```
-
-The module is immutable, exposes readonly `id` and package `version`, and is ready
-synchronously after import. There is no global registration or runtime loading.
 Core is a peer dependency. The locale includes a static Spanish Liang resource;
 opt in with `hyphenation: { enabled: true }` to obtain `ca\u00admi\u00adno` from
 `camino`. Defaults are six letters and two letters on each side. Only lowercase

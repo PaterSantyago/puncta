@@ -34,103 +34,21 @@ See the [quick start](https://github.com/PaterSantyago/puncta/blob/codex/user-do
 and [documentation index](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/README.md).
 Release-specific URLs are pending. These links point to the documentation branch.
 
+## Guide and reference
+
+- [Configure settings and locales](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/configuration.md).
+- [Core signatures](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/core.md).
+- [Settings and defaults](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md).
+- [Locale rules](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md).
+
 ## Existing reference material
 
 These sections contain reference material until the separate reference pages are
 complete. Its migration and full documentation review are pending.
 
-Synchronous ESM typography, with explicitly installed locales and no React or DOM
-requirement. The implementation covers quotes, apostrophes, ordinary spaces, punctuation intervals,
-ellipses, dashes, ranges, minus, units, percentages and currencies, plus optional
-digit grouping and algorithmic hyphenation in en-gb and es-es. Recognition spans transparent inline
-leaves and respects nested configuration scopes.
-
-```ts
-import { createPuncta } from "@use-puncta/core";
-import { enGb } from "@use-puncta/with-en-gb";
-
-const puncta = createPuncta({ locales: [enGb], locale: enGb.id });
-puncta.text("Hello ,  world..."); // "Hello, world…"
-puncta.html("<span>Wait...</span>"); // "<span>Wait…</span>"
-puncta.text("😀 Wait...", { detailed: true });
-```
-
-`text` and `html` return strings by default. `detailed: true` returns `result`,
-`hasEdits`, `outputChanged`, `edits`, `sources`, `appliedRules` and `warnings`.
-Ranges use UTF-16 offsets in original text leaves. A boolean variable produces a
-union return type. Four or more consecutive dots stay unchanged. Repeating the
-conversion creates no new edits. Read a locale identifier from `locale.id`;
-`localeId` has been removed.
-
-The `spaces` rule collapses repeated U+0020 spaces and fixes unambiguous punctuation
-intervals. It retains line endings, blank lines, indentation, tabs, existing NBSP,
-numeric punctuation and dates. Opt-in digit grouping additionally preserves
-complete numeric candidates and repeated spaces separating independent numbers;
-it can normalize valid integer-group separators as described below. In es-es it removes ordinary inner spaces after
-existing `¿`/`¡` and before `?`/`!`; it does not supply missing signs. Textual double-hyphen markers and recognised dashes use spaced en dashes in
-en-gb and closed em-dash insertions in es-es. A known unit disambiguates
-`10-12 kg` → `10–12\u00a0kg` and `-5 kg` → `−5\u00a0kg`. Standalone ranges
-require `rules.ranges.standalone: true`; ordinary word hyphens and dialogue
-markers are preserved. `rules.dashes.normalizeExisting: false` retains formatted
-dash styles while still recognising explicit markers.
-
-Spacing around ambiguous ellipses (including separated dots), spaced numeric
-punctuation and periods directly between text stays conservative. Detailed results
-use `typography.ambiguous`, `ruleId: "spaces"` and original `location.ranges` for
-those intervals. Recognition of ellipses continues when their conversion is off,
-so general space cleanup cannot destroy their intervals. Warnings may repeat on
-unchanged ambiguous text; disabled rules and protected text produce no rule warnings.
-
-Quotes use `‘…’` then `“…”` in en-gb, and `«…»`, `“…”`, `‘…’` in es-es,
-continuing by alternating single/double pairs. `rules.quotes.normalizeExisting: false`
-retains formatted pairs and selects straight-pair styles compatible with their
-immediate neighbours. Unpaired or ambiguous delimiters are preserved with
-`quotes.unpaired` or `typography.ambiguous` warnings. No missing signs are added,
-and punctuation stays on its original side of each quote. Spanish inner ordinary
-spaces are removed by the independently switchable `spaces` rule.
-
-Punctuation apostrophes become U+2019 under `apostrophes`; turning off that rule
-still recognises their role within a quote. Letter apostrophe U+02BC is retained.
-Feet/inches and unresolved quote roles are not guessed. Quotes can span a single
-line break, br/wbr, or an opaque inline fragment. Blank lines, blocks and Suspense
-end a quote context. A child typography scope has independent depth while the
-outer pair can surround it. Protected content never supplies quote delimiters.
-
-Known case-sensitive units bind to numbers with U+00A0 NBSP, including composite
-notations such as `km/h` and `m²`. The angle degree stays attached (`30°`), while
-`°C` and `°F` take NBSP. `rules.units.additional` adds literal whole designations;
-its array replaces inherited additions, removes case-sensitive duplicates and
-rejects empty strings, edge whitespace and control characters. Additions retain
-the distinct percentage, currency and angle roles.
-
-Percentages use no space in en-gb and NBSP in es-es; set
-`rules.percentages.space` to `"none"` or `"nbsp"` to override. Currency codes
-`GBP`, `EUR`, `USD` use NBSP before or after a number. Symbols `£`, `€`, `$` attach
-before the number in en-gb and use NBSP after it in es-es. The opposite symbol
-order preserves its original interval and reports `currency.order`; currency and
-number order are never changed. Numeric separators retain their spelling unless
-opt-in digit grouping explicitly normalizes eligible integer groups. A currency between two numbers
-belongs to its attached side (no ordinary space, including existing NBSP). When
-both sides have equal attachment, the construction remains unchanged with
-`typography.ambiguous`. These recognised intervals survive general space cleanup
-even when their own rule is disabled. New bonds stop at line breaks, opaque
-fragments and nested typography scopes.
-
-Both the locale modules and the active locale are required. A call can explicitly
-select another loaded locale. Invalid arguments throw `PunctaConfigError` with
-`code`, `details`, `optionPath` and `location`. Instances snapshot their registry
-and all explicit settings, so changing caller objects or arrays cannot change an
-instance. `with(overrides)` returns an independent instance with the same registry.
-`locale`, `enabled`, `rules` and `hyphenation` are shared settings. Rule groups merge
-by field; omitted/undefined fields inherit, null fields or groups restore the
-current locale defaults. Arrays replace inherited additions. A locale change keeps
-explicit overrides and revalidates language minima, even with hyphenation disabled.
-
-```ts
-const paused = puncta.with({ rules: { ellipsis: { enabled: false } } });
-paused.text("Wait..."); // "Wait..."
-paused.text("Wait...", { rules: { ellipsis: null } }); // "Wait…"
-```
+Shared settings and the ten standard rule groups now have canonical definitions
+in the references above. The material below covers pending HTML, protection,
+diagnostics, hyphenation, and digit-grouping slices.
 
 HTML supports `data-puncta=""`, `data-puncta="off"`, `data-puncta-locale` and
 JSON `data-puncta-options` (rules/hyphenation only). Each marker creates an independent

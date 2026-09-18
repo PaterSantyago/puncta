@@ -34,25 +34,17 @@ See the [quick start](https://github.com/PaterSantyago/puncta/blob/codex/user-do
 and [documentation index](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/README.md).
 Release-specific URLs are pending. These links point to the documentation branch.
 
+## Guide and reference
+
+- [Configure settings and locales](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/configuration.md).
+- [Core signatures](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/core.md).
+- [Settings and defaults](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md).
+- [Locale rules](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md).
+
 ## Existing reference material
 
 These sections contain reference material until the separate reference pages are
 complete. Its migration and full documentation review are pending.
-
-Explicitly installed en-gb locale module. Named ESM export: `enGb`.
-
-```ts
-import { createPuncta } from "@use-puncta/core";
-import { enGb } from "@use-puncta/with-en-gb";
-
-const puncta = createPuncta({ locales: [enGb], locale: enGb.id });
-puncta.text("Wait..."); // "Wait…"
-```
-
-The module is immutable, exposes readonly `id` and package `version`, and is ready
-synchronously after import. There is no global registration or runtime loading.
-Quotes, apostrophes, spaces, punctuation intervals, ellipsis, textual dashes, numeric ranges, minus, units, percentages and currencies are implemented; the full locale
-profile is implemented. Core is a peer dependency.
 
 Enable algorithmic soft hyphens explicitly with
 `puncta.with({ hyphenation: { enabled: true } })`. The default minimum word length

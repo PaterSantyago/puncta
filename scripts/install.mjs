@@ -173,10 +173,14 @@ try {
   }
   // First-result consumers have only the documented core/locale dependencies.
   for (const manager of ["npm", "pnpm"]) {
-    for (const id of ["en-gb", "es-es"]) {
+    for (const ids of [["en-gb"], ["es-es"], ["en-gb", "es-es"]]) {
+      const id = ids.join("-");
       const cwd = join(temporary, `${manager}-documentation-${id}`);
       await mkdir(cwd);
-      const names = [core.name, `@use-puncta/with-${id}`];
+      const names = [
+        core.name,
+        ...ids.map((locale) => `@use-puncta/with-${locale}`),
+      ];
       await writeFile(
         join(cwd, "package.json"),
         JSON.stringify({

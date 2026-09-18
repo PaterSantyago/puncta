@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readdir, readFile, mkdir, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -119,6 +120,69 @@ function headings(markdown) {
   return anchors;
 }
 
+// Compare public declarations and defaults with the reviewed documentation inventory.
+// A source change requires a new semantic review; a matching hash is not that review.
+export async function documentationContracts() {
+  const files = [
+    "packages/core/src/types.ts",
+    "packages/core/src/index.ts",
+    "packages/core/src/config.ts",
+    "packages/with-en-gb/src/index.ts",
+    "packages/with-es-es/src/index.ts",
+  ];
+  const contracts = [];
+  for (const file of files) {
+    const source = await readFile(join(root, file), "utf8");
+    const declarations = [
+      ...source.matchAll(
+        /^export (?:interface|type|function|class|const) (\w+)/gm,
+      ),
+    ];
+    for (const [index, match] of declarations.entries()) {
+      const name = match[1];
+      if (file.endsWith("config.ts") && name !== "PunctaConfigError") continue;
+      const declaration = source.slice(
+        match.index,
+        declarations[index + 1]?.index ?? source.length,
+      );
+      contracts.push({
+        file,
+        name,
+        sha256: createHash("sha256")
+          .update(declaration.replace(/\s+/g, " "))
+          .digest("hex"),
+      });
+    }
+  }
+  const settings = await readFile(
+    join(root, "packages/core/src/settings.ts"),
+    "utf8",
+  );
+  for (const [name, expression] of [
+    ["sharedKeys", /export const sharedKeys = ([\s\S]*?);/],
+    ["ruleDefaults", /const groups = ([\s\S]*?);/],
+    [
+      "hyphenationDefaults",
+      /function hyphenationDefaults[\s\S]*?return ([\s\S]*?);/,
+    ],
+    [
+      "percentageLocaleDefault",
+      /\.\.\.\(name === "percentages"([\s\S]*?)\.\.\.settings\.rules/,
+    ],
+  ]) {
+    const definition = settings.match(expression)?.[1];
+    assert.ok(definition, `Missing settings contract: ${name}`);
+    contracts.push({
+      file: "packages/core/src/settings.ts",
+      name,
+      sha256: createHash("sha256")
+        .update(definition.replace(/\s+/g, " "))
+        .digest("hex"),
+    });
+  }
+  return contracts;
+}
+
 export async function checkDocumentation() {
   const inventory = JSON.parse(
     await readFile(join(root, inventoryPath), "utf8"),
@@ -127,6 +191,32 @@ export async function checkDocumentation() {
   for (const name of await readdir(join(root, "packages"))) {
     if ((await readdir(join(root, "packages", name))).includes("README.md"))
       pages.add(`packages/${name}/README.md`);
+  }
+  const contracts = await documentationContracts();
+  assert.deepEqual(
+    inventory.sourceContracts.map(({ file, name, sha256 }) => ({
+      file,
+      name,
+      sha256,
+    })),
+    contracts,
+    "Public declarations/defaults changed: review the canonical documentation and update its inventory",
+  );
+  for (const contract of inventory.sourceContracts) {
+    assert.ok(
+      ["covered", "partial", "pending"].includes(contract.status),
+      `${contract.name}: status required`,
+    );
+    assert.ok(contract.issue, `${contract.name}: issue required`);
+    const [file, anchor] = contract.target.split("#");
+    assert.ok(
+      pages.has(file),
+      `${contract.name}: registered canonical page required`,
+    );
+    assert.ok(
+      headings(await readFile(join(root, file), "utf8")).has(anchor),
+      `${contract.name}: canonical anchor missing`,
+    );
   }
   const examples = await documentationExamples();
   assert.equal(
