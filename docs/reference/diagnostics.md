@@ -47,7 +47,7 @@ An unchanged result is not proof that the input has no warnings.
 
 | Code                                 | Cause                                                                                                                 | Source, rule, locale, details                                                                                                                                     | Action                                                                                                                                                                                        |
 | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `typography.ambiguous`               | Unclear quote, dash, range, minus, currency attachment, spacing, ellipsis, technical-token change, or digit grouping. | `source: "rule"`; relevant `ruleId`; active locale; empty `details`; text location.                                                                               | Check the rule and original candidate. Correct the source if its intended form is clear. Protect intentional notation. See [rule limits](locales-and-rules.md#unchanged-and-ambiguous-input). |
+| `typography.ambiguous`               | Unclear quote, dash, range, minus, currency attachment, spacing, ellipsis, technical-token change, or digit grouping. | `source: "rule"`; related `ruleId`; active locale; empty `details`; text location.                                                                                | Check the rule and original candidate. Correct the source if its intended form is clear. Protect intentional notation. See [rule limits](locales-and-rules.md#unchanged-and-ambiguous-input). |
 | `quotes.unpaired`                    | Quote has no matching pair in its recognition context.                                                                | `source: "rule"`, `ruleId: "quotes"`; active locale; empty `details`; text location.                                                                              | Correct the quote pair or protect intentional text. Check context boundaries.                                                                                                                 |
 | `currency.order`                     | Currency order does not agree with the selected profile.                                                              | `source: "rule"`, `ruleId: "currencies"`; active locale; empty `details`; full construction text location.                                                        | Check the locale and [currency profile](locales-and-rules.md#currencies). Correct the source order if necessary. Puncta does not reorder it.                                                  |
 | `hyphenation.unsupported-characters` | Candidate word has characters outside the locale alphabet.                                                            | `source: "rule"`, `ruleId: "hyphenation.insert"`; active locale; empty `details`; word text location.                                                             | Check the word and selected locale. The word gets no insertion.                                                                                                                               |
@@ -58,8 +58,8 @@ An unchanged result is not proof that the input has no warnings.
 | `html.parse`                         | HTML parser reports a problem.                                                                                        | `source: "parser"`, `ruleId: null`, `locale: null`; `details.parserCode`; input location or unavailable location.                                                 | Check the HTML and fragment context. The parser can repair the tree. This warning is not a sanitization result.                                                                               |
 
 Rule warnings use original text ranges and the active locale.
-`typography.ambiguous` uses the rule that found the uncertain input as `ruleId`.
-This includes technical-token checks that prevent a rule from changing token meaning.
+`typography.ambiguous` uses the rule that found the input that caused the warning as `ruleId`.
+This includes technical-token checks that prevent changes to token meaning.
 Disabled rules and protected text cause no warnings from those rules.
 Other enabled rules can report their own warnings for the same input.
 Hyphenation insertion warnings also need insertion enabled and a candidate that passes the initial admission checks.
@@ -98,7 +98,7 @@ Sources include the text leaves that the operation visits, not a full copy of pr
 Plain text has one source with `id: 0` and `path: []`, even with protection ranges.
 
 For HTML, `text` is decoded text. Numeric path entries index the parsed tree.
-Comments count in these indices. Parser-inserted elements also affect paths.
+Comments count in these indices. Elements that the parser inserts also have an effect on paths.
 For React, paths address the original input tree, not rendered DOM or component output.
 Numeric entries index arrays. `"children"` enters element children and `"fallback"` enters a Suspense fallback.
 Numeric React children use their string representation for source text.
@@ -118,15 +118,15 @@ Its `before` is the joined source text from those ranges.
 This union maps decoded HTML positions to original HTML string positions.
 The offsets also use UTF-16 units and an exclusive end.
 
-| Shape                                                  | Meaning                                                                                                                             |
-| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `{ accuracy: "exact", start: number, end: number }`    | Both boundaries map to the original input. An entity can have a different length from its decoded text.                             |
-| `{ accuracy: "covering", start: number, end: number }` | A boundary is in a multi-codepoint origin. The input span includes that full origin. It is not a precise patch range.               |
-| `{ accuracy: "unavailable", reason: string }`          | No reliable contiguous input span. For example, parser repairs can join text from separate input spans. No `start` or `end` fields. |
+| Shape                                                  | Meaning                                                                                                                                            |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `{ accuracy: "exact", start: number, end: number }`    | Both boundaries map to the original input. An entity can have a different length from its decoded text.                                            |
+| `{ accuracy: "covering", start: number, end: number }` | A boundary divides the decoded text of one origin. The input span includes that full origin. It is not an accurate patch range.                    |
+| `{ accuracy: "unavailable", reason: string }`          | No contiguous input span that the parser can map. For example, parser repairs can join text from separate input spans. No `start` or `end` fields. |
 
 Entity decoding, CRLF normalization, and non-BMP text keep source provenance when decoding agrees with the parsed leaf.
 Unavailable mapping does not remove the decoded `sourceId`, `start`, or `end`.
-Use those fields to find the source leaf. Do not infer missing HTML offsets.
+Use those fields to find the source leaf. Do not calculate HTML offsets when the mapping is unavailable.
 
 ### Edit and AppliedRule
 
@@ -134,11 +134,11 @@ Use those fields to find the source leaf. Do not infer missing HTML offsets.
 
 | Field     | Type and meaning                                      |
 | --------- | ----------------------------------------------------- |
-| `kind`    | `"replace"                                            | "insert" | "delete"` |
+| `kind`    | `"replace"`, `"insert"`, or `"delete"`                |
 | `before`  | `string`: original text across the ranges             |
 | `after`   | `string`: replacement text. Empty for deletion        |
 | `locale`  | `LocaleId`: active locale for this edit               |
-| `ruleIds` | `readonly RuleId[]`: rules responsible for the edit   |
+| `ruleIds` | `readonly RuleId[]`: rules that made the edit         |
 | `ranges`  | `readonly Range[]`: positions in the original sources |
 
 `AppliedRule` has `ruleId: RuleId` and `locale: LocaleId`.
@@ -169,7 +169,7 @@ All fields are readonly.
 
 `location` is `ConfigLocation` or `{ kind: "text", ranges: readonly (TextRange | HtmlRange)[] }`.
 Use `kind` and `accuracy` to narrow the unions before you read their fields.
-The [warning catalogue](#warnings) gives the code-specific fields.
+The [warning catalog](#warnings) gives the code-specific fields.
 
 ## Read an error and a warning
 
@@ -257,10 +257,11 @@ console.log(JSON.stringify(repaired.edits[0].ranges));
 [{"sourceId":0,"start":1,"end":4,"inputRange":{"accuracy":"unavailable","reason":"Parser text cannot be mapped to a contiguous input span"}}]
 ```
 
-The last range has no reliable HTML input position because the parser joined separate input spans.
+The last range has no HTML input position that the parser can map because the parser joined separate input spans.
 The decoded source range stays available.
 For an entity replacement with an `exact` mapping, see [grouping source positions](#grouping-source-positions).
-`covering` is a permitted mapping shape for boundaries in a multi-codepoint origin.
+`covering` is a permitted mapping shape for boundaries that divide one decoded origin.
+That origin can be a non-BMP entity with two UTF-16 units, or an entity with more than one code point.
 These examples do not depend on a typography rule that edits only part of such an origin.
 
 ## Read React paths
@@ -404,7 +405,7 @@ An unchanged U+202F produces no grouping edit or applied-rule entry.
 
 For HTML, `before` and `after` are decoded text.
 An entity separator replacement maps to the full original entity spelling.
-Input mappings use `exact` for mapped boundaries, `covering` for a range through a multi-codepoint origin, or `unavailable` with a reason.
+Input mappings use `exact` for mapped boundaries, `covering` for a boundary that divides one decoded origin, or `unavailable` with a reason.
 Supported digit and separator entities map at their boundaries. Grouping uses only these boundaries for positions in entities.
 The [HTML source example](../guides/html.md#group-digits-across-inline-elements) shows separator ownership.
 

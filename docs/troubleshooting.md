@@ -2,7 +2,7 @@
 
 [Documentation index](README.md)
 
-Select the symptom below. Use the [diagnostic catalogue](reference/diagnostics.md) for codes, fields, and source positions.
+Select the symptom below. Use the [diagnostic catalog](reference/diagnostics.md) for codes, fields, and source positions.
 
 ## The API is missing
 
@@ -48,7 +48,7 @@ For `locale.unavailable`, load the module at creation. Then select its ID.
 For `locale.duplicate`, remove the duplicate registry entry.
 For `locale.incompatible`, use the matching supported package export.
 
-For other codes, use the [error catalogue](reference/diagnostics.md#errors).
+For other codes, use the [error catalog](reference/diagnostics.md#errors).
 For `config.invalid-option`, check the [valid surfaces and values](reference/settings.md).
 Wrong types, unknown fields, and whole-object null resets are invalid.
 
@@ -63,7 +63,7 @@ An unresolved quote or ambiguous interval can produce a warning on each call.
 `hasEdits: false` does not mean that `warnings` is empty.
 Correct the source when its intended role is clear.
 See [unchanged and ambiguous input](reference/locales-and-rules.md#unchanged-and-ambiguous-input).
-Use the [warning catalogue](reference/diagnostics.md#warnings) to identify the rule and remedy.
+Use the [warning catalog](reference/diagnostics.md#warnings) to identify the rule and corrective action.
 
 ## HTML output has unexpected markup
 

@@ -40,7 +40,7 @@ Use [diagnostics](reference/diagnostics.md) for report fields, codes, and source
 ## Solve a problem
 
 Use [troubleshooting](troubleshooting.md) for installation, settings, locale changes,
-and unchanged text. Use the diagnostic codes to find the relevant remedy.
+and unchanged text. Use the diagnostic codes to find the related corrective action.
 
 ## Contribute
 

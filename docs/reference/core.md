@@ -61,7 +61,7 @@ Defaults are `{}` for `details`, `[]` for `optionPath`, and
 
 For `config.invalid-option`, `details.reason` is `required`, `type`, `value`, or `unknown`.
 See the [checked error example](settings.md#locale-dependent-validation).
-See the [error catalogue](diagnostics.md#errors) and [location union](diagnostics.md#configlocation).
+See the [error catalog](diagnostics.md#errors) and [location union](diagnostics.md#configlocation).
 
 ## Instance methods
 

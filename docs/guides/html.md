@@ -153,7 +153,7 @@ Each edit range refers to original decoded text in one leaf.
 Its `inputRange` refers to the original HTML string.
 Tags between leaves are not part of these ranges.
 Both coordinates use UTF-16 units.
-Full diagnostic schemas belong to the pending diagnostics reference.
+See [diagnostic fields and original source positions](../reference/diagnostics.md#result-types) for the full report schemas.
 
 ### Context boundaries
 
