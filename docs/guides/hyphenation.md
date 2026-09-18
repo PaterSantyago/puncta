@@ -16,8 +16,8 @@ Puncta does not control layout.
 
 Set `hyphenation.enabled: true` on an instance, call, or nested typography scope.
 Insertion operates after typography and uses the selected locale's resource.
-The [settings reference](../reference/settings.md#hyphenation) defines minima and reset behavior.
-The [locale reference](../reference/locales-and-rules.md#hyphenation) defines word admission and language limits.
+The [settings reference](../reference/settings.md#hyphenation) gives minima and reset behavior.
+The [locale reference](../reference/locales-and-rules.md#hyphenation) gives word admission and language limits.
 
 <!-- puncta:example hyphenation-insert -->
 
@@ -59,15 +59,15 @@ backbone
 back\u00adbone
 ```
 
-A field reset keeps the other inherited fields. A whole `hyphenation` reset also resets insertion to off.
-An existing SHY prevents further insertion in that word.
-This does not prevent other typography rules from operating.
+A field reset keeps the other inherited fields. A reset of all `hyphenation` fields also sets insertion to off.
+An existing SHY prevents more insertion in that word.
+Other typography rules can operate.
 
 ## Check words that stay unchanged
 
 Detailed calls return warnings for unsupported characters, mixed scripts, and Spanish `tl` ambiguity.
-Case exclusions, short words, digits, apostrophes, hyphens, and existing SHY do not require an insertion warning.
-Protected text does not produce insertion warnings.
+Case exclusions, short words, digits, apostrophes, hyphens, and existing SHY do not cause an insertion warning.
+Protected text does not cause insertion warnings.
 This program prints each result and its warning codes.
 
 <!-- puncta:example hyphenation-exclusions -->
@@ -131,7 +131,7 @@ caféine 0
 ```
 
 The `о` in `backbоne` is Cyrillic U+043E.
-Its visual similarity to Latin `o` does not make it an English letter.
+Its shape is almost the same as Latin `o`, but it is not an English letter.
 
 ## Insert across HTML and React leaves
 
@@ -174,9 +174,9 @@ console.log(
 
 ## Remove SHY from text
 
-Use `stripSoftHyphens` for export. It removes accessible author SHY and Puncta SHY without typography or digit grouping.
+Use `stripSoftHyphens` for export. It removes author SHY and Puncta SHY from text that it can process, without typography or digit grouping.
 It does not use word admission or insertion minima to select characters for removal.
-Text ranges and automatic technical-text protection still apply.
+Text ranges and automatic technical-text protection also apply.
 See [core removal options and overloads](../reference/core.md#stripsofthyphens).
 
 <!-- puncta:example hyphenation-remove-text -->
@@ -288,14 +288,14 @@ hyphenation.remove
 
 ## Resources and validation
 
-Insertion requires a compatible resource from the selected locale package.
+A compatible resource from the selected locale package is necessary for insertion.
 Both supplied locales include their resource. Puncta does not fetch a resource during a call.
 Missing or incompatible insertion resources cause `hyphenation.resource-unavailable` or `hyphenation.resource-incompatible` before a result returns.
 Use matching functional core and locale packages. Do not construct custom locale objects.
 
-Removal needs no insertion resource, including in nested scopes.
-It still validates shared settings, locale selection, minima, and format-specific options.
+Removal needs no insertion resource, even in nested scopes.
+It validates shared settings, locale selection, minima, and format-specific options.
 `hyphenation.enabled: false` does not disable removal. Shared `enabled: false` does.
 See [locale-change validation](../reference/settings.md#locale-dependent-validation) for a reset example.
 
-For unchanged words or absent line breaks, use [hyphenation troubleshooting](../troubleshooting.md#no-soft-hyphens-or-no-line-breaks).
+For unchanged words or missing line breaks, use [hyphenation troubleshooting](../troubleshooting.md#no-soft-hyphens-or-no-line-breaks).

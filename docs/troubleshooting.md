@@ -158,10 +158,10 @@ For resource errors, use matching functional core and locale packages.
 The public scaffold is not the functional package set.
 For an invalid minimum after a locale change, [reset the inherited field](reference/settings.md#locale-dependent-validation).
 
-## Soft hyphens remain after removal
+## Soft hyphens stay after removal
 
 Use the removal operation for the input format.
-HTML requires `format: "html"`. React requires the pure removal function and an explicit instance.
+For HTML, use `format: "html"`. For React, use the pure removal function and an explicit instance.
 Check protected text, automatic technical tokens, attributes, disabled scopes, unavailable languages, and opaque React components.
 These regions keep SHY. A child cannot cancel inherited protection.
 See [separate removal examples](guides/hyphenation.md#remove-shy-from-text).

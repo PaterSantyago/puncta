@@ -102,7 +102,7 @@ Shared settings are flat fields in the options object.
 There is no nested `options` field.
 `protect`, `format`, `mode`, and `context` are invalid.
 Use tree protection instead of text ranges.
-Missing or invalid instances throw `instance.missing`.
+A missing instance throws `instance.missing`. An invalid instance throws `config.invalid-option`.
 
 Pure calls validate settings and `detailed` even when processing is disabled.
 Core settings errors also apply to pure calls.
@@ -134,8 +134,8 @@ Detailed coordinate walkthroughs and the full diagnostic catalog are pending.
 ## stripSoftHyphensReact
 
 Import this function from `@use-puncta/with-react/pure`.
-Call it synchronously with a `ReactNode` and `ReactTransformOptions`, including an explicit instance.
-It removes accessible U+00AD without typography or digit grouping.
+Call it synchronously with a `ReactNode` and `ReactTransformOptions`. Supply an explicit instance.
+It removes U+00AD from text that it can process, without typography or digit grouping.
 It does not read Context, install a Provider, or mutate the input tree.
 
 ```ts
@@ -156,11 +156,11 @@ function stripSoftHyphensReact(
 `detailed` defaults to `false`. A boolean variable gives `ReactNode | ReactResult`.
 All [ReactTransformOptions fields and validation](#reacttransformoptions) apply.
 `format`, `mode`, `context`, `protect`, and a nested `options` field are invalid.
-Missing or invalid instances throw `instance.missing`.
+A missing instance throws `instance.missing`. An invalid instance throws `config.invalid-option`.
 Invalid call settings throw the applicable core configuration error.
 
 No insertion resource is necessary, even when `hyphenation.enabled` is true.
-Removal still validates settings, locale minima, and visited nested scopes.
+Removal validates settings, locale minima, and visited nested scopes.
 Shared `enabled: false` prevents removal. `hyphenation.enabled: false` does not.
 Attributes, opaque content, protected hosts, disabled scopes, and unavailable-language regions keep SHY.
 The function does not render custom components or inspect their output.

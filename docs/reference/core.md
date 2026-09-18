@@ -5,7 +5,7 @@
 Import public values and types from `@use-puncta/core`.
 All operations are synchronous. Core operates without React or a browser DOM.
 This page covers instance configuration, text/HTML parameters, and return overloads.
-Full source-coordinate definitions remain in the pending diagnostics slice.
+Full source-coordinate definitions are part of the pending diagnostics slice.
 
 ## Runtime exports
 
@@ -263,7 +263,7 @@ Full location definitions are pending in the diagnostics slice.
 ### stripSoftHyphens
 
 Call `instance.stripSoftHyphens(source, options?)` synchronously with a string.
-It removes accessible U+00AD without typography or digit grouping.
+It removes U+00AD from text that it can process, without typography or digit grouping.
 `format` defaults to `"text"`. The method returns a string unless `detailed` is true.
 These declarations show all six overloads:
 
@@ -277,7 +277,7 @@ stripSoftHyphens(source: string, options: StripSoftHyphensOptions): string | Tex
 ```
 
 A boolean `detailed` value gives the format-specific union.
-If the options type permits both formats, the return type also permits both report types.
+If both formats are permitted in the options type, both report types are also permitted in the return type.
 The options types have these fields:
 
 | Type                      | Fields and defaults                                                                                                               |
@@ -295,14 +295,14 @@ Invalid options throw `PunctaConfigError` with `config.invalid-option` or the ap
 Removal needs no insertion resource and does not depend on `hyphenation.enabled`.
 Shared `enabled: false` prevents removal.
 Protected text, technical tokens, HTML attributes, disabled scopes, and unavailable-language regions keep SHY.
-The HTML parser and serializer still operate.
+The HTML parser and serializer also operate.
 See [text and HTML removal examples](../guides/hyphenation.md#remove-shy-from-text).
 
 Reports use `hyphenation.remove` deletion edits with original UTF-16 ranges.
 `hasEdits` includes these deletions. `outputChanged` compares the result with the input string.
 HTML serialization can change the output without a removal edit.
 Insertion through `text()` or `html()` instead uses `hyphenation.insert` edits after typography.
-An insertion at a transparent leaf boundary belongs to the left leaf.
+Puncta gives an insertion at a transparent leaf boundary to the left leaf.
 
 ### Check removal types and validation
 

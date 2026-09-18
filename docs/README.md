@@ -39,7 +39,7 @@ and [React package instructions](../packages/with-react/README.md).
 
 The [grouping diagnostics](reference/diagnostics.md#digit-grouping) are available.
 The full diagnostic catalog is pending.
-Some diagnostic definitions remain pending.
+Some diagnostic definitions are pending.
 
 ## Solve a problem
 

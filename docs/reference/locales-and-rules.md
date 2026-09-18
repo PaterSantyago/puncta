@@ -485,19 +485,19 @@ Its `NOTICE.md` identifies upstream sources and licenses.
 | `en-gb` | Latin a–z, lowercase or one initial capital                          |
 | `es-es` | Latin a–z plus á, é, í, ó, ú, ü, ñ, lowercase or one initial capital |
 
-Spanish permits equivalent decomposed graphemes without a change to their source spelling.
+Spanish supports equivalent decomposed graphemes without a change to their source spelling.
 All capitals, mixed case, digits, apostrophes, ordinary hyphens, and existing SHY cause whole-word exclusion.
-Unsupported graphemes and mixed scripts keep the word unchanged and can produce detailed warnings.
-Protected text produces no insertion warnings.
+Unsupported graphemes and mixed scripts keep the word unchanged and can cause detailed warnings.
+Protected text causes no insertion warnings.
 Opaque, protected, and scope boundaries prevent insertion in adjacent incomplete words.
 
 Spanish words with `tl` stay unchanged with `hyphenation.language-ambiguity`.
-Regional pronunciation differences make the division ambiguous.
+Regional pronunciation differences give different divisions.
 Puncta has no English pronunciation detector.
-The algorithm can omit permitted positions. Evidence from a fixed corpus does not establish accuracy for all words.
+The algorithm does not always insert SHY at all permitted positions. Evidence from a fixed corpus does not show accuracy for all words.
 
 The [English corpus record](../acceptance/en-gb-hyphenation-corpus.md) and [Spanish corpus record](../acceptance/es-es-hyphenation-corpus.md) document language evidence selected before engine comparison.
-English `back|bone` follows compound construction and pronunciation.
-Spanish `ca|mi|no` follows the RAE syllable-division rules.
+English compound construction and pronunciation give `back|bone`.
+The RAE syllable-division rules give Spanish `ca|mi|no`.
 The [checked programs](../guides/hyphenation.md#enable-insertion) show these results and excluded forms.
-A permitted position does not require a rendered line break.
+A permitted position does not always cause a rendered line break.

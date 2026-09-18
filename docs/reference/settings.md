@@ -118,13 +118,13 @@ Unknown fields, arrays, and non-object groups other than `null` are invalid.
 
 Use `hyphenation` in shared instance/call options, component `options`, or `data-puncta-options` JSON.
 An omitted field or `undefined` inherits. A field set to `null` resets to the current locale default.
-`hyphenation: null` resets all fields, including `enabled` to `false`.
+`hyphenation: null` resets all fields and sets `enabled` to `false`.
 An empty object keeps inherited fields. See [merge rules](#inheritance-and-reset).
 
-Insertion requires the selected locale's compatible resource when `hyphenation.enabled` is true.
+The selected locale's compatible resource is necessary for insertion when `hyphenation.enabled` is true.
 Resource validation also applies when shared `enabled` is false.
-Removal bypasses insertion resource validation but still validates settings and minima, including nested scopes.
-The [hyphenation guide](../guides/hyphenation.md#resources-and-validation) describes resource failures and removal.
+Removal bypasses insertion resource validation but validates settings and minima, also in nested scopes.
+The [hyphenation guide](../guides/hyphenation.md#resources-and-validation) gives information about resource failures and removal.
 
 ## Locale-dependent validation
 

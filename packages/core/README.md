@@ -61,8 +61,8 @@ and astral characters retain UTF-16 provenance. Unmappable parser repairs report
 `accuracy: "unavailable"` with a reason.
 
 Use the [hyphenation guide](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/hyphenation.md) for insertion and text, HTML, or React removal.
-The [core removal reference](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/core.md#stripsofthyphens) defines all format options and overloads.
-The [locale reference](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#hyphenation) defines word admission and language limits.
+The [core removal reference](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/core.md#stripsofthyphens) gives all format options and overloads.
+The [locale reference](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#hyphenation) gives word admission and language limits.
 
 These are selected editorial profiles: en-gb follows an Oxford-style quotation
 choice; es-es follows the agreed RAE-oriented profile. They do not exhaust valid
