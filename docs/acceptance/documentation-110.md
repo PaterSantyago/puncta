@@ -56,7 +56,11 @@ A different agent checked revision `02f64d6ea096e107cc085049ba1818d05dc2abb9` ag
 The review used the official ASD-STE100 Issue 9 rules and dictionary.
 It found two groups of P2 language issues and one P3 navigation issue.
 The author applied all eight wording corrections and replaced the stale README pointer with the canonical state-limit link.
-Independent review of these corrections is pending.
+
+A different agent checked the corrections at revision
+`87450638cf9430676bbc698f9b71fdd525eabb09`.
+All eight language corrections and the navigation correction passed.
+No unresolved factual, navigation, coverage, or language issue remains for issue 110.
 
 The author used the official Issue 9 rules and dictionary for a first prose pass.
 No new project dictionary applies.
