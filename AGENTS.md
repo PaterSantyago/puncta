@@ -2,23 +2,23 @@
 
 ### Issue tracker
 
-Задачи и спецификации ведём в GitHub Issues. Перед работой с ними читай `docs/agents/issue-tracker.md`.
+Use GitHub Issues for tasks and specifications. Read `docs/agents/issue-tracker.md` before you work with issues.
 
 ### Triage labels
 
-Используем пять стандартных меток triage. Перед классификацией задач читай `docs/agents/triage-labels.md`.
+Use the five standard triage labels. Read `docs/agents/triage-labels.md` before you classify issues.
 
 ### Domain docs
 
-Используем single-context: корневой `CONTEXT.md` и `docs/adr/`. Перед изучением проекта читай `docs/agents/domain.md`.
+Use a single context: the root `CONTEXT.md` file and `docs/adr/`. Read `docs/agents/domain.md` before you study the project.
 
 ### Project skills
 
-По текущей задаче читай соответствующий `SKILL.md` ниже. Применяй рекомендации в рамках согласованных контрактов проекта.
+Read the applicable `SKILL.md` below for the current task. Apply its guidance within the agreed project contracts.
 
-- **Проверки свойств** — при генерации, ревью или разборе падений тестов идемпотентности, защиты текста и эквивалентности входов: [property-based-testing](.agents/skills/property-based-testing/SKILL.md). Сочетай их с независимыми языковыми эталонами.
-- **Браузеры** — при проверке React в браузере, отладке hydration и работе с тестами Playwright: [playwright-cli](.agents/skills/playwright-cli/SKILL.md).
-- **Сборка пакетов** — при изменении настроек tsdown, declarations, exports, внешних зависимостей или упаковки ресурсов локалей: [tsdown](.agents/skills/tsdown/SKILL.md). Сверяй примеры с установленной версией инструмента.
-- **Проектирование** — при выборе интерфейсов и границ модулей ядра, локалей или адаптера: [a-philosophy-of-software-design](.agents/skills/a-philosophy-of-software-design/SKILL.md).
-- **Рефакторинг** — при изменении структуры кода с сохранением наблюдаемого поведения: [refactoring](.agents/skills/refactoring/SKILL.md).
-- **Алгоритмы** — при реализации или ревью обработки Unicode, диапазонов исходного текста, таблиц правил и инвариантов: [code-complete](.agents/skills/code-complete/SKILL.md).
+- **Property tests** — Read [property-based-testing](.agents/skills/property-based-testing/SKILL.md) when you generate, review, or diagnose tests for idempotence, text protection, or input equivalence. Use independent language references with these tests.
+- **Browsers** — Read [playwright-cli](.agents/skills/playwright-cli/SKILL.md) when you check React in a browser, debug hydration, or work with Playwright tests.
+- **Package builds** — Read [tsdown](.agents/skills/tsdown/SKILL.md) when you change tsdown settings, declarations, exports, external dependencies, or locale resource packaging. Check examples against the installed tool version.
+- **Design** — Read [a-philosophy-of-software-design](.agents/skills/a-philosophy-of-software-design/SKILL.md) when you select interfaces and module boundaries for core, locales, or the adapter.
+- **Refactoring** — Read [refactoring](.agents/skills/refactoring/SKILL.md) when you change code structure and keep observable behavior the same.
+- **Algorithms** — Read [code-complete](.agents/skills/code-complete/SKILL.md) when you implement or review Unicode processing, source text ranges, rule tables, or invariants.

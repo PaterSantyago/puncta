@@ -11,13 +11,9 @@ by `scripts/install.mjs`.
 - Original UTF-16 deletion ranges, HTML entity spelling and React source ownership;
   locale-specific applied-rule pairs; repeated removal has no edits.
 - Default/explicit formats, rejected foreign-format options, all result overloads.
-- Insertion disabled versus full disable; explicit independent re-enable; plain
-  protected ranges, protected hosts and unread declarations, unavailable language
-  with a supported child, opaque components and attributes.
+- Disabled insertion versus full disable; explicit independent re-enable. Checks also cover plain protected ranges, protected hosts, unread declarations, unavailable language with a supported child, opaque components, and attributes.
 - Technical URL protection over every transparent leaf split.
-- Deterministic bounded Unicode generation injects SHY into a known original;
-  removal must recover that original, preserve a wholly protected input and replay
-  edits against the original coordinates. This complements the literal examples.
+- Deterministic bounded Unicode generation inserts SHY into a known original. Removal must recover that original, preserve a fully protected input, and replay edits against the original coordinates. This complements the literal examples.
 - Missing insertion resources reject creation, `with` and ordinary processing;
   removal call/host options still validate structure and locale minima without
   requiring insertion resources.

@@ -93,10 +93,7 @@ The `/pure` entry does not turn arbitrary RSC trees into accessible JSX.
 The private `examples/rsc` consumer verifies this boundary using pinned Next.js
 16.3.5, application React/React DOM 19.3.0 and Node 24.21.0. Next App Router
 uses its bundled React; this fixture observes `19.3.0-canary-cbb046ab-20260731`
-on both server and client and records it separately. Its production build imports the
-public ESM exports without source aliases; actual Flight client references,
-HTML before JavaScript, hydration and interactive updates are checked in all
-three browsers (`pnpm build && pnpm test:rsc`). See
+on both server and client and records it separately. Its production build imports the public ESM exports without source aliases. `pnpm build && pnpm test:rsc` checks Flight client references, HTML before JavaScript, hydration, and interactive updates in all three browsers. See
 [the integration instructions](../../examples/rsc/README.md). This is a tested
 consumer, not a guarantee for all framework versions or edge runtimes; no server
 JSX component or server Provider is supplied.

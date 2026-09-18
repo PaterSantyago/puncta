@@ -5,9 +5,7 @@ the difference between a suite that finds bugs and one that just runs.
 
 ## Put constraints in the strategy, not in `assume()`
 
-This is the single highest-value habit. `assume()` discards inputs after generation,
-so a filter that rejects most candidates wastes the budget and eventually trips
-Hypothesis's exhausted-filter guard — which surfaces as a warning nobody reads.
+This is the single highest-value habit. `assume()` discards inputs after generation. A filter that rejects most candidates wastes the budget and eventually triggers Hypothesis's exhausted-filter warning. This warning can be missed.
 
 ```python
 # Slow, and mostly discards
@@ -62,8 +60,7 @@ Defaults (100 examples, 200ms deadline) are wrong at both ends of the workflow:
 @settings(max_examples=1000, deadline=None)     # nightly
 ```
 
-Set `deadline=None` for anything doing real work — the default deadline turns a slow
-machine into a failing test, and that flake gets the whole suite deleted.
+Set `deadline=None` for tests that do substantial work. The default deadline can fail on a slow machine. These intermittent failures can cause maintainers to remove the suite.
 
 ## Determinism as a property
 

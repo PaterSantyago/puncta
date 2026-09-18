@@ -2,8 +2,7 @@
 
 ## Purpose
 
-This repository follows **A Philosophy of Software Design** in the sense of John Ousterhout:
-fight complexity directly by designing modules with deep value, clean interfaces, strong information hiding, and low cognitive load.
+This repository follows John Ousterhout’s **A Philosophy of Software Design**. Reduce complexity with deep modules, clear interfaces, strong information hiding, and low cognitive load.
 
 All code generation, edits, and reviews must optimize for:
 - lower complexity

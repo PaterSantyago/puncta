@@ -2,8 +2,7 @@
 
 ## Purpose
 
-This repository follows **Code Complete** in the sense of Steve McConnell:
-apply disciplined software construction practices that reduce defects, improve readability, and produce robust code under real-world constraints.
+This repository follows Steve McConnell’s **Code Complete**. Apply disciplined construction practices that reduce defects, improve readability, and produce reliable code under actual constraints.
 
 All code generation, edits, and reviews must optimize for:
 - low-defect construction
@@ -44,7 +43,7 @@ Do not optimize for cleverness, minimal keystrokes, or fashionable idioms at the
 
 ## Construction Prerequisites and Decisions
 
-1. Do not treat construction as isolated typing; verify that requirements, architecture, major risks, and coding conventions are clear enough for the change.
+1. Do not treat construction as isolated typing. Verify that requirements, architecture, major risks, and coding conventions are clear enough for the change.
 2. Resolve major construction decisions before large implementation work: language constraints, error policy, data representation, reuse strategy, integration approach, and testing approach.
 3. Use upstream uncertainty as a reason to build a small validated slice, not as an excuse for speculative code.
 4. Keep the software metaphor or design model only if it helps make concrete construction decisions.

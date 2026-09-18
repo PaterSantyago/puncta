@@ -13,7 +13,7 @@ Working code, small pieces, and familiar wrappers are not automatically simple.
 - Optimize for lower cognitive load and local understandability, not shorter files, familiar patterns, fewer lines, or clever compactness.
 - Prefer deep modules; reject wrappers, layers, helpers, facades, and split-outs that do not hide real complexity.
 - Hide volatile decisions, representations, storage, protocol facts, workflow bookkeeping, and messy edge handling in one owning module.
-- Make interfaces caller-centered and semantic; avoid staged APIs, flags, setup sequences, and mechanism leakage when the module can provide the right operation.
+- Make interfaces caller-centered and semantic. Avoid staged APIs, flags, setup sequences, and exposed mechanisms when the module can provide the correct operation.
 - If a change feels awkward or spreads widely, improve ownership and abstraction instead of adding tactical special cases.
 - Combine or split by total complexity: keep shared knowledge together and split only at independently understandable boundaries.
 - Treat names and comments as design signals: precise abstraction names, explicit contracts, and no comments that compensate for bad decomposition.

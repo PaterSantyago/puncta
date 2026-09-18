@@ -26,12 +26,12 @@ conversion creates no new edits. Read a locale identifier from `locale.id`;
 The `spaces` rule collapses repeated U+0020 spaces and fixes unambiguous punctuation
 intervals. It retains line endings, blank lines, indentation, tabs, existing NBSP,
 numeric punctuation and dates. In es-es it removes ordinary inner spaces after
-existing `¿`/`¡` and before `?`/`!`; it does not supply missing signs. Textual double-hyphen markers and recognised dashes use spaced en dashes in
+existing `¿`/`¡` and before `?`/`!`; it does not supply missing signs. Textual double-hyphen markers and recognized dashes use spaced en dashes in
 en-gb and closed em-dash insertions in es-es. A known unit disambiguates
 `10-12 kg` → `10–12\u00a0kg` and `-5 kg` → `−5\u00a0kg`. Standalone ranges
 require `rules.ranges.standalone: true`; ordinary word hyphens and dialogue
 markers are preserved. `rules.dashes.normalizeExisting: false` retains formatted
-dash styles while still recognising explicit markers.
+dash styles while still recognizing explicit markers.
 
 Spacing around ambiguous ellipses (including separated dots), spaced numeric
 punctuation and periods directly between text stays conservative. Detailed results
@@ -43,13 +43,13 @@ unchanged ambiguous text; disabled rules and protected text produce no rule warn
 Quotes use `‘…’` then `“…”` in en-gb, and `«…»`, `“…”`, `‘…’` in es-es,
 continuing by alternating single/double pairs. `rules.quotes.normalizeExisting: false`
 retains formatted pairs and selects straight-pair styles compatible with their
-immediate neighbours. Unpaired or ambiguous delimiters are preserved with
+immediate neighbors. Unpaired or ambiguous delimiters are preserved with
 `quotes.unpaired` or `typography.ambiguous` warnings. No missing signs are added,
 and punctuation stays on its original side of each quote. Spanish inner ordinary
 spaces are removed by the independently switchable `spaces` rule.
 
 Punctuation apostrophes become U+2019 under `apostrophes`; turning off that rule
-still recognises their role within a quote. Letter apostrophe U+02BC is retained.
+still recognizes their role within a quote. Letter apostrophe U+02BC is retained.
 Feet/inches and unresolved quote roles are not guessed. Quotes can span a single
 line break, br/wbr, or an opaque inline fragment. Blank lines, blocks and Suspense
 end a quote context. A child typography scope has independent depth while the
@@ -70,7 +70,7 @@ order preserves its original interval and reports `currency.order`; currency and
 number notation are never reordered or rewritten. A currency between two numbers
 belongs to its attached side (no ordinary space, including existing NBSP). When
 both sides have equal attachment, the construction remains unchanged with
-`typography.ambiguous`. These recognised intervals survive general space cleanup
+`typography.ambiguous`. These recognized intervals survive general space cleanup
 even when their own rule is disabled. New bonds stop at line breaks, opaque
 fragments and nested typography scopes.
 
@@ -101,7 +101,7 @@ and protected elements skip declarative configuration parsing.
 Plain-text calls accept `protect: [{ start, end }]` in original UTF-16 offsets.
 Ranges must end at grapheme boundaries; adjacent/overlapping ranges merge, empty
 ranges have no effect, and invalid ranges throw `protect.invalid-range`. Protection
-belongs to that call, not an instance. Recognised URLs with an explicit scheme or
+belongs to that call, not an instance. Recognized URLs with an explicit scheme or
 `www.`, email, IP addresses and `v1.2.3` versions are protected automatically,
 including across transparent inline joins. URL bodies conservatively retain
 punctuation that may belong to a path or query. Markdown and other technical text
@@ -110,7 +110,7 @@ require explicit protection.
 HTML protects code/pre/script/style, kbd/samp, form values (including standalone
 option), template/noscript, SVG/MathML/ruby and embedded/media content. The presence
 of `hidden` and editable content protect entire subtrees; `aria-hidden` alone does
-not. Protected contents and nested declarative settings are not analysed. Unknown
+not. Protected contents and nested declarative settings are not analyzed. Unknown
 elements remain opaque and produce `markup.element-unsupported` warnings.
 
 HTML uses parse5 8.0.0. `mode` defaults to `"fragment"` with explicit `"div"`

@@ -1,10 +1,7 @@
 # Typography scaling regression
 
 The baseline at `3a93a08` rescanned complete accessible text for each whitespace
-interval and each candidate ellipsis, quote pair or dash group. Even `"a ".repeat(n)`
-produced quadratic recognition work without edits or warnings: input lengths
-1000, 2000 and 4000 sent 501500, 2003000 and 8006000 characters to the technical
-recogniser respectively. A separate ellipsis-spacing regexp retried from every
+interval and each candidate ellipsis, quote pair or dash group. Even `"a ".repeat(n)` caused quadratic recognition work without edits or warnings. Input lengths 1000, 2000, and 4000 sent 501500, 2003000, and 8006000 characters to the technical recognizer, respectively. A separate ellipsis-spacing regexp retried from every
 position in a long space run.
 
 The implementation now indexes the SHY-free view and whitespace boundaries once
@@ -14,10 +11,7 @@ containing both an ASCII double quote and `@` retain the complete check. The
 multiset comparison, warning conditions and original UTF-16 coordinates remain
 unchanged. No-op spacing checks still run because they can produce warnings.
 
-The ellipsis-spacing search starts only at the beginning of a space run. Other
-measured repeated work was removed by scanning immediately preceding spaces,
-tracking indentation in one forward pass, indexing range overlaps and numeric
-bonds, and evaluating apostrophe lookahead only when its result is needed.
+The ellipsis-spacing search starts only at the beginning of a space run. Other measured repeated work was also removed. The implementation scans immediately preceding spaces, tracks indentation in one forward pass, and indexes range overlaps and numeric bonds. It evaluates apostrophe lookahead only when necessary.
 Range overlap uses the original strict inequalities, including zero-length
 insertions and touching boundaries. Its append-only index uses O(n) memory and
 O(log n) insertion/query time for n UTF-16 code units.
@@ -61,10 +55,7 @@ long indentation, and independent dash/ellipsis decisions. Existing literal
 locale corpora, protection tests and every-two-leaf partition tests remain the
 independent linguistic and adapter oracles.
 
-During implementation, an isolated baseline bundle was also compared against
-9300 complete public reports using fixed-seed generated inputs (`0x12345678`):
-both locales, six setting profiles, text, explicit protection, HTML and pure
-React with transparent inline splits. The comparison covered the full result,
+During implementation, an isolated baseline bundle was compared against 9300 complete public reports from fixed-seed generated inputs (`0x12345678`). Cases covered both locales, six setting profiles, text, explicit protection, HTML, and pure React with transparent inline splits. The comparison covered the full result,
 edits, warnings, sources and applied rules; all matched. That differential
 experiment is development evidence, not a substitute for the checked-in tests.
 

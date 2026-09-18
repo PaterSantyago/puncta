@@ -12,9 +12,7 @@ Nineteen negative cases retain the specified skip/warning priorities in all thre
 inputs. Optional omissions total **42 positions in 33 words**. Runtime code and
 resource generation do not import the corpus.
 
-The original 8,523-pattern baseline had three incorrect additions:
-`reciprocity` at 2 and 7, `universities` at 9; and four missing mandatory positions:
-`bathtub` at 4, `bookend` at 4, `brainchild` at 5, `coalfield` at 4. The independently
+The original 8,523-pattern baseline had three incorrect additions: `reciprocity` at 2 and 7, and `universities` at 9. Four mandatory positions were missing: `bathtub` at 4, `bookend` at 4, `brainchild` at 5, and `coalfield` at 4. The independently
 reviewed productive-family layer and conservative VCV omission policy resolve
 these without whole-word exceptions. The original eight exception words remain
 in the gate; all their permitted positions are omitted by this conservative
@@ -82,33 +80,27 @@ English insertion without runtime loading.
 
 Run `node scripts/hyphenation/prepare-en-gb.mjs --check` to compare regenerated
 artifacts byte for byte. The recipe reads only the fixed upstream TeX input and
-the declared refinement recipe. It ignores the entire exception block, removes exactly the four
-audited doubly anchored patterns, generates the declared character-class/component
-layer, merges matching paths by coordinatewise maximum, and compiles the table.
+the declared refinement recipe. It ignores the entire exception block and removes exactly the four audited doubly anchored patterns. It generates the declared character-class/component layer, merges matching paths by coordinatewise maximum, and compiles the table.
 The frozen corpus is read only by tests.
 
 ## Technical coverage
 
-The focused tests cover shared word admission across transparent leaves, left-leaf
-seam ownership, opaque/protected/scope edges, existing SHY across leaves, exact
-original UTF-16 insertions and HTML entities, raised minima, disable flags,
-resource availability/compatibility, stable registry snapshots and isolated calls.
+The focused tests cover these cases:
+
+- Shared word admission across transparent leaves and left-leaf ownership at boundaries.
+- Opaque/protected/scope edges and existing SHY across leaves.
+- Exact original UTF-16 insertions and HTML entities.
+- Raised minima and disable flags.
+- Resource availability/compatibility, stable registry snapshots, and isolated calls.
+
 Typography precedes insertion, with a temporary provenance map back to original
 text. SHY remains part of word-boundary checks in numeric and unit recognition,
 preventing later typography from treating a hyphenated word prefix as a unit.
-Apostrophe roles come from the wider quotation context, including quotations
-across lines and opaque nodes; trailing possessives remain whole-word skips even
-when apostrophe formatting is disabled. Word joiners at protected edges do not
-expose otherwise incomplete fragments. Mixed-script diagnostics compare Unicode
-Script properties using the fixed Unicode 17.0 alias inventory (source and hash
-in `unicode-scripts.ts`, Unicode License V3 in the core notice); Common and
-Inherited characters do not contribute a distinct script. Punctuation spacing
-preserves an ambiguous interval when inserting a space would create a new
-technical token at that boundary, keeping quotation recognition stable on a
-subsequent call. The same guard applies to each connected textual-dash group;
-unrelated groups still format. Quotation normalisation uses the same conservative
+Apostrophe roles come from the wider quotation context, including quotations across lines and opaque nodes. Trailing possessives remain whole-word skips even when apostrophe formatting is disabled. Word joiners at protected edges do not
+expose otherwise incomplete fragments. Mixed-script diagnostics compare Unicode Script properties with the fixed Unicode 17.0 alias inventory. `unicode-scripts.ts` records the source and hash. The core notice contains Unicode License V3. Common and Inherited characters do not contribute a distinct script. Punctuation spacing preserves an ambiguous interval if space insertion would create a new technical token at that boundary. This keeps quotation recognition stable on a later call. The same guard applies to each connected textual-dash group;
+unrelated groups still format. Quotation normalization uses the same conservative
 check without narrowing URI protection. Quotation trees containing an unmatched delimiter
-remain ambiguous rather than creating a new delimiter pairing after normalisation.
+remain ambiguous rather than creating a new delimiter pairing after normalization.
 The committed generator uses the full 32-bit random value and
 asserts more than 1,900 distinct inputs among its 2,000 combinations.
 

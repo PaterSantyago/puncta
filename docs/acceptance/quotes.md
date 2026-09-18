@@ -9,7 +9,7 @@ Boundary, diagnostics and option expectations follow #30–#33.
 | Requirement                                                      | Public verification                                                                                                                                           |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | en-gb/es-es outer and nested pairs, arbitrary alternating levels | Literal corpus, four-level literal, existing formatted pairs                                                                                                  |
-| Preserved styles and neighbouring pair compatibility             | All canonical normalizeExisting:false examples; conflicting preserved children remain unchanged with warning                                                  |
+| Preserved styles and neighboring pair compatibility              | All canonical normalizeExisting:false examples; conflicting preserved children remain unchanged with warning                                                  |
 | Apostrophes independent of quote formatting                      | Contractions, O'Neill, plural possessive, disabled apostrophes within quotation; U+02BC and feet/inches preservation                                          |
 | Text/HTML/pure React/component equivalence                       | Every two-leaf partition of every quote corpus row; text, parse5-decoded HTML, pure tree and actual Puncta SSR; repeated structured conversion                |
 | Quote boundaries                                                 | LF/CR/CRLF, blank lines, br/wbr, opaque code/img, blocks, child Spanish scope, custom component, Suspense content/fallback/outside                            |
@@ -26,7 +26,7 @@ claimed here. The existing limitation for arbitrary deep protection toggles is
 unchanged; keyed reorder guarantees are not broadened.
 
 Recognition is conservative rather than a universal linguistic parser. Missing
-partners, incompatible preserved neighbours and ambiguous delimiters are retained;
+partners, incompatible preserved neighbors and ambiguous delimiters are retained;
 protected text is not inspected to resolve them. Removing an interval that would
 create a new technical token is also conservative, while a known punctuation-space
 insertion is considered in that decision. Warnings can recur on unchanged input.

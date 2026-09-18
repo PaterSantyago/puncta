@@ -25,7 +25,7 @@ are computed synchronously and do not promise perfect division of arbitrary
 text or control actual rendered line breaks.
 
 `hyphenation-manifest.json` identifies the fixed input, baseline and versioned
-Puncta refinement. `NOTICE.md` contains the full upstream attribution and licence.
+Puncta refinement. `NOTICE.md` contains the full upstream attribution and license.
 No whole-word exception table is included.
 
 MIT licensed. Public publication is separate work.

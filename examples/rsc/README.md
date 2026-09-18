@@ -75,8 +75,7 @@ pnpm test:rsc
 ```
 
 On Linux CI use `playwright install --with-deps` to install system dependencies.
-The test starts and stops a loopback production Next server on an available port;
-it does not use a development server or replace RSC with ordinary React SSR.
+The test starts and stops a loopback production Next server on an available port. It does not use a development server or replace RSC with ordinary React SSR.
 It checks:
 
 - A real `text/x-component` Flight response includes the `Puncta` client reference,
@@ -87,14 +86,9 @@ It checks:
 - The direct package client reference receives updated Provider configuration,
   while server text and the raw server sibling stay unchanged.
 
-Literal text oracles use the agreed quote/ellipsis profiles, `back|bone` from the
-independently reviewed en-gb corpus and Spanish syllables `ca|mi|no`; they are not
-computed with the implementation under test. Escapes above denote actual U+00AD
+Literal text references use the agreed quote/ellipsis profiles, `back|bone` from the independently reviewed en-gb corpus, and Spanish syllables `ca|mi|no`. The implementation under test does not calculate them. Escapes above denote actual U+00AD
 characters, not a guarantee of a visible line break.
 
-`artifacts/rsc/` records Flight, HTML before JavaScript for each engine, the server
-log and a JSON report with commit, Node/framework/application React versions,
-actual framework React versions, Playwright browser revisions and executable
-paths. The existing CI browser job builds this example and runs the check on
+`artifacts/rsc/` records Flight, HTML before JavaScript for each engine, the server log, and a JSON report. The report includes the commit, Node/framework/application React versions, actual framework React versions, Playwright browser revisions, and executable paths. The existing CI browser job builds this example and runs the check on
 Linux alongside `pnpm test:browser`. The example remains outside release archives;
 archive installation/exports checks are independently covered by `pnpm check`.

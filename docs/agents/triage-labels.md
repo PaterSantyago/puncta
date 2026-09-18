@@ -1,12 +1,12 @@
 # Triage Labels
 
-| Каноническая роль | Метка в GitHub  | Значение                                          |
-| ----------------- | --------------- | ------------------------------------------------- |
-| needs-triage      | needs-triage    | Требуется первичная оценка                        |
-| needs-info        | needs-info      | Ожидаем уточнения от автора                       |
-| ready-for-agent   | ready-for-agent | Задача определена и готова для автономного агента |
-| ready-for-human   | ready-for-human | Требуется реализация человеком                    |
-| wontfix           | wontfix         | Задача не будет выполняться                       |
+| Canonical role  | GitHub label    | Meaning                                               |
+| --------------- | --------------- | ----------------------------------------------------- |
+| needs-triage    | needs-triage    | Initial assessment is required                        |
+| needs-info      | needs-info      | More information is required from the author          |
+| ready-for-agent | ready-for-agent | The task is defined and ready for an autonomous agent |
+| ready-for-human | ready-for-human | A person must implement the task                      |
+| wontfix         | wontfix         | The task will not be implemented                      |
 
-Когда навык указывает роль triage, используй соответствующую метку.
-При изменении соглашений обновляй столбец «Метка в GitHub».
+When a skill specifies a triage role, use its corresponding label.
+If the conventions change, update the “GitHub label” column.

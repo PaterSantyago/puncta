@@ -35,13 +35,11 @@ No added dependency, production hook or test-only library export is needed.
 | Independent Suspense contexts   | Unmatched outer quotes remain literal on opposite sides of Suspense; content and fallback get independent complete quotation pairs. `back`/`bone` across the boundary do not form a hyphenated word; `backbone` inside content does. Available content can be delivered as a partial React segment before the delayed component completes. |
 | Parallel request isolation      | Four simultaneously pending requests mix both streaming APIs, en-gb/es-es and hyphenation/rule overrides. Reverse-order resumption produces each literal expected output twice, with no settings or source leakage.                                                                                                                        |
 | Cancellation and retry          | Both streaming APIs abort after fallback delivery. Reusing the same source tree after resolution yields the expected fresh output. Changed settings recompute from the original ASCII quotation/ellipsis text without retained automatic SHY.                                                                                              |
-| Nested ownership and protection | Immediate Provider text remains raw, its nested Puncta uses Spanish, independent siblings transform, and code/off subtrees propagate protection through an opaque Card and enabled nested Provider/Puncta, including after retry.                                                                                                          |
+| Nested ownership and protection | Immediate Provider text remains raw. Its nested Puncta uses Spanish, and independent siblings transform. Code/off subtrees propagate protection through an opaque Card and enabled nested Provider/Puncta, including after retry.                                                                                                          |
 | Local reports                   | Explicit detailed calls retain original source text and local source IDs across interleaved requests. Returned reports do not change when other calls run; mutating one report does not mutate another or a later call. Disabled quote rules do not acquire another request's warnings.                                                    |
 | Render purity                   | Repeated component renders do not publish typography warnings through console methods. Explicit detailed calls still return warnings. Pure traversal does not invoke opaque components, await thenables or enumerate arbitrary iterables.                                                                                                  |
 
-Expected language results are literals from the agreed profiles and independent
-English `backbone` / Spanish `adhesivo` corpus analyses; the test does not derive
-its expected output from another Puncta transform. Stream assertions address
+Expected language results are literals from the agreed profiles and independent English `backbone` / Spanish `adhesivo` corpus analyses. The test does not derive expected output from another Puncta transform. Stream assertions address
 application text and ordering, not React's generated boundary IDs or recovery
 script implementation. A test failure aborts its open streams; delivery waits
 have a bounded timeout, with no timing sleep used to trigger promise resolution.
@@ -70,8 +68,5 @@ executed by the Node fixture or used by Puncta to finish typography. Delivered
 application text already has its final typography; later React chunks complete
 Suspense boundaries without a Puncta text-repair phase.
 
-This is evidence for the exact Node/React versions above. It does not complete the
-three-browser hydration matrix (#55) or RSC integration (#56), promise guarantees
-for arbitrary opaque component internals, or expand the documented state-remount
-limitation for deep protection toggles in the React README. No public npm release
+This is evidence for the exact Node/React versions above. It does not complete the three-browser hydration matrix (#55) or RSC integration (#56). It gives no guarantees for arbitrary opaque component internals. The React README documents state-remount limits for deep protection changes. This check does not change those limits. No public npm release
 is part of this check.
