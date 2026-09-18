@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile, copyFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import test from "node:test";
+import semver from "semver";
 import { registryFixture } from "./registry-fixture.mjs";
 import { publicPackages } from "./workspace.mjs";
 
@@ -124,7 +125,7 @@ async function fixture() {
       child.on("close", (code) => done({ code, output }));
     });
   }
-  return { ...f, cwd, bundle, state, plan, commit, run };
+  return { ...f, cwd, bundle, state, plan, archives, commit, run };
 }
 test("verified archives publish core first, next tags and immutable Git tags, then pass consumers", async () => {
   const f = await fixture();
@@ -193,7 +194,10 @@ test("consumer rejects a next tag resolving outside the verified bundle even whe
     await mkdir(other);
     execFileSync("tar", [
       "-xzf",
-      join(f.bundle, "use-puncta-with-react-0.1.0-alpha.0.tgz"),
+      join(
+        f.bundle,
+        f.archives.find((p) => p.name === "@use-puncta/with-react").file,
+      ),
       "-C",
       other,
     ]);
@@ -201,7 +205,7 @@ test("consumer rejects a next tag resolving outside the verified bundle even whe
     const manifest = JSON.parse(
       await readFile(join(directory, "package.json")),
     );
-    manifest.version = "0.1.0-alpha.1";
+    manifest.version = semver.inc(manifest.version, "prerelease", "alpha");
     await writeFile(join(directory, "package.json"), JSON.stringify(manifest));
     execFileSync(
       "npm",
@@ -331,7 +335,11 @@ test("an existing version with different bytes stops publication and records a c
     await mkdir(other);
     await writeFile(
       join(other, "package.json"),
-      JSON.stringify({ name: "@use-puncta/core", version: "0.1.0-alpha.0" }),
+      JSON.stringify({
+        name: "@use-puncta/core",
+        version: f.plan.packages.find((p) => p.name === "@use-puncta/core")
+          .version,
+      }),
     );
     await writeFile(join(other, "index.js"), "export const wrong = true;\n");
     execFileSync(
@@ -424,7 +432,10 @@ test("a published version with an unavailable package index retains tags and res
     const partial = JSON.parse(await readFile(join(f.state, "result.json")));
     assert.equal(partial.status, "incomplete");
     assert.equal(partial.packages[0].status, "published");
-    assert.equal(partial.packages[0].distTags.next, "0.1.0-alpha.0");
+    assert.equal(
+      partial.packages[0].distTags.next,
+      f.plan.packages.find((p) => p.name === "@use-puncta/core").version,
+    );
     assert.deepEqual(publishes, ["/@use-puncta/core"]);
     unavailable = false;
     const resumed = await f.run(["--registry", registry], env);
