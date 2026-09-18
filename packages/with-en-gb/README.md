@@ -1,35 +1,51 @@
 # @use-puncta/with-en-gb
 
-Explicitly installed en-gb locale module. Named ESM export: `enGb`.
+The British English locale for Puncta. Named ESM export: `enGb`.
+
+**Unreleased functional version.** Public `0.1.0-alpha.0` is the historical
+scaffold and does not have this API.
+
+## Start
+
+Install `@use-puncta/core` and `@use-puncta/with-en-gb` as direct dependencies.
+Use the compatible functional release versions when they are available. The
+[installation page](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/installation.md)
+contains the npm and pnpm command templates and current release status.
+
+<!-- puncta:example package-with-en-gb -->
 
 ```ts
 import { createPuncta } from "@use-puncta/core";
 import { enGb } from "@use-puncta/with-en-gb";
 
 const puncta = createPuncta({ locales: [enGb], locale: enGb.id });
-puncta.text("Wait..."); // "Wait…"
+console.log(puncta.text("Wait..."));
 ```
 
-The module is immutable, exposes readonly `id` and package `version`, and is ready
-synchronously after import. There is no global registration or runtime loading.
-Quotes, apostrophes, spaces, punctuation intervals, ellipsis, textual dashes, numeric ranges, minus, units, percentages and currencies are implemented; the full locale
-profile is implemented. Core is a peer dependency.
+Output:
 
-Enable algorithmic soft hyphens explicitly with
-`puncta.with({ hyphenation: { enabled: true } })`. The default minimum word length
-is 6, with at least 2 letters before and 3 after each position; these minima can
-be raised. The alphabet is a–z, with lowercase or one initial capital. Existing
-SHY, digits, apostrophes, real hyphens, other case forms and protected text prevent
-automatic insertion in the complete word. Unsupported characters and mixed
-scripts are preserved with warnings only in detailed results.
+<!-- puncta:output package-with-en-gb -->
 
-The packaged immutable resource uses Liang patterns without whole-word
-exceptions. Its conservative refinement can omit valid positions; no universal
-linguistic accuracy or pronunciation inference is claimed. Ordinary words span
-transparent leaves; an opaque or locale boundary conservatively prevents
-insertion in an adjoining partial word. Each new SHY is an original-coordinate
-`hyphenation.insert` edit. Reprocessing does not add more SHY. Use
-`stripSoftHyphens` for a separate clean export. See `NOTICE.md` for code/data
-attribution.
+```text
+Wait…
+```
+
+See the [quick start](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/text-and-html.md)
+and [documentation index](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/README.md).
+Release-specific URLs are pending. These links point to the documentation branch.
+
+## Guide and reference
+
+- [Configure settings and locales](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/configuration.md).
+- [Core signatures](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/core.md).
+- [Settings and defaults](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md).
+- [Locale rules](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md).
+
+## Existing reference material
+
+Use the [hyphenation guide](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/hyphenation.md) for insertion and removal.
+See [locale admission and evidence](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#hyphenation) and [minima and resets](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md#hyphenation).
+Use the [digit-grouping reference](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#digit-grouping) for notation, examples, and exclusions.
+`NOTICE.md` contains upstream attribution and licenses.
 
 MIT licensed. Public publication is separate work.

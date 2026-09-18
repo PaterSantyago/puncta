@@ -1,3 +1,4 @@
+import { digitGrouping } from "./digit-grouping.js";
 import { rangeIndex } from "./ranges.js";
 import { precedingSpaceStart } from "./spaces.js";
 import { numericDashes, textualDashes } from "./dashes.js";
@@ -97,6 +98,16 @@ export function segmentTypography(
       const dashes = textualDashes(text, settings);
       const bonds = numberBonds(text, settings);
       const numeric = numericDashes(text, settings, bonds, dashes.roles);
+      const grouping = digitGrouping(text, settings, bonds, dashes.roles);
+      for (const change of grouping.changes)
+        edit(change.start, change.end, "\u202f", "digitGrouping");
+      for (const span of grouping.ambiguous)
+        ambiguous(
+          span.start,
+          span.end,
+          "Numeric grouping is ambiguous; the complete candidate was preserved.",
+          "digitGrouping",
+        );
       for (const change of numeric.changes)
         edit(change.start, change.end, change.after, change.ruleId);
       for (const span of numeric.ambiguous) {
@@ -149,6 +160,7 @@ export function segmentTypography(
         ...dashes.preserved,
         ...numeric.preserved,
         ...bonds.map((bond) => bond.construction),
+        ...grouping.preserved,
       ];
       // Start only at the beginning of a space run. Retrying at every space
       // makes a long indentation without any dots quadratic.
@@ -165,7 +177,11 @@ export function segmentTypography(
             "Ellipsis spacing is ambiguous; its intervals were preserved.",
           );
       }
-      for (const match of text.matchAll(/\p{N}+(?: *[.,:/-] *\p{N}+)+/gu)) {
+      // A suffix of the same digit run cannot succeed when its full run failed.
+      // Avoid retrying the punctuation search at every digit of a long integer.
+      for (const match of text.matchAll(
+        /(?<!\p{N})\p{N}+(?: *[.,:/-] *\p{N}+)+/gu,
+      )) {
         const start = match.index;
         const end = start + match[0].length;
         preserved.push({ start, end });

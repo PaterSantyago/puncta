@@ -1,3 +1,4 @@
+import { mixedGrouping } from "./fixtures/digit-grouping.mjs";
 import assert from "node:assert/strict";
 import { Writable } from "node:stream";
 import { test } from "node:test";
@@ -491,3 +492,240 @@ test("renderToString uses a transformed independent fallback for suspended conte
   assert.ok(retry.includes("«Ready…»"));
   assert.equal(retry.includes("<i>"), false);
 });
+
+const grouping = (locale = "en-gb", patch = {}) =>
+  make(locale, {
+    rules: { digitGrouping: { enabled: true, minDigits: 4, ...patch } },
+  });
+
+for (const renderer of ["pipeable", "readable"]) {
+  test(`${renderer}: grouping reaches shell and independent fallback before resolution, then survives abort/retry`, {
+    timeout: 10000,
+  }, async (t) => {
+    const delayed = deferredContent();
+    const original = h(
+      "section",
+      null,
+      h("p", { id: "group-shell" }, 12, h("em", null, 345n), "; 12,345"),
+      h("span", { id: "before" }, "12"),
+      h(
+        Suspense,
+        { fallback: h("i", { id: "group-fallback" }, "6789") },
+        h(
+          delayed.Delayed,
+          null,
+          h(Puncta, null, h("b", { id: "group-content" }, "45678")),
+        ),
+      ),
+      h("span", { id: "after" }, "345"),
+      h("code", null, 12345),
+    );
+    const tree = h(Puncta, { instance: grouping() }, original);
+    const sync = renderToString(tree);
+    assert.ok(sync.includes('<i id="group-fallback">6\u202f789</i>'));
+    const stream = await capture(t, renderer, tree);
+    await stream.until('<span id="after">345</span>');
+    assert.equal(stream.allReady, false);
+    assert.ok(delayed.attempts > 0);
+    assert.ok(
+      stream.html.includes(
+        '<p id="group-shell">12\u202f<em>345</em>; 12\u202f345</p>',
+      ),
+    );
+    assert.ok(stream.html.includes('<span id="before">12</span>'));
+    assert.ok(stream.html.includes('<i id="group-fallback">6\u202f789</i>'));
+    assert.equal(stream.html.includes('id="group-content"'), false);
+    const reason = new Error("grouping cancellation");
+    stream.abort(reason);
+    await stream.done;
+    assert.ok(stream.errors.includes(reason));
+    delayed.release();
+    const retry = await capture(t, renderer, tree);
+    await retry.done;
+    assert.ok(retry.html.includes('<b id="group-content">45\u202f678</b>'));
+    assert.ok(
+      retry.html.includes(
+        '<p id="group-shell">12\u202f<em>345</em>; 12\u202f345</p>',
+      ),
+    );
+    assert.ok(retry.html.includes("<code>12345</code>"));
+    assert.deepEqual(retry.errors, []);
+    const disabled = renderToString(
+      h(Puncta, { instance: grouping("en-gb", { enabled: false }) }, original),
+    );
+    assert.ok(
+      disabled.includes('<p id="group-shell">12<em>345</em>; 12,345</p>'),
+    );
+    assert.ok(disabled.includes('<b id="group-content">45678</b>'));
+    assert.equal(original.props.children[0].props.children[0], 12);
+    assert.equal(
+      original.props.children[0].props.children[1].props.children,
+      345n,
+    );
+  });
+}
+
+test("parallel grouping streams isolate locales, thresholds, normalization and reports through reverse resumption", {
+  timeout: 10000,
+}, async (t) => {
+  const children = h("p", null, "1,234; 12345; 12 345");
+  const cases = [
+    ["pipeable", grouping(), "1\u202f234; 12\u202f345; 12\u202f345", "en-gb"],
+    ["readable", grouping("es-es"), "1,234; 12\u202f345; 12\u202f345", "es-es"],
+    [
+      "readable",
+      grouping("en-gb", { minDigits: 6 }),
+      "1,234; 12345; 12 345",
+      "en-gb",
+    ],
+    [
+      "pipeable",
+      grouping("en-gb", { normalizeExisting: false }),
+      "1,234; 12\u202f345; 12 345",
+      "en-gb",
+    ],
+    [
+      "readable",
+      grouping("es-es", { enabled: false }),
+      "1,234; 12345; 12 345",
+      null,
+    ],
+  ];
+  const requests = await Promise.all(
+    cases.map(async ([renderer, instance, expected, expectedWarningLocale]) => {
+      const delayed = deferredContent();
+      const report = transformReact("12 34; 12345", {
+        instance,
+        detailed: true,
+      });
+      const snapshot = JSON.stringify(report);
+      const stream = await capture(
+        t,
+        renderer,
+        h(
+          PunctaProvider,
+          { instance },
+          h(Puncta, null, children),
+          h(
+            Suspense,
+            { fallback: h(Puncta, null, h("i", null, "12345")) },
+            h(delayed.Delayed, null, h(Puncta, null, children)),
+          ),
+        ),
+      );
+      await stream.until("</i>");
+      assert.equal(stream.allReady, false);
+      assert.ok(stream.html.includes(`<p>${expected}</p>`));
+      return {
+        stream,
+        delayed,
+        instance,
+        expected,
+        report,
+        snapshot,
+        expectedWarningLocale,
+      };
+    }),
+  );
+  for (const request of requests.toReversed()) {
+    const issued = request.stream.html;
+    request.delayed.release();
+    await request.stream.done;
+    assert.ok(request.stream.html.startsWith(issued));
+    assert.equal(
+      request.stream.html.split(`<p>${request.expected}</p>`).length - 1,
+      2,
+    );
+    assert.deepEqual(request.stream.errors, []);
+    assert.equal(JSON.stringify(request.report), request.snapshot);
+    assert.deepEqual(
+      transformReact("12 34; 12345", {
+        instance: request.instance,
+        detailed: true,
+      }),
+      request.report,
+    );
+  }
+  for (const { report, expectedWarningLocale } of requests) {
+    assert.deepEqual(report.sources, [
+      { id: 0, text: "12 34; 12345", path: [] },
+    ]);
+    assert.equal(
+      report.warnings.length,
+      expectedWarningLocale === null ? 0 : 1,
+    );
+    if (expectedWarningLocale !== null) {
+      assert.equal(report.warnings[0].locale, expectedWarningLocale);
+      assert.equal(report.warnings[0].ruleId, "digitGrouping");
+      assert.deepEqual(report.warnings[0].location.ranges, [
+        { sourceId: 0, start: 0, end: 5 },
+      ]);
+    }
+  }
+  requests[0].report.sources[0].text = "caller mutation";
+  requests[0].report.warnings.length = 0;
+  assert.equal(JSON.stringify(requests[1].report), requests[1].snapshot);
+  assert.equal(
+    transformReact("12 34; 12345", {
+      instance: requests[0].instance,
+      detailed: true,
+    }).sources[0].text,
+    "12 34; 12345",
+  );
+});
+
+for (const renderer of ["pipeable", "readable"]) {
+  test(`${renderer}: mixed range and bond corpus is complete in shell/fallback before resolution`, {
+    timeout: 10000,
+  }, async (t) => {
+    const delayed = deferredContent();
+    const [english, spanish] = mixedGrouping;
+    const instance = make("en-gb", {
+      rules: { digitGrouping: { enabled: true } },
+      hyphenation: { enabled: true },
+    });
+    const tree = h(
+      Puncta,
+      { instance },
+      h("p", { id: "mixed-shell" }, english.source),
+      h(
+        Suspense,
+        {
+          fallback: h(
+            Puncta,
+            { locale: "es-es" },
+            h("p", { id: "mixed-fallback" }, spanish.source),
+          ),
+        },
+        h(
+          delayed.Delayed,
+          null,
+          h(
+            Puncta,
+            { locale: "es-es" },
+            h("p", { id: "mixed-content" }, spanish.source),
+          ),
+        ),
+      ),
+      h("code", null, '"12345-67890kg..."'),
+    );
+    const sync = renderToString(tree);
+    assert.ok(sync.includes(english.expected));
+    assert.ok(sync.includes(spanish.expected));
+    const stream = await capture(t, renderer, tree);
+    await stream.until(`id="mixed-fallback"`);
+    assert.equal(stream.allReady, false);
+    assert.ok(stream.html.includes(english.expected));
+    assert.ok(stream.html.includes(spanish.expected));
+    assert.equal(stream.html.includes('id="mixed-content"'), false);
+    delayed.release();
+    await stream.done;
+    assert.ok(
+      stream.html.includes(`<p id="mixed-content">${spanish.expected}</p>`),
+    );
+    assert.ok(
+      stream.html.includes("<code>&quot;12345-67890kg...&quot;</code>"),
+    );
+    assert.deepEqual(stream.errors, []);
+  });
+}

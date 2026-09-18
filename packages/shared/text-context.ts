@@ -302,9 +302,10 @@ function projectReport(
 ) {
   const edits: Edit[] = [];
   const warnings: PunctaWarning[] = [];
+  const sourceRanges = sourceRangeProjector(spans);
   for (const edit of report.edits) {
     const ranges = edit.ranges.flatMap((range) =>
-      sourceRanges(spans, range.start, range.end),
+      sourceRanges(range.start, range.end),
     );
     if (ranges.length) edits.push({ ...edit, ranges });
   }
@@ -314,56 +315,69 @@ function projectReport(
       continue;
     }
     const ranges = warning.location.ranges.flatMap((range) =>
-      sourceRanges(spans, range.start, range.end),
+      sourceRanges(range.start, range.end),
     );
     if (ranges.length)
       warnings.push({ ...warning, location: { kind: "text", ranges } });
   }
   const apostrophes = (report.apostrophes ?? []).flatMap((range) =>
-    sourceRanges(spans, range.start, range.end),
+    sourceRanges(range.start, range.end),
   );
   return { edits, warnings, apostrophes };
 }
 
-/** Convert a position in joined accessible text back to separate original leaves. */
-function sourceRanges(
-  spans: readonly RecognitionSpan[],
-  start: number,
-  end: number,
-): Span[] {
-  const ranges: Span[] = [];
-  let offset = 0;
-  for (const span of spans) {
-    if ("virtual" in span) {
-      offset += span.virtual.length;
-      continue;
+/** Index joined offsets once, then visit only leaves touched by each range.
+ * Closed bounds for insertions preserve ownership at the left nonempty leaf,
+ * including when empty or virtual spans occur at a seam. */
+function sourceRangeProjector(spans: readonly RecognitionSpan[]) {
+  const offsets = [0];
+  for (const span of spans)
+    offsets.push(
+      offsets[offsets.length - 1] +
+        ("virtual" in span ? span.virtual.length : span.end - span.start),
+    );
+  return (start: number, end: number): Span[] => {
+    let low = 0;
+    let high = spans.length;
+    while (low < high) {
+      const middle = Math.floor((low + high) / 2);
+      if (offsets[middle + 1] < start) low = middle + 1;
+      else high = middle;
     }
-    const length = span.end - span.start;
-    // An insertion at a transparent seam belongs to the left nonempty leaf.
-    if (
-      start === end &&
-      length > 0 &&
-      start >= offset &&
-      start <= offset + length
-    )
-      return [
-        {
+    const ranges: Span[] = [];
+    for (
+      let index = low;
+      index < spans.length && offsets[index] <= end;
+      index++
+    ) {
+      const span = spans[index];
+      if ("virtual" in span) continue;
+      const offset = offsets[index];
+      const length = span.end - span.start;
+      if (
+        start === end &&
+        length > 0 &&
+        start >= offset &&
+        start <= offset + length
+      )
+        return [
+          {
+            sourceId: span.sourceId,
+            start: span.start + start - offset,
+            end: span.start + start - offset,
+          },
+        ];
+      const overlapStart = Math.max(start, offset);
+      const overlapEnd = Math.min(end, offset + length);
+      if (overlapStart < overlapEnd)
+        ranges.push({
           sourceId: span.sourceId,
-          start: span.start + start - offset,
-          end: span.start + start - offset,
-        },
-      ];
-    const overlapStart = Math.max(start, offset);
-    const overlapEnd = Math.min(end, offset + length);
-    if (overlapStart < overlapEnd)
-      ranges.push({
-        sourceId: span.sourceId,
-        start: span.start + overlapStart - offset,
-        end: span.start + overlapEnd - offset,
-      });
-    offset += length;
-  }
-  return ranges;
+          start: span.start + overlapStart - offset,
+          end: span.start + overlapEnd - offset,
+        });
+    }
+    return ranges;
+  };
 }
 
 /** Detect CRLF and whitespace-only lines across transparent leaves too. Structural
@@ -378,21 +392,20 @@ function splitLines(
     const text = spans
       .map((span) => sources[span.sourceId].text.slice(span.start, span.end))
       .join("");
+    const sourceRanges = sourceRangeProjector(spans);
     let start = 0;
     for (const match of text.matchAll(
       /(?:\r\n|\r|\n)(?:[ \t]*(?:\r\n|\r|\n))*/gu,
     )) {
       result.push(
-        ...sourceRanges(spans, start, match.index).map((span) => ({ span })),
+        ...sourceRanges(start, match.index).map((span) => ({ span })),
       );
       result.push({
         boundary: /^(?:\r\n|\r|\n)$/u.test(match[0]) ? "line" : "block",
       });
       start = match.index + match[0].length;
     }
-    result.push(
-      ...sourceRanges(spans, start, text.length).map((span) => ({ span })),
-    );
+    result.push(...sourceRanges(start, text.length).map((span) => ({ span })));
     spans = [];
   }
   for (const part of parts) {

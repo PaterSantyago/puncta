@@ -17,7 +17,7 @@ transcribed from the contract, never generated from the recognizer.
 | Settings inheritance                            | Calls, `with`, declarative HTML/React, PunctaProvider; independent enabled fields and null defaults                                                                            |
 | Interaction and invariants                      | Quotes/ellipsis/spaces literals, 12,000 seeded generated contexts over two locales and three configurations, original edits with replay, idempotence and full-range protection |
 
-Numeric recognition never interprets or rewrites separators, signs or range
+With digit grouping disabled, numeric recognition never interprets or rewrites separators, signs or range
 markers. It retains original spans for local interval edits. Range/minus
 conversion remains #46. Currency recognition uses those same spans before any
 unit spacing changes: `GBP1kg` becomes `GBP 1 kg` in one call.
@@ -31,3 +31,14 @@ implements the contract's conservative ambiguity policy without moving currency.
 Typography edits, including the currency warnings, project through the existing
 shared structural context. No new public API or React reconciliation behavior is
 introduced; the documented deep protection-toggle limitation remains unchanged.
+
+## Opt-in grouping extension (#89)
+
+With `rules.digitGrouping.enabled`, complete known designations also admit
+interior grouping. The number recognizer includes original group spaces and
+created U+202F; exterior unit/currency/percentage intervals retain their own
+rules, including disabled formatting and atypical currency-order warnings.
+`12345kg` becomes `12\u202f345\u00a0kg`. Unknown complete suffixes stay excluded.
+The full interaction matrix and current evidence are in
+[digit grouping, slice #89](digit-grouping.md#number-bonds-and-ranges-slice-89).
+Earlier separator-preservation claims above describe disabled grouping.

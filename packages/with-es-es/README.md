@@ -1,31 +1,51 @@
 # @use-puncta/with-es-es
 
-Explicitly installed es-es locale module. Named ESM export: `esEs`.
+The Spanish from Spain locale for Puncta. Named ESM export: `esEs`.
+
+**Unreleased functional version.** Public `0.1.0-alpha.0` is the historical
+scaffold and does not have this API.
+
+## Start
+
+Install `@use-puncta/core` and `@use-puncta/with-es-es` as direct dependencies.
+Use the compatible functional release versions when they are available. The
+[installation page](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/installation.md)
+contains the npm and pnpm command templates and current release status.
+
+<!-- puncta:example package-with-es-es -->
 
 ```ts
 import { createPuncta } from "@use-puncta/core";
 import { esEs } from "@use-puncta/with-es-es";
 
 const puncta = createPuncta({ locales: [esEs], locale: esEs.id });
-puncta.text("Wait..."); // "Wait…"
+console.log(puncta.text("Wait..."));
 ```
 
-The module is immutable, exposes readonly `id` and package `version`, and is ready
-synchronously after import. There is no global registration or runtime loading.
-Core is a peer dependency. The locale includes a static Spanish Liang resource;
-opt in with `hyphenation: { enabled: true }` to obtain `ca\u00admi\u00adno` from
-`camino`. Defaults are six letters and two letters on each side. Only lowercase
-and one initial capital are admitted, using a–z, á/é/í/ó/ú/ü/ñ. Decomposed accents
-are supported without changing their original spelling.
+Output:
 
-Whole words containing `tl` are conservatively skipped with
-`hyphenation.language-ambiguity` in detailed mode. Existing SHY, protection,
-unsupported alphabets and expected skip policies remain authoritative. Results
-are computed synchronously and do not promise perfect division of arbitrary
-text or control actual rendered line breaks.
+<!-- puncta:output package-with-es-es -->
 
-`hyphenation-manifest.json` identifies the fixed input, baseline and versioned
-Puncta refinement. `NOTICE.md` contains the full upstream attribution and license.
-No whole-word exception table is included.
+```text
+Wait…
+```
+
+See the [quick start](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/text-and-html.md)
+and [documentation index](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/README.md).
+Release-specific URLs are pending. These links point to the documentation branch.
+
+## Guide and reference
+
+- [Configure settings and locales](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/configuration.md).
+- [Core signatures](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/core.md).
+- [Settings and defaults](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md).
+- [Locale rules](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md).
+
+## Existing reference material
+
+Use the [hyphenation guide](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/hyphenation.md) for insertion and removal.
+See [locale admission and evidence](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#hyphenation) and [minima and resets](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md#hyphenation).
+Use the [digit-grouping reference](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#digit-grouping) for notation, examples, and exclusions.
+`NOTICE.md` contains upstream attribution and licenses.
 
 MIT licensed. Public publication is separate work.

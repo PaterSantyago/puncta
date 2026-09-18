@@ -81,3 +81,25 @@ export type ExactInstalledOverloads = [
   Expect<Equal<typeof stripReactTrue, ReactResult>>,
   Expect<Equal<typeof stripReactBoolean, ReactNode | ReactResult>>,
 ];
+
+// The grouping extension is shared by text, HTML and pure React declarations.
+const grouping = {
+  rules: {
+    digitGrouping: { enabled: true, minDigits: 4, normalizeExisting: false },
+  },
+} as const;
+instance.with(grouping).text("12345");
+instance.html("12345", grouping);
+transformReact("12345", { instance, ...grouping });
+instance.with({ rules: { digitGrouping: null } });
+instance.text("12345", {
+  rules: {
+    digitGrouping: { enabled: null, minDigits: null, normalizeExisting: null },
+  },
+});
+export type GroupingRuleId = Expect<
+  Equal<
+    Extract<import("@use-puncta/core").RuleId, "digitGrouping">,
+    "digitGrouping"
+  >
+>;

@@ -14,7 +14,7 @@
     "build": "pnpm -r build",
     "test:install": "node scripts/install.mjs",
     "test": "pnpm test:functional && pnpm test:release && pnpm test:publish && pnpm test:install",
-    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm build && pnpm pack:check && pnpm test && node scripts/release.mjs validate",
+    "check": "pnpm lint && pnpm format:check && pnpm docs:check && pnpm typecheck && pnpm build && pnpm pack:check && pnpm test && node scripts/release.mjs validate",
     "pack:check": "node scripts/pack.mjs",
     "test:release": "node --test scripts/release.test.mjs",
     "release:prepare": "node scripts/release.mjs prepare",
@@ -23,7 +23,8 @@
     "test:functional": "node --test tests/*.test.mjs",
     "test:scaling": "node scripts/check-scaling.mjs",
     "test:browser": "node tests/browser/run.mjs",
-    "test:rsc": "node tests/rsc/run.mjs"
+    "test:rsc": "node tests/rsc/run.mjs",
+    "docs:check": "node scripts/documentation.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.13",

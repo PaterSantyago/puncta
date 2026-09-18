@@ -113,3 +113,22 @@ characters and additional negative/regression cases.
 | Older Node/React majors, every patch in a manifest range, every framework/platform version                                          | #33 §7 fixes a tested matrix. Exact observed versions appear in the report; untested environments have no PASS claim.                                                                                                                                                                                     |
 | Corpus freeze hashes, resource regeneration/subprocesses or Node-without-browser-globals inside a browser                           | #33 §§7–8 require these on Node; browser-shared text oracles and Node-only infrastructure checks run in their appropriate environments.                                                                                                                                                                   |
 | New public npm publication or release promotion                                                                                     | #33 §8 explicitly accepts real local-registry archives; public release is separate work.                                                                                                                                                                                                                  |
+
+## Digit grouping extension (#83–86, implementation #87–93)
+
+The [final grouping contract matrix](digit-grouping.md#final-contract-matrix-93)
+maps each canonical grammar, configuration, diagnostic, coordinate and runtime
+branch to executable checks. It includes every canonical literal with its own
+settings and mixed text/HTML/pure React/component SSR oracles. Standalone numbers,
+normalization, bonds/ranges, scopes/reports, React runtime and long-input/scaling
+slices are implemented; their historical evidence remains in the same report.
+
+The final revision also tests prose-dash boundaries, nested locale/normalization
+settings with protection and entities, all two-leaf splits of mixed oracles,
+streaming shell/fallback and mounted updates. Previous separator-preservation
+claims apply to disabled grouping. Enabled grouping may replace only eligible
+integer separators with U+202F; cleanup retains candidate spelling and boundaries
+between separate numbers. `RuleId` includes `digitGrouping`.
+
+See [final execution evidence](digit-grouping.md#final-execution-93) for actual
+results and the tested revision; mapped checks alone are not PASS evidence.

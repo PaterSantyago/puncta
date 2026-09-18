@@ -19,6 +19,7 @@ export default function ClientPanel({
   const [text, setText] = useState(source);
   const [locale, setLocale] = useState<"en-gb" | "es-es">("en-gb");
   const [hyphenation, setHyphenation] = useState(true);
+  const [grouping, setGrouping] = useState(true);
   return (
     <section aria-label="Client typography">
       <p>
@@ -47,13 +48,29 @@ export default function ClientPanel({
         />
         Hyphenation
       </label>
+      <label>
+        <input
+          type="checkbox"
+          checked={grouping}
+          onChange={(event) => setGrouping(event.target.checked)}
+        />
+        Digit grouping
+      </label>
       <PunctaProvider
         instance={instance}
         locale={locale}
-        options={{ hyphenation: { enabled: hyphenation } }}
+        options={{
+          hyphenation: { enabled: hyphenation },
+          rules: { digitGrouping: { enabled: grouping, minDigits: 4 } },
+        }}
       >
         <p id="client-text">
           <Puncta>{text}</Puncta>
+        </p>
+        <p id="client-grouped">
+          <Puncta>
+            {12345}; {12345678901234567890n}
+          </Puncta>
         </p>
         {children}
       </PunctaProvider>

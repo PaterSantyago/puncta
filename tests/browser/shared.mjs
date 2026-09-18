@@ -1,5 +1,6 @@
 // The same public-API assertions run in Node and in every real browser engine.
 import "../ellipsis.test.mjs";
+import "../digit-grouping-react.test.mjs";
 import "../spaces.test.mjs";
 import "../quotes.test.mjs";
 import "../dashes.test.mjs";

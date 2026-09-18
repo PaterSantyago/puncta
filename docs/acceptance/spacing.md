@@ -30,3 +30,12 @@ between text are preserved with a `spaces` warning. This conservative choice doe
 not parse Markdown, infer missing punctuation, or implement future quote/dash/unit
 rules. Spaces do not cross opaque or structural boundaries. The previously recorded
 React limit for arbitrary deep protection toggles remains unchanged.
+
+## Opt-in digit-grouping extension
+
+The historical results above predate digit grouping. With it enabled, cleanup
+preserves malformed candidates and valid existing groups when normalization or
+the threshold forbids replacement. Two or more spaces, tabs and newlines remain
+boundaries between independent numbers; cleanup must not turn them into a single
+group separator on a repeat pass. Eligible integer separators may normalize to
+U+202F. See [final grouping acceptance](digit-grouping.md#final-contract-matrix-93).

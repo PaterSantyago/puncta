@@ -65,3 +65,16 @@ breaks across fonts, widths or engines. Arbitrary deep protection toggles retain
 the documented Context-bridge reconciliation limit in the React README; fixed
 protection during keyed reorders and direct-child protection toggles are tested.
 RSC is a separate acceptance slice.
+
+## Grouping runtime (#91)
+
+The shared public numeric-leaf tests run in every engine. The HTTP hydration
+fixture includes U+202F in shell/fallback/content and exact large-bigint text;
+server/client text and original shell child-node identities must match for all
+three renderers. `grouping.mjs` adds ten mounted updates after hydration: enable,
+disable, normalization, threshold, locale, number/bigint/exponential children and
+keyed reorder. It checks the clicked counter, DOM text node, key/ref ownership,
+element count and recoverable errors. Literal expectations distinguish automatic
+separators from explicit source spaces and U+202F. Existing protection and deep
+reconciliation limitations remain unchanged. Execution evidence is in
+[the grouping matrix](../../docs/acceptance/digit-grouping.md#react-runtime-slice-91).
