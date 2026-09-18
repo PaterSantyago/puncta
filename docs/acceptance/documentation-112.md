@@ -66,7 +66,10 @@ No project dictionary applies.
 A separate review checked revision `fa95685cdd73bd55fc6c7c56354c01ab4dba8d09` against the implementation, issue 112, and the parent specification.
 The review also checked the official ASD-STE100 Issue 9 rules and dictionary.
 It found one incorrect React error code and STE vocabulary and grammar issues.
-The author applied all requested corrections. Final review of these corrections is pending.
+
+The author applied all corrections. A separate final review checked the corrections at
+`f26361fd90d43a5850bca5ecadc72d6a0f60e2f8`. All 42 code/output fences are unchanged.
+No factual or language finding is open for this slice.
 
 All 42 code/output fences in the nine corrected files are unchanged.
 Focused documentation, formatting, and diff checks passed after correction.
