@@ -59,6 +59,8 @@ git push --atomic origin 'refs/tags/@use-puncta/core@0.1.0-alpha.0' 'refs/tags/@
 
 A rejected tag push does not undo npm publication. Resolve the conflict without moving a published release tag; retain the state and report the release incomplete until its remote tags are confirmed.
 
+The public pnpm consumer fixtures exclude only the exact package versions from the checked bundle from `minimumReleaseAge`. Without these temporary exceptions, pnpm's default one-day delay can resolve an older version even when the request uses `@next`. Other dependencies retain the default age policy. The fixture settings do not change repository or user configuration, and resolved versions must still match the checked archives.
+
 ## Subsequent OIDC releases
 
 `publish.yml` uses GitHub-hosted Ubuntu with Node 24.21.0 and pinned npm 11.19.0, which supports trusted publishing of the exact `.tgz` archives. Configure and verify a separate publisher for every package as described in [Trusted publisher setup](#trusted-publisher-setup). Enable `NPM_OIDC_ENABLED=true` only after all four configurations match. A successful configuration readback or Verdaccio run is not a real OIDC release.
