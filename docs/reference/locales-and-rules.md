@@ -260,7 +260,7 @@ The `digitGrouping` rule inserts U+202F NNBSP in eligible integer digits, in gro
 It does not change digits, decimal signs, or fractional digits.
 Grouping is text processing, not numeric conversion.
 An optional leading `+`, `-`, or U+2212 `−` is permitted.
-The independent minus rule can change an ASCII minus sign.
+The minus rule operates independently and can change an ASCII minus sign.
 
 | Input notation           | en-gb                                                             | es-es                   |
 | ------------------------ | ----------------------------------------------------------------- | ----------------------- |
@@ -272,7 +272,7 @@ The independent minus rule can change an ASCII minus sign.
 Mixtures of the four permitted group spaces are valid.
 `normalizeExisting: true` changes valid separators to U+202F when the integer digit count is at or above `minDigits`.
 `false` keeps the full existing grouped spelling.
-Existing groups are not removed below the threshold.
+Puncta does not remove existing groups below the threshold.
 An existing U+202F that stays unchanged produces no edit.
 See [canonical option definitions](settings.md#digit-grouping).
 
@@ -356,13 +356,13 @@ Currency order, percent spacing, and minus formatting keep their own rules and w
 An en-dash range can contain two valid endpoints.
 An ASCII hyphen is eligible only with a known unit or `rules.ranges.standalone: true`.
 U+2212 is a minus sign, not a range separator.
-Both endpoints must be eligible before either endpoint can change.
+Both endpoints must be eligible before one or both endpoints can change.
 The threshold and normalization choice then apply independently to each endpoint.
 
 An invalid endpoint keeps the full range ungrouped.
 A leading-zero or technical endpoint causes no grouping warning, even if the other endpoint has malformed grouping.
 If no endpoint is excluded, malformed grouping causes one warning for the full range.
-Disabling units, ranges, percentages, or currencies formatting does not remove their recognition context.
+When you disable formatting for units, ranges, percentages, or currencies, their recognition context stays available.
 Grouping does not convert the range separator itself.
 Recognized prose dashes bound numeric context even when dash formatting is disabled.
 
@@ -457,13 +457,13 @@ Examples are `1234 567`, `12 34`, and `1 , 234`.
 Each candidate produces one grouping ambiguity warning.
 A high threshold or `normalizeExisting: false` does not stop this warning.
 
-The following forms are excluded without grouping warnings:
+Grouping excludes these forms without grouping warnings:
 
 - Leading zeros, missing integer parts, and non-ASCII or mixed digits.
 - Combining marks, identifiers, unknown suffixes, and scientific notation.
 - Slash/colon numeric structures, arithmetic expressions, and three or more dotted or hyphenated segments.
 
-Puncta does not guess years or telephone numbers.
+Puncta does not identify numbers as years or telephone numbers.
 A four-digit year stays unchanged at the default threshold but can change with `minDigits: 4`.
 Use [protection](../guides/protection.md) for text that must not change.
 Other rules can still produce their own changes or warnings on excluded input.

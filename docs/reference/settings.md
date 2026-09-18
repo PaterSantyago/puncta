@@ -248,7 +248,7 @@ try {
 config.invalid-option rules.digitGrouping.minDigits value
 ```
 
-Protected declarative content is not inspected.
+Puncta does not inspect protected declarative content.
 An HTML `data-puncta="off"` marker has priority over options on the same host.
 Running React components still validate their own props.
 SHY removal validates shared settings but does not group digits or produce grouping warnings.

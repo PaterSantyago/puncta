@@ -107,12 +107,12 @@ An unchanged U+202F produces no grouping edit or applied-rule entry.
 For HTML, `before` and `after` are decoded text.
 An entity separator replacement maps to the full original entity spelling.
 Input mappings use `exact` for mapped boundaries, `covering` for a range through a multi-codepoint origin, or `unavailable` with a reason.
-Grouping does not invent positions in entities. Supported digit and separator entities map at their boundaries.
+Supported digit and separator entities map at their boundaries. Grouping uses only these boundaries for positions in entities.
 The [HTML source example](../guides/html.md#group-digits-across-inline-elements) shows separator ownership.
 
 The output writes U+202F as `\u202f` to make the separator visible.
 The first output below has insertions at offsets 4 and 7.
-The initial emoji occupies two UTF-16 units. Offsets do not refer to the transformed result.
+The initial emoji has two UTF-16 units. Offsets do not refer to the transformed result.
 The HTML replacement has decoded range `[0, 1)` and original input range `[6, 11)` for `&#32;`.
 
 <!-- puncta:example grouping-positions -->

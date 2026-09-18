@@ -18,16 +18,16 @@ Core and React package entries now link to these canonical definitions.
 Their previous grouping anchors stay available.
 The full diagnostic catalog is pending in issue 114.
 
-| Displayed program     | Checked requirement                                                                                                       |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `grouping-options`    | Opt-in, default/changed threshold, fraction digits, inherited settings, pause/enable, field/group reset                   |
-| `grouping-validation` | Invalid threshold error, exact option path and reason with processing disabled                                            |
-| `grouping-notation`   | Both locales, decimal/comma distinction, existing separators, mixed spaces, threshold and normalization                   |
-| `grouping-bonds`      | Full unit/currency/percent designations, composites/additions, ranges, invalid endpoints, independent formatting switches |
-| `grouping-html`       | Transparent elements/comments/lang, explicit scopes, protection, line boundaries, insertion/replacement ownership         |
-| `grouping-react`      | Components, Provider inheritance, pure reports, exact bigint, transparent and explicit scope boundaries                   |
-| `grouping-warnings`   | Excluded and ambiguous input, exact warning fields, high-threshold/normalization behavior, endpoint exclusion priority    |
-| `grouping-positions`  | Original UTF-16 offsets, non-BMP input, entity mapping, unchanged separators, warning across leaves                       |
+| Displayed program     | Checked requirement                                                                                                                      |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `grouping-options`    | Opt-in, default/changed threshold, fraction digits, inherited settings, pause/enable, field/group reset                                  |
+| `grouping-validation` | Invalid threshold error, exact option path and reason with processing disabled                                                           |
+| `grouping-notation`   | Both locales, decimal/comma distinction, existing separators, mixed spaces, threshold and normalization                                  |
+| `grouping-bonds`      | Full unit/currency/percent designations, composites/additions, ranges, invalid endpoints, formatting switches that operate independently |
+| `grouping-html`       | Transparent elements/comments/lang, explicit scopes, protection, line boundaries, insertion/replacement ownership                        |
+| `grouping-react`      | Components, Provider inheritance, pure reports, exact bigint, transparent and explicit scope boundaries                                  |
+| `grouping-warnings`   | Excluded and ambiguous input, exact warning fields, high-threshold/normalization behavior, endpoint exclusion priority                   |
+| `grouping-positions`  | Original UTF-16 offsets, non-BMP input, entity mapping, unchanged separators, warning across leaves                                      |
 
 Source review compared the notation and range definitions with `packages/core/src/digit-grouping.ts` and `number-bonds.ts`.
 The inventory compares `RulesOptions` and `ruleDefaults` with their public type and settings source fingerprints.
@@ -50,7 +50,7 @@ These archives are not the public scaffold packages.
 | Final prose changes              | Focused formatting, documentation, and diff checks passed                                                                                                                              |
 
 The existing npm and pnpm consumers check displayed sources against matching archives.
-No duplicate regression runner or new library tests are introduced.
+This change adds no duplicate regression runner or new library tests.
 The full run used stable example source. Final changes only adjusted prose and this evidence record.
 
 Existing browser evidence from issue 110 applies to unchanged grouping runtime claims.
@@ -61,11 +61,23 @@ This slice adds no new mounted behavior claim and does not repeat browser or RSC
 
 ## Review and limits
 
+A different agent reviewed revision `247844bb8beaaebdb797450783fd9214aa5b3646` against the implementation base.
+The factual, coverage, navigation, and scope review had no findings.
+The standards review found three P2 language groups: ordinary wording, verbal -ing constructions, and passive voice with a known actor.
+The author applied the requested corrections. A different agent must still check those corrections.
+
 The author checked prose against the official ASD-STE100 Issue 9 rules and dictionary.
 Exact identifiers, code, and literal examples keep their spelling.
-No project dictionary applies. Independent factual and language review is pending.
+No project dictionary applies. The final language correction check is pending.
 
 Package README links point to the documentation branch. Local target pages and anchors passed verification.
-New remote URLs await verification after the coordinator pushes the commit.
+The coordinator checked 20 remote documentation URLs. All returned HTTP 200.
 Public functional installation and release-specific links stay pending until publication.
 No publication, tag, release version change, or new environment support promise is part of this result.
+
+## Review corrections
+
+The corrections use approved ordinary wording, conditions for the three rule-disable statements, and active voice for known actors.
+Code and output blocks are unchanged from the reviewed revision.
+Focused documentation and formatting checks passed after these corrections.
+The full suite was not repeated.

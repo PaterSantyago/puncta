@@ -253,13 +253,13 @@ Server rendering and SHY removal guides are pending.
 
 Use `options.rules.digitGrouping` on `Puncta` or `PunctaProvider`.
 The Provider supplies settings but does not transform its direct children.
-For pure calls, supply the instance explicitly. Pure calls do not use Provider Context.
+For pure calls, supply the instance. Pure calls do not use Provider Context.
 See [shared settings](../reference/settings.md#digit-grouping) for the full defaults and reset rules.
 
 Arrays, Fragments, and transparent host elements share numeric recognition context.
 A nested explicit scope or opaque component stops a number.
 Insertion at a transparent boundary belongs to the left nonempty leaf.
-A replacement separator stays in its original leaf. The input children are not mutated.
+A replacement separator stays in its original leaf. Puncta does not mutate the input children.
 
 This full TSX program checks component output and a pure transformation.
 `renderToStaticMarkup` writes the HTML. The output shows U+202F as an escape.
@@ -346,23 +346,23 @@ console.log(
 12\u202f345\u202f678\u202f901\u202f234\u202f567\u202f890
 ```
 
-A number or bigint contributes `String(value)` to recognition.
+For a number or bigint, recognition uses `String(value)`.
 Changed numeric leaves become strings. Unchanged leaves keep their number or bigint type.
 Bigints keep exact decimal digits. Exponential number strings, for example `1e21`, are excluded.
 Puncta cannot give exact digits after JavaScript precision loss.
 
 Locale, options, and child updates recompute from original children.
-Disabling grouping removes inserted separators when the original source had none.
-It does not strip explicit U+202F or change separators back to commas in transformed text supplied as new input.
+When you disable grouping, Puncta removes inserted separators if the original source had none.
+It does not remove explicit U+202F or change separators back to commas in transformed text supplied as new input.
 See [state and protection-change limits](#preserve-state-during-updates).
 
 The existing browser checks verify grouping updates and hydration in Chromium, Firefox, and WebKit.
 They check supported state, ref, and DOM identity behavior.
 Server checks include grouping in shell, fallback, and resolved content for all three supported SSR renderers.
-Concurrent requests have independent options, locales, and reports. An abort/retry starts from original children.
+Concurrent requests process their options, locales, and reports independently. An abort/retry starts from original children.
 See the [runtime acceptance scope](../acceptance/digit-grouping.md#react-runtime-slice-91).
 
 The existing RSC consumer checks server-owned grouping and client-owned grouping independently.
 Client locale or grouping changes do not change server-owned text.
 The [server integration instructions](../../packages/with-react/README.md#server-integration) define the tested boundary and versions.
-This does not promise support for all framework versions or edge runtimes.
+These checks do not show support for all framework versions or edge runtimes.

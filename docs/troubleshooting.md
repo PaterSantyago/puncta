@@ -114,7 +114,7 @@ See [the reconciliation limit](guides/react.md#preserve-state-during-updates).
 
 ## Digit grouping does not change a number
 
-Set `rules.digitGrouping.enabled: true` explicitly.
+Set `rules.digitGrouping.enabled: true`.
 Check the integer digit count against `minDigits`. Fractional digits do not count.
 Use [the configuration example](guides/configuration.md#enable-digit-grouping) to check threshold and reset behavior.
 An explicit scope, protection, or opaque component can stop a number across leaves.
@@ -137,7 +137,7 @@ The U+00A0 bond between a number and its unit belongs to the units rule, not dig
 ## Grouping does not correct lost digits
 
 Puncta does not convert numeric values. It cannot give exact digits after JavaScript precision loss.
-Supply a string or exact bigint when the original digits matter.
+When exact digits are necessary, supply a string or exact bigint.
 An exponential numeric representation is excluded.
 A transformed string supplied as new input has its own explicit separators.
 To recompute a React result without grouping, keep the original children as input.

@@ -185,9 +185,9 @@ Digit grouping inserts U+202F NNBSP between integer digit groups.
 The number/unit bond uses U+00A0 NBSP.
 Install core and en-gb to run this full program.
 The output writes these invisible characters as escapes.
-Actual strings contain the characters, not the escape notation.
+Output strings contain the characters, not the escape notation.
 
-Set `enabled: true` explicitly. A threshold change alone does not enable the rule.
+Set `enabled: true`. A threshold change does not enable the rule.
 Use strings for exact input digits. Grouping does not convert text to a number.
 It cannot give exact digits after JavaScript precision loss.
 
@@ -238,7 +238,7 @@ console.log(compact.text("12345", { rules: { digitGrouping: null } }));
 The decimal sign and fractional trailing zeros stay unchanged.
 Only the integer digits count for `minDigits`.
 A field reset uses the current locale default. A group reset also disables grouping.
-Disabling only the rule keeps explicit settings for later use.
+When you disable only the rule, explicit settings stay available for later use.
 See [settings](../reference/settings.md#digit-grouping),
 [notation and exclusions](../reference/locales-and-rules.md#digit-grouping),
 [HTML scopes](html.md#group-digits-across-inline-elements), and
