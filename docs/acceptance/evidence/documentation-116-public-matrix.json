@@ -1,0 +1,374 @@
+{
+  "checkedAt": "2026-09-18T16:36:13.281370+00:00",
+  "command": "PUNCTA_CONSUMER_REGISTRY=https://registry.npmjs.org PUNCTA_CONSUMER_BUNDLE=<retained-authorized-alpha.1-bundle> node scripts/install.mjs",
+  "exitCode": 0,
+  "releaseCommit": "932ab23b959c92eef435cca7fb55a08ec12d93bc",
+  "bundlePlanSha256": "ea31eea476f39c0cbbaae8f69784f9f85a4aa97405a5420d3bda4e6cca09c430",
+  "policy": "This matrix uses exact checked-version pnpm age exceptions for @next consumers. Separate displayed-command tests use fresh projects without exceptions.",
+  "output": [
+    "Documentation: 22 displayed examples type-checked and executed (@use-puncta/core, @use-puncta/with-en-gb)",
+    "npm: first-result core/en-gb consumer verified",
+    "Documentation: 1 displayed examples type-checked and executed (@use-puncta/core, @use-puncta/with-es-es)",
+    "npm: first-result core/es-es consumer verified",
+    "Documentation: 35 displayed examples type-checked and executed (@use-puncta/core, @use-puncta/with-en-gb, @use-puncta/with-es-es)",
+    "npm: first-result core/en-gb-es-es consumer verified",
+    "Documentation: 22 displayed examples type-checked and executed (@use-puncta/core, @use-puncta/with-en-gb)",
+    "pnpm: first-result core/en-gb consumer verified",
+    "Documentation: 1 displayed examples type-checked and executed (@use-puncta/core, @use-puncta/with-es-es)",
+    "pnpm: first-result core/es-es consumer verified",
+    "Documentation: 35 displayed examples type-checked and executed (@use-puncta/core, @use-puncta/with-en-gb, @use-puncta/with-es-es)",
+    "pnpm: first-result core/en-gb-es-es consumer verified",
+    "@use-puncta/with-react: requested next, resolved 0.1.0-alpha.1",
+    "@use-puncta/core: requested transitive, resolved 0.1.0-alpha.1",
+    "Public ESM import, transitive core, shared React/core, selected locales and SSR verified",
+    "",
+    "npm react-only: clean @next installation and dependency graph verified",
+    "@use-puncta/with-react: requested next, resolved 0.1.0-alpha.1",
+    "@use-puncta/core: requested transitive, resolved 0.1.0-alpha.1",
+    "@use-puncta/with-en-gb: requested next, resolved 0.1.0-alpha.1",
+    "Public ESM import, transitive core, shared React/core, selected locales and SSR verified",
+    "",
+    "npm en-gb: clean @next installation and dependency graph verified",
+    "npm en-gb: public API declarations verified with explicitly installed core",
+    "@use-puncta/with-react: requested next, resolved 0.1.0-alpha.1",
+    "@use-puncta/core: requested transitive, resolved 0.1.0-alpha.1",
+    "@use-puncta/with-es-es: requested next, resolved 0.1.0-alpha.1",
+    "Public ESM import, transitive core, shared React/core, selected locales and SSR verified",
+    "",
+    "npm es-es: clean @next installation and dependency graph verified",
+    "npm es-es: public API declarations verified with explicitly installed core",
+    "@use-puncta/with-react: requested next, resolved 0.1.0-alpha.1",
+    "@use-puncta/core: requested transitive, resolved 0.1.0-alpha.1",
+    "@use-puncta/with-en-gb: requested next, resolved 0.1.0-alpha.1",
+    "@use-puncta/with-es-es: requested next, resolved 0.1.0-alpha.1",
+    "Public ESM import, transitive core, shared React/core, selected locales and SSR verified",
+    "",
+    "npm en-gb, es-es: clean @next installation and dependency graph verified",
+    "npm en-gb, es-es: public API declarations verified with explicitly installed core",
+    "Documentation: 49 displayed examples type-checked and executed (@use-puncta/core, @use-puncta/with-react, @use-puncta/with-en-gb, @use-puncta/with-es-es)",
+    "@use-puncta/with-react: requested next, resolved 0.1.0-alpha.1",
+    "@use-puncta/core: requested transitive, resolved 0.1.0-alpha.1",
+    "Public ESM import, transitive core, shared React/core, selected locales and SSR verified",
+    "",
+    "pnpm react-only: clean @next installation and dependency graph verified",
+    "@use-puncta/with-react: requested next, resolved 0.1.0-alpha.1",
+    "@use-puncta/core: requested transitive, resolved 0.1.0-alpha.1",
+    "@use-puncta/with-en-gb: requested next, resolved 0.1.0-alpha.1",
+    "Public ESM import, transitive core, shared React/core, selected locales and SSR verified",
+    "",
+    "pnpm en-gb: clean @next installation and dependency graph verified",
+    "pnpm en-gb: public API declarations verified with explicitly installed core",
+    "@use-puncta/with-react: requested next, resolved 0.1.0-alpha.1",
+    "@use-puncta/core: requested transitive, resolved 0.1.0-alpha.1",
+    "@use-puncta/with-es-es: requested next, resolved 0.1.0-alpha.1",
+    "Public ESM import, transitive core, shared React/core, selected locales and SSR verified",
+    "",
+    "pnpm es-es: clean @next installation and dependency graph verified",
+    "pnpm es-es: public API declarations verified with explicitly installed core",
+    "@use-puncta/with-react: requested next, resolved 0.1.0-alpha.1",
+    "@use-puncta/core: requested transitive, resolved 0.1.0-alpha.1",
+    "@use-puncta/with-en-gb: requested next, resolved 0.1.0-alpha.1",
+    "@use-puncta/with-es-es: requested next, resolved 0.1.0-alpha.1",
+    "Public ESM import, transitive core, shared React/core, selected locales and SSR verified",
+    "",
+    "pnpm en-gb, es-es: clean @next installation and dependency graph verified",
+    "pnpm en-gb, es-es: public API declarations verified with explicitly installed core",
+    "Documentation: 49 displayed examples type-checked and executed (@use-puncta/core, @use-puncta/with-react, @use-puncta/with-en-gb, @use-puncta/with-es-es)"
+  ],
+  "displayedPrograms": [
+    {
+      "id": "first-result",
+      "file": "README.md",
+      "sourceSha256": "18fa816fdb9b836c2cc1a2e08312f1916df93b7d105271da4d6dd45d60db51e7",
+      "outputSha256": "553914ffb5fe227c7ad4f02ce862ea7993739674d167c03627c7e37d9ddda6ca"
+    },
+    {
+      "id": "text-start",
+      "file": "docs/getting-started/text-and-html.md",
+      "sourceSha256": "18fa816fdb9b836c2cc1a2e08312f1916df93b7d105271da4d6dd45d60db51e7",
+      "outputSha256": "553914ffb5fe227c7ad4f02ce862ea7993739674d167c03627c7e37d9ddda6ca"
+    },
+    {
+      "id": "html-start",
+      "file": "docs/getting-started/text-and-html.md",
+      "sourceSha256": "92b0c421b074b0aaa1c79271a45b64e4ba815e0e545388349e3596782e6bc5e8",
+      "outputSha256": "1056abb6790739fff72e873115bcf83bab72fd20b640ad8913712e580694666d"
+    },
+    {
+      "id": "package-core",
+      "file": "packages/core/README.md",
+      "sourceSha256": "18fa816fdb9b836c2cc1a2e08312f1916df93b7d105271da4d6dd45d60db51e7",
+      "outputSha256": "553914ffb5fe227c7ad4f02ce862ea7993739674d167c03627c7e37d9ddda6ca"
+    },
+    {
+      "id": "package-with-en-gb",
+      "file": "packages/with-en-gb/README.md",
+      "sourceSha256": "18fa816fdb9b836c2cc1a2e08312f1916df93b7d105271da4d6dd45d60db51e7",
+      "outputSha256": "553914ffb5fe227c7ad4f02ce862ea7993739674d167c03627c7e37d9ddda6ca"
+    },
+    {
+      "id": "package-with-es-es",
+      "file": "packages/with-es-es/README.md",
+      "sourceSha256": "e778cba1b803b1af7a01da10024c6b9a54c3bb6432314fdf419d927957f9e4ad",
+      "outputSha256": "553914ffb5fe227c7ad4f02ce862ea7993739674d167c03627c7e37d9ddda6ca"
+    },
+    {
+      "id": "configuration-variants",
+      "file": "docs/guides/configuration.md",
+      "sourceSha256": "0cb7c14fa61222cb34c60d4e91ddaa0ee2e2faf018126bb61c32b761463d0fcd",
+      "outputSha256": "8b87d812198578d37533c1dd0c24be832a0ede56bc3367d301766d331481b55b"
+    },
+    {
+      "id": "configuration-locales",
+      "file": "docs/guides/configuration.md",
+      "sourceSha256": "4411a9f4cdf74c9363297d42cf88237dfe860e14ae44ce7aeda0af0b3df5a7b0",
+      "outputSha256": "0163a7416901cfa5d79355f3050456559415ffe5497a2c9d69c88321200cf7dd"
+    },
+    {
+      "id": "configuration-units",
+      "file": "docs/guides/configuration.md",
+      "sourceSha256": "bcde90e04e310e2e25502e576a50df12c8a96bcd5a8a584458369681d58a70ed",
+      "outputSha256": "340ce83ffeba9050c7f3fdccdbb40cb16f3171c9949355b1262287a6a29c751b"
+    },
+    {
+      "id": "settings-validation",
+      "file": "docs/reference/settings.md",
+      "sourceSha256": "6b1aa20493192e0498a6c1e1cea6990465a8e74766b4ddac20d6d0207048b69f",
+      "outputSha256": "2a0763c4c0ea14cdefd565bb13ef21a755f0fa173294bd0513559d629825432e"
+    },
+    {
+      "id": "core-results",
+      "file": "docs/reference/core.md",
+      "sourceSha256": "22acf8edc04588980d83d4329aa889b40854c6a71d1a56bcca3b5f1278eb544b",
+      "outputSha256": "8a8ea791d2ea718cafae69fca939f4f4f5fa8046c4cc12eda2d989ea90110cfb"
+    },
+    {
+      "id": "locale-rules",
+      "file": "docs/reference/locales-and-rules.md",
+      "sourceSha256": "282a5d8e679b5cb23ef1ba00657a11663b84042d17f2290d60dc38082e61c83a",
+      "outputSha256": "a4c467a94d290afcafa1c74104e63c264af2a53c78e1edd132ddb73a3dcfb5b3"
+    },
+    {
+      "id": "locale-limits",
+      "file": "docs/reference/locales-and-rules.md",
+      "sourceSha256": "71a22f809f8171932e23f42352cce0528302133e918fee332bc55c323f48b666",
+      "outputSha256": "52991346a3277f0402d3418876c8ab280c503bcd387d44e79ba0d09849edde29"
+    },
+    {
+      "id": "configuration-scopes",
+      "file": "docs/guides/configuration.md",
+      "sourceSha256": "f2859b100552e3dc69f9541516408f516dcef851d4c17ba394be93c8080ddf1c",
+      "outputSha256": "6e70032cbcbf9f9f293d11f9da7ef1613e49f1a8c871900f78a99a744ba81aef"
+    },
+    {
+      "id": "html-modes",
+      "file": "docs/guides/html.md",
+      "sourceSha256": "cbb0ce9372700fb1364537996ce8b80dc2a2b4c640d60f3b622d0f5d39b7368e",
+      "outputSha256": "8e96f8c2d6da3232f49dd2372ee464dd2ecd07c9b3da3cf9e45bc11566413e26"
+    },
+    {
+      "id": "html-scopes",
+      "file": "docs/guides/html.md",
+      "sourceSha256": "158e59c235f5c7dd7cc8228a990903fd89709bb99bdf4d5f2d270ac5da1065e6",
+      "outputSha256": "175f1f140f73e85e661d6ee7f62fff2f58224746d8343ef2803e0fc88c985540"
+    },
+    {
+      "id": "html-joins",
+      "file": "docs/guides/html.md",
+      "sourceSha256": "876baa2d1651e41e5e3798412dfe53fe70572d38a5c82647d7da4a9884bff94a",
+      "outputSha256": "19427dd3d5bfb0c3eb1fd7ce3284904057b42f8f1ec19aaab84781cc84220a97"
+    },
+    {
+      "id": "html-serialization",
+      "file": "docs/guides/html.md",
+      "sourceSha256": "2ed3448ad73a782e2bf3ead20150b02cfe209b55fbd50999d1b6b1a9e6e1db8c",
+      "outputSha256": "1e759e715c12972a714a61de95c2947469fe6135c4e78d5e593e008c3f62c0fa"
+    },
+    {
+      "id": "protection-ranges",
+      "file": "docs/guides/protection.md",
+      "sourceSha256": "bd863adf8e278c07553c11d2b5e79d10d400a8ab90048f387ab22b4ce052790f",
+      "outputSha256": "c96608e0084a77909a4be81a8275a9bd722e13af6d64c682d555edd307fd869d"
+    },
+    {
+      "id": "protection-technical",
+      "file": "docs/guides/protection.md",
+      "sourceSha256": "d3dcf004783838386da638b49b81868b6c248a56a86b0104097aa966a2af97cf",
+      "outputSha256": "e3ea01e8042e55437784d24fe2e672cc2a5ab0cdb66bfb1dfff24fca5fa53aa3"
+    },
+    {
+      "id": "protection-markup",
+      "file": "docs/guides/protection.md",
+      "sourceSha256": "ab108792e1eb1caceb93198a57dbf5bcd42776273c173aa75e117dbbc727c92b",
+      "outputSha256": "73c9fc069eb19a3ffd0a27f828381d5a8d931c6264a6c9eb2ac8a0191026eb03"
+    },
+    {
+      "id": "core-format-validation",
+      "file": "docs/reference/core.md",
+      "sourceSha256": "3c02a80cca86acf05d950c7898074234111535d42b05d9bfa2e0a40c0982ada8",
+      "outputSha256": "71d68a6d100eec6ebb12d0c098b4ea3e910ea5902df3ca92dda70beda3c03805"
+    },
+    {
+      "id": "react-start",
+      "file": "docs/getting-started/react.md",
+      "sourceSha256": "47d60629334224602e4f5af7c45cf1ca028699a963f7560d67bf0fa42bc5ab36",
+      "outputSha256": "d4f79a8aa0cc00d81044a33ed0573b83e5eab4815499ce182163d6b30a96e269"
+    },
+    {
+      "id": "react-direct",
+      "file": "docs/getting-started/react.md",
+      "sourceSha256": "c5a198da18dd94469b6507fe38c365052ed91284713693839d142235ae6d1675",
+      "outputSha256": "553914ffb5fe227c7ad4f02ce862ea7993739674d167c03627c7e37d9ddda6ca"
+    },
+    {
+      "id": "react-component",
+      "file": "docs/guides/react.md",
+      "sourceSha256": "f3b94796e3e027daa2872bf856ac4c86b554e7296a6acda732d4c6229e48ed8b",
+      "outputSha256": "d4f79a8aa0cc00d81044a33ed0573b83e5eab4815499ce182163d6b30a96e269"
+    },
+    {
+      "id": "react-scopes",
+      "file": "docs/guides/react.md",
+      "sourceSha256": "ac95bb4ba0572b3449678fbf29a02c0a323799af58e5e66527372bfec885757d",
+      "outputSha256": "83edfc283c4f350b85bb1430c342989939e1d2d51d05d022d202de277b185b21"
+    },
+    {
+      "id": "react-pure",
+      "file": "docs/guides/react.md",
+      "sourceSha256": "cbf4020ea5bbe295f4cd3d642a96635ae40fb80b0ec36e123a66540927cd17f2",
+      "outputSha256": "252ce48c92feaa997d835058192280927d6f991c83a4c88172fa994ddf829c2e"
+    },
+    {
+      "id": "react-children",
+      "file": "docs/guides/react.md",
+      "sourceSha256": "2383853f247b1b403c2a243e22ec5b21efe06ad06c447adfda8699db7a42ba58",
+      "outputSha256": "8ebf2f8b5aa6cec64b75fdd17e341990c562a5ac85d074c1677083b23342dbaf"
+    },
+    {
+      "id": "react-errors",
+      "file": "docs/reference/react.md",
+      "sourceSha256": "b1cf4d0c470709e6047f6b0e2bc2bd1bf02cbeda0c9c50be9e2789791e3a0363",
+      "outputSha256": "99497c5b89e2809739cc4325c9c9ddaf2f784caa609c5f29b3183735c62d5084"
+    },
+    {
+      "id": "package-react",
+      "file": "packages/with-react/README.md",
+      "sourceSha256": "3957717bb3233b14fc64cff7c692d98c0799ec8cd6facb9d2f6ee1270c359df1",
+      "outputSha256": "553914ffb5fe227c7ad4f02ce862ea7993739674d167c03627c7e37d9ddda6ca"
+    },
+    {
+      "id": "grouping-options",
+      "file": "docs/guides/configuration.md",
+      "sourceSha256": "15cf79d2a9e653672a8c007e7d1e823cb7680ad822057691f4d54c984c4dedc2",
+      "outputSha256": "dfc3731f4e20d81f69fa54e5b79efdbf94d24bd2e1dd0fec8cdfc86ed1ba7d85"
+    },
+    {
+      "id": "grouping-validation",
+      "file": "docs/reference/settings.md",
+      "sourceSha256": "afb08884026a608687ba18c7d8dac9a1363a8a0fdffdc5cc60f7353e5957cc41",
+      "outputSha256": "e5ce808128dcbdee18e487491ab40d10c7c54fdfa5aef96a9a39b739b9c33207"
+    },
+    {
+      "id": "grouping-notation",
+      "file": "docs/reference/locales-and-rules.md",
+      "sourceSha256": "1a11006f2cc137b9f185569f70cc5086322549de79888ce5ff5aac6e72b8d2bd",
+      "outputSha256": "fd055e27d1c7fb1a57f19042b9df12bfffee0fdb08871aaa58ed3d9d46cda95f"
+    },
+    {
+      "id": "grouping-bonds",
+      "file": "docs/reference/locales-and-rules.md",
+      "sourceSha256": "ce6b7b141b84ee8ac18e3e7c764c147a458e828df82a5121cd9d1fe38535e991",
+      "outputSha256": "0325d06f9fffa58526141296ad02498cc5aa4e58bca897b72f0a131361abe428"
+    },
+    {
+      "id": "grouping-html",
+      "file": "docs/guides/html.md",
+      "sourceSha256": "8a8491f668dac3cd7b0884e63d4e4ac5b8d50865442fac1f4c3bb536258336de",
+      "outputSha256": "c534d150b9aa0568c5be3b05297b43951316ec60a65dbdb641d6f9545705b493"
+    },
+    {
+      "id": "grouping-react",
+      "file": "docs/guides/react.md",
+      "sourceSha256": "c521a6a49021e44766b60045b812c10bbacc87990b2f2f9e94a16d199b046f0e",
+      "outputSha256": "ef6a79305e0a6158e7076fd804e781aea82366e96c522c8daa9287a110f5fe64"
+    },
+    {
+      "id": "grouping-warnings",
+      "file": "docs/reference/diagnostics.md",
+      "sourceSha256": "dd6e6d8f95b47d51b32890ee0cc251e88f9b292326d754e1e1d5ef13a764729b",
+      "outputSha256": "f2bf2cb26c54979dab6a35a3da346df22f221f70a87fd16bb8f3699f3c8975d8"
+    },
+    {
+      "id": "grouping-positions",
+      "file": "docs/reference/diagnostics.md",
+      "sourceSha256": "db6fadda1f1efc5e0359afa6c7ea18b187efe51de4a6e09b8f387c972c234a09",
+      "outputSha256": "9fbb3fd236039c913ef669de7e66457bf818cdd4ccd24c241a22038250966656"
+    },
+    {
+      "id": "hyphenation-insert",
+      "file": "docs/guides/hyphenation.md",
+      "sourceSha256": "13b8a2040a686e201cbb2c8d20d17de27bb687c8103e0560f074c5800968b3b6",
+      "outputSha256": "7c6aae5302f858e5ca787b84cd97df815921664a477711be7143a651daf97956"
+    },
+    {
+      "id": "hyphenation-exclusions",
+      "file": "docs/guides/hyphenation.md",
+      "sourceSha256": "eed625aaab030941d4c937d23176f13168f11b8e7d91e821ec2eafecdc1e3b70",
+      "outputSha256": "55ee7579bfecaccac3aa638da7382d93965a378ab6fef2606b20ff2ddd74a145"
+    },
+    {
+      "id": "hyphenation-trees",
+      "file": "docs/guides/hyphenation.md",
+      "sourceSha256": "46da7aacfe6b73ee3b52c7ab9a828ba6db24665f8a9ae6f39431defcbc93ddbf",
+      "outputSha256": "7e18ed29a2139b00c9bdc6e5ebf2d657552394d09d12475324ea256f6557ebdf"
+    },
+    {
+      "id": "hyphenation-remove-text",
+      "file": "docs/guides/hyphenation.md",
+      "sourceSha256": "fac28f6e3c10d482b465b51d151012e3f246ff8869670cf9877c27938d11b62a",
+      "outputSha256": "6844bbab6de29aae713c2232136d794b7d68288c9c251e6c1fb607f7b9299447"
+    },
+    {
+      "id": "hyphenation-remove-html",
+      "file": "docs/guides/hyphenation.md",
+      "sourceSha256": "999eb5f1df50ee726b7e030787524ece2ace850f4c027d30e03d672ba9fb8c0e",
+      "outputSha256": "60abf83d816c379184e4afffb8a51579a192bbdc203ba52854e2dd6d4e4f6114"
+    },
+    {
+      "id": "hyphenation-remove-react",
+      "file": "docs/guides/hyphenation.md",
+      "sourceSha256": "315487674b0701435e6dd25934aec31ab7e721953d216ffaa4085b39044997f4",
+      "outputSha256": "1b4cbad3728b9a33a4dbaaae7bf5281d7f3e9546134443f6a71e6f5b82fd38cf"
+    },
+    {
+      "id": "hyphenation-removal-types",
+      "file": "docs/reference/core.md",
+      "sourceSha256": "ea8be94cf5f8af12d4920190ee797550624af8183a4b20ac446d9ccdf4707e16",
+      "outputSha256": "36980b966f0ff927d11e03d53102660b45a461a1a339123d73a0cd3908930dfe"
+    },
+    {
+      "id": "server-sync",
+      "file": "docs/guides/server-rendering.md",
+      "sourceSha256": "2efca610d7b4ded3d3fd4985f59bfd074fe8d69fc0429771705e4ebe81e11f65",
+      "outputSha256": "a661d6181c58b5632b6bb89ff61185c3609076131033ddf4ba0924581159f57e"
+    },
+    {
+      "id": "diagnostics-error-warning",
+      "file": "docs/reference/diagnostics.md",
+      "sourceSha256": "df123f11d00adc0a54c8e9e387c2346234163bc5e931d82b4d09547f52e032ad",
+      "outputSha256": "99577cdbb80b16e221c89d38ff0b622e3e73432d6e2a4bdfe9c55babb4d4f91a"
+    },
+    {
+      "id": "diagnostics-html",
+      "file": "docs/reference/diagnostics.md",
+      "sourceSha256": "e5feab40b51d36026c0fe835ceea93fb5df50c83acec29b65ea570b30fba902e",
+      "outputSha256": "9fff993b3227ec839806b9f6da54af0b919011e95d259f1ca52cd2d37acdade3"
+    },
+    {
+      "id": "diagnostics-react",
+      "file": "docs/reference/diagnostics.md",
+      "sourceSha256": "9e4cd306cb3d1b95f7e88955eb71cca98151c0fc015d86688196f25d6aa688ae",
+      "outputSha256": "8f1a69b53d8e4c73e16c6cd327add3ca5e6c7c159c34bb526e50e88a3dfc586d"
+    }
+  ]
+}

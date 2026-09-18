@@ -113,8 +113,17 @@ After a release is fully verified and its remote tags exist, remove the complete
 
 The initial four `0.1.0-alpha.0` publications were confirmed in [#13](https://github.com/PaterSantyago/puncta/issues/13#issuecomment-5681990798). Checks verified archive hashes, eight npm/pnpm consumer scenarios, and remote package tags. The npm registry exposed both `next` and `latest` for those first versions. The executor never explicitly promoted `latest`.
 
-The source manifests now include the public `repository.url` required for provenance, and archive checking verifies the exact URL. This metadata will reach npm in the next agreed release of each package; the published alpha.0 archives have not been changed or republished. Metadata setup alone adds no release intent.
+The four `0.1.0-alpha.1` packages were published through npm OIDC with provenance.
+The [completed publication run](https://github.com/PaterSantyago/puncta/actions/runs/35367122861)
+verified the authorized archive hashes, public npm/pnpm consumers, and remote package tags.
+All four tags identify `932ab23b959c92eef435cca7fb55a08ec12d93bc`.
+The [functional release plan](https://github.com/PaterSantyago/puncta/blob/932ab23b959c92eef435cca7fb55a08ec12d93bc/release/plan.json)
+stays at that commit; the completed plan was removed from the current checkout.
+`next` selects `0.1.0-alpha.1`; `latest` stays on `0.1.0-alpha.0`.
+See the [post-publication documentation report](acceptance/documentation-116.md).
 
-Trusted publisher configuration is tracked separately in [#14](https://github.com/PaterSantyago/puncta/issues/14). A verified configuration means npm has the expected trust relationship and direct publication permission. It does not prove an OIDC token exchange or provenance for a published version. The next real, agreed alpha release will provide that evidence through its successful publication run and npm provenance. Do not create an extra release or describe a dry-run as OIDC publication proof.
+Trusted publisher setup is recorded in [the configuration task](https://github.com/PaterSantyago/puncta/issues/14).
+The successful functional publication supplies the real OIDC and provenance evidence.
+The historical alpha.0 archives were not changed or republished.
 
 References: [npm trust CLI](https://docs.npmjs.com/cli/v11/commands/npm-trust/), [trusted publishing](https://docs.npmjs.com/trusted-publishers/) and [provenance prerequisites](https://docs.npmjs.com/generating-provenance-statements/), checked 2026-09-15.

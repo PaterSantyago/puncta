@@ -1,0 +1,360 @@
+{
+  "checkedAt": "2026-09-18T16:35:21.759Z",
+  "releaseCommit": "932ab23b959c92eef435cca7fb55a08ec12d93bc",
+  "authorizationRun": 35364186174,
+  "publicationRun": 35367122861,
+  "packages": [
+    {
+      "name": "@use-puncta/core",
+      "version": "0.1.0-alpha.1",
+      "sha256": "3608420025cc2b00881cf77a8ab3e467077cbe65fbc2beea8548da9aad4a0c0e",
+      "tags": {
+        "next": "0.1.0-alpha.1",
+        "latest": "0.1.0-alpha.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/PaterSantyago/puncta.git",
+        "type": "git",
+        "directory": "packages/core"
+      },
+      "provenance": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@use-puncta%2fcore@0.1.0-alpha.1",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "releaseTag": "refs/tags/@use-puncta/core@0.1.0-alpha.1",
+      "tagCommit": "932ab23b959c92eef435cca7fb55a08ec12d93bc",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.mts",
+          "import": "./dist/index.mjs"
+        }
+      },
+      "publishedReadme": {
+        "sha256": "86f12e267401a8d5f069490e99a8c937f0381e193a8dcb5f73d91f779679722c",
+        "hasUnreleasedNotice": true,
+        "links": [
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/installation.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/text-and-html.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/README.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/configuration.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/core.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/html.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/protection.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/hyphenation.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/diagnostics.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/troubleshooting.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/configuration.md#enable-digit-grouping",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#digit-grouping",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/html.md#group-digits-across-inline-elements",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/diagnostics.md#digit-grouping",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/compatibility.md",
+            "httpStatus": 200
+          }
+        ]
+      }
+    },
+    {
+      "name": "@use-puncta/with-en-gb",
+      "version": "0.1.0-alpha.1",
+      "sha256": "76be12d670ea29f2a4033deeec36b2c6043e992ef01e5e6f29b78b3a50e59be7",
+      "tags": {
+        "next": "0.1.0-alpha.1",
+        "latest": "0.1.0-alpha.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/PaterSantyago/puncta.git",
+        "type": "git",
+        "directory": "packages/with-en-gb"
+      },
+      "provenance": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@use-puncta%2fwith-en-gb@0.1.0-alpha.1",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "releaseTag": "refs/tags/@use-puncta/with-en-gb@0.1.0-alpha.1",
+      "tagCommit": "932ab23b959c92eef435cca7fb55a08ec12d93bc",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.mts",
+          "import": "./dist/index.mjs"
+        }
+      },
+      "publishedReadme": {
+        "sha256": "a1542044739a5d007fa89df26147f02c80b20a03d7a316e01b32cd8a61f421bd",
+        "hasUnreleasedNotice": true,
+        "links": [
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/installation.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/text-and-html.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/README.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/configuration.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/core.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/hyphenation.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#hyphenation",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md#hyphenation",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#digit-grouping",
+            "httpStatus": 200
+          }
+        ]
+      }
+    },
+    {
+      "name": "@use-puncta/with-es-es",
+      "version": "0.1.0-alpha.1",
+      "sha256": "5ced5d7f39b88881299f9a067f7f116fb8936890be1f6f2e223f8ae3fa544f1d",
+      "tags": {
+        "next": "0.1.0-alpha.1",
+        "latest": "0.1.0-alpha.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/PaterSantyago/puncta.git",
+        "type": "git",
+        "directory": "packages/with-es-es"
+      },
+      "provenance": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@use-puncta%2fwith-es-es@0.1.0-alpha.1",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "releaseTag": "refs/tags/@use-puncta/with-es-es@0.1.0-alpha.1",
+      "tagCommit": "932ab23b959c92eef435cca7fb55a08ec12d93bc",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.mts",
+          "import": "./dist/index.mjs"
+        }
+      },
+      "publishedReadme": {
+        "sha256": "906098c85e1649feda419fce93139154a2420b02ec818aba0f0d97bac49dafd7",
+        "hasUnreleasedNotice": true,
+        "links": [
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/installation.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/text-and-html.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/README.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/configuration.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/core.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/hyphenation.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#hyphenation",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md#hyphenation",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#digit-grouping",
+            "httpStatus": 200
+          }
+        ]
+      }
+    },
+    {
+      "name": "@use-puncta/with-react",
+      "version": "0.1.0-alpha.1",
+      "sha256": "ce6b29f76a48ad4e5664b657711ebb237fd7f8990b6c14b56c7d6030f5d1d092",
+      "tags": {
+        "next": "0.1.0-alpha.1",
+        "latest": "0.1.0-alpha.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/PaterSantyago/puncta.git",
+        "type": "git",
+        "directory": "packages/with-react"
+      },
+      "provenance": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@use-puncta%2fwith-react@0.1.0-alpha.1",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "releaseTag": "refs/tags/@use-puncta/with-react@0.1.0-alpha.1",
+      "tagCommit": "932ab23b959c92eef435cca7fb55a08ec12d93bc",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.mts",
+          "import": "./dist/index.mjs"
+        },
+        "./pure": {
+          "types": "./dist/pure.d.mts",
+          "import": "./dist/pure.mjs"
+        }
+      },
+      "publishedReadme": {
+        "sha256": "53d71dd1029a3a2c16ba699ca67c9d8766cfebfc60e3dc783320fd77420207f4",
+        "hasUnreleasedNotice": true,
+        "links": [
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/installation.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/react.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/react.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/react.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/hyphenation.md#remove-shy-from-react",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/react.md#stripsofthyphensreact",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/server-rendering.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/compatibility.md#server-environments",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/examples/rsc/README.md",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/configuration.md#enable-digit-grouping",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#digit-grouping",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md#digit-grouping",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/react.md#group-digits-in-react",
+            "httpStatus": 200
+          },
+          {
+            "url": "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/react.md#preserve-state-during-updates",
+            "httpStatus": 200
+          }
+        ]
+      }
+    }
+  ]
+}
