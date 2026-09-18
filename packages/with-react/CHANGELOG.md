@@ -1,5 +1,11 @@
 # @use-puncta/with-react
 
+## 0.1.0-alpha.1
+
+### Patch Changes
+
+- Implement the first synchronous ellipsis slice across text, HTML and React (#39)
+
 ## 0.1.0-alpha.0
 
 ### Minor Changes
