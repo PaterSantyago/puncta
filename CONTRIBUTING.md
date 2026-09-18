@@ -14,18 +14,22 @@ pnpm install --frozen-lockfile
 pnpm check
 ```
 
-Node **24.21.0 LTS** is pinned for development and CI. Build tools require a recent
-Node patch (tsdown requires at least 24.11 on Node 24); that is separate from the
-consumer runtime contract, currently verified on Node 24 LTS. Public package
+Node **24.21.0 LTS** is pinned for development and CI. Build tools require a recent Node patch. tsdown requires at least 24.11 on Node 24. The separate consumer runtime contract is currently verified on Node 24 LTS. Public package
 manifests do not impose development-only engine constraints on applications.
 
-Stable versions rechecked against the npm registry on 2026-09-15: pnpm 12.4.1,
-React and React types 19.3.0, TypeScript 7.0.2, tsdown 0.23.0, Biome 2.5.13,
-Prettier 3.9.6, Verdaccio 6.10.3. The lockfile fixes their dependency graph;
+The stable versions were checked against the npm registry on 2026-09-15:
+
+- pnpm 12.4.1
+- React and React types 19.3.0
+- TypeScript 7.0.2
+- tsdown 0.23.0
+- Biome 2.5.13
+- Prettier 3.9.6
+- Verdaccio 6.10.3
+
+The lockfile fixes their dependency graph;
 strict peer checks stay enabled. The real build verifies tool compatibility.
-tsdown currently warns that the TypeScript 7 compiler API is experimental;
-independent typechecking and actual declaration generation both pass without
-suppressing peer conflicts or compiler checks.
+tsdown currently warns that the TypeScript 7 compiler API is experimental. Independent typechecking and actual declaration generation both pass. Peer conflicts and compiler checks are not suppressed.
 
 ## Checks
 
@@ -55,9 +59,7 @@ isolated caches/stores, and install packages by name and exact version. Each
 consumer has its own npm cache, pnpm metadata cache (`XDG_CACHE_HOME`) and pnpm
 store; npm's cache setting alone does not isolate pnpm metadata. A regression
 queries both package managers' effective cache paths. The
-initial application supplies React and React DOM, with core only transitive. The check publishes the
-adapter first and proves installation fails without core, then publishes the
-remaining archives and runs this matrix independently with each package manager:
+initial application supplies React and React DOM, with core only transitive. The check publishes the adapter first and verifies that installation fails without core. Then it publishes the remaining archives. Each package manager runs this matrix independently:
 
 | Direct Puncta dependencies | Verification                                   |
 | -------------------------- | ---------------------------------------------- |
@@ -111,18 +113,13 @@ in Chromium, Firefox and WebKit; CI runs it alongside the browser matrix.
    Keep the public GitHub `repository.url` and update `repository.directory`
    to the new package path for provenance.
 2. Extend the internal locale format and supported `LocaleId` union. Locale
-   modules are opaque; arbitrary user-created locale objects are unsupported. Keep
-   core as `workspace:^` in both peerDependencies and devDependencies: the peer
-   belongs to consumers; the devDependency lets pnpm resolve and pack the
-   workspace peer. Add no React dependency and no registration in core.
+   modules are opaque; arbitrary user-created locale objects are unsupported. Keep core as `workspace:^` in both peerDependencies and devDependencies. The peer belongs to consumers. The devDependency lets pnpm resolve and pack the workspace peer. Add no React dependency and no registration in core.
 3. Run `pnpm install` to update the lockfile. `packages/*` is a workspace glob,
    so recursive builds discover the new package. `scripts/workspace.mjs` uses
    `pnpm list -r` to discover public modules, excludes every private module and
    enforces `@use-puncta/core` or `@use-puncta/with-<name>` names. Packing and the
    test registry use that shared set; release tooling must use it too.
-4. Add the locale's identifier/export name to `scripts/consumer.mjs`, add its
-   individual and combined scenarios in `scripts/install.mjs`, and include it
-   in the locale manifest/declaration assertions in `scripts/pack.mjs`. These
+4. Add the locale's identifier/export name to `scripts/consumer.mjs`. Add its individual and combined scenarios in `scripts/install.mjs`. Include it in the locale manifest/declaration assertions in `scripts/pack.mjs`. These
    checks must verify chosen locales and absence of unselected locales with
    both npm and pnpm. Extend the private example when useful.
 5. Run `pnpm check`. Public npm publication is a separate release step; a new
@@ -165,7 +162,7 @@ that the first public npm release has happened.
 
 ## Release workflow
 
-See [independent alpha releases](docs/releases.md) for native pnpm change intents, the automated release PR, required head checks and verified artifact retrieval. npm publication is a separate task.
+See [independent alpha releases](docs/releases.md) for native pnpm change intents, automated release PRs, head checks, and verified artifact retrieval. Publication to npm is a separate task.
 
 ## Documentation changes
 

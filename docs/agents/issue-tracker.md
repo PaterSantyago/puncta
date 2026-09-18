@@ -1,57 +1,61 @@
 # Issue tracker: GitHub
 
-Задачи и спецификации этого проекта живут в GitHub Issues.
-Используй gh CLI. Репозиторий определяется по git remote.
+Use GitHub Issues for project tasks and specifications.
+Use the `gh` CLI. Identify the repository from the Git remote.
 
-## Основные операции
+## Basic operations
 
-- Создать задачу: gh issue create --title "..." --body-file <file>
-- Прочитать задачу с обсуждением: gh issue view <number> --comments
-- Получить метки: gh issue view <number> --json labels
-- Найти задачи: gh issue list --state open --json number,title,body,labels,comments
-  При необходимости добавляй фильтры --label и --state.
-- Добавить комментарий: gh issue comment <number> --body-file <file>
-- Добавить или снять метку:
-  gh issue edit <number> --add-label "..."
-  gh issue edit <number> --remove-label "..."
-- Закрыть задачу: gh issue close <number>
+- Create an issue: `gh issue create --title "..." --body-file <file>`
+- Read an issue and its discussion: `gh issue view <number> --comments`
+- Get labels: `gh issue view <number> --json labels`
+- Find issues: `gh issue list --state open --json number,title,body,labels,comments`.
+  Add `--label` and `--state` filters as necessary.
+- Add a comment: `gh issue comment <number> --body-file <file>`
+- Add a label: `gh issue edit <number> --add-label "..."`
+- Remove a label: `gh issue edit <number> --remove-label "..."`
+- Close an issue: `gh issue close <number>`
 
-Для многострочного текста используй временный файл и --body-file.
+For multiline text, use a temporary file and `--body-file`.
 
-«Опубликовать в трекере» означает создать GitHub issue.
-«Получить соответствующий тикет» означает прочитать issue и комментарии.
+“Publish in the tracker” means create a GitHub issue.
+“Get the corresponding ticket” means read the issue and its comments.
 
 ## Pull requests as a triage surface
 
 **PRs as a request surface: no.**
 
-Если флаг включён, применяй те же состояния и метки к внешним PR.
-Используй gh pr view, gh pr diff, gh pr list, gh pr comment,
-gh pr edit и gh pr close. Внешними считай PR с authorAssociation
-CONTRIBUTOR, FIRST_TIME_CONTRIBUTOR или NONE.
+If this flag is enabled, apply the same states and labels to external PRs.
+Use `gh pr view`, `gh pr diff`, `gh pr list`, `gh pr comment`,
+`gh pr edit`, and `gh pr close`.
+A PR is external if its `authorAssociation` is `CONTRIBUTOR`, `FIRST_TIME_CONTRIBUTOR`, or `NONE`.
 
-Issues и PR используют общую нумерацию. Если тип ссылки #<number>
-неясен, проверь gh pr view, затем gh issue view.
+Issues and PRs share a number sequence. If a `#<number>` reference is unclear, check `gh pr view`, then `gh issue view`.
 
-## Работа с wayfinder
+## Work with wayfinder
 
-- Карта — issue с меткой wayfinder:map и разделами
-  Notes / Decisions-so-far / Fog.
-- Дочерние тикеты связывай с картой через GitHub sub-issues.
-  Если они недоступны, используй список задач в карте и строку
-  Part of #<map> в начале дочернего тикета.
-- Тип тикета обозначай меткой wayfinder:<type>:
-  research, prototype, grilling или task.
-- Блокировки записывай через нативные GitHub issue dependencies:
-  gh api --method POST repos/<owner>/<repo>/issues/<child>/dependencies/blocked_by
-  -F issue_id=<blocker-db-id>
-  Здесь нужен database id блокирующей задачи, полученный через
-  gh api repos/<owner>/<repo>/issues/<n> --jq .id.
-- Если зависимости недоступны, используй строку Blocked by: #<n>.
-  Тикет разблокирован, когда все блокирующие задачи закрыты.
-- Следующий тикет — первый открытый дочерний тикет в порядке карты
-  без исполнителя и открытых блокировок.
-- При взятии в работу назначь себя:
-  gh issue edit <number> --add-assignee @me.
-- При завершении добавь комментарий с результатом, закрой тикет
-  и запиши краткий итог со ссылкой в Decisions-so-far карты.
+- A map is an issue with the `wayfinder:map` label and these sections:
+  `Notes`, `Decisions-so-far`, and `Fog`.
+- Link child tickets to the map with GitHub sub-issues.
+  If sub-issues are unavailable, use a task list in the map.
+  In that case, also add `Part of #<map>` at the start of each child ticket.
+- Identify the ticket type with a `wayfinder:<type>` label:
+  `research`, `prototype`, `grilling`, or `task`.
+- Record blockers with native GitHub issue dependencies:
+
+  ```sh
+  gh api --method POST repos/<owner>/<repo>/issues/<child>/dependencies/blocked_by -F issue_id=<blocker-db-id>
+  ```
+
+  Use the blocking issue's database ID. Get it with:
+
+  ```sh
+  gh api repos/<owner>/<repo>/issues/<n> --jq .id
+  ```
+
+- If dependencies are unavailable, use `Blocked by: #<n>`.
+  A ticket is unblocked when all blocking issues are closed.
+- Select the first open child ticket in map order that has no assignee and no open blockers.
+- Assign the ticket to yourself when you start work:
+  `gh issue edit <number> --add-assignee @me`.
+- When the work is complete, add a result comment and close the ticket.
+  Record a short result and link in the map's `Decisions-so-far` section.

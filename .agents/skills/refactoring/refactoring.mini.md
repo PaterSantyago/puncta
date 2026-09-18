@@ -2,7 +2,7 @@
 
 ## When to use
 
-Use when changing existing code, preparing a feature or bug fix, reviewing cleanup, or reducing structural friction without intending to change observable behavior.
+Use for existing-code changes, feature or bug-fix preparation, cleanup review, or structural improvements that preserve observable behavior.
 
 ## Primary bias to correct
 
@@ -12,18 +12,18 @@ Refactoring is behavior-preserving design work in small steps. Do not turn clean
 
 - Preserve observable behavior during refactoring. Isolate behavior changes from structural changes and never disguise a feature, migration, or redesign as cleanup.
 - Work in small, reversible, buildable, testable, reviewable steps. Split a patch when it is too large to reason about locally.
-- Establish or identify a safety net before risky refactoring. Use characterization tests for unclear behavior, keep test updates aligned with intended behavior, and never delete a failing test to finish cleanup.
-- Use preparatory and follow-up refactoring around feature work: identify what makes the requested change awkward, reshape that local structure first when useful, make the behavior change, then clean debt introduced by the change.
-- Refactor the current blocking smell, not every smell in sight: duplication, long functions, long parameter lists, globals, divergent change, shotgun surgery, feature envy, primitive obsession, repeated conditionals, temporary fields, middle men, or speculative generality.
-- Prefer the simplest named move that helps: rename, extract, inline, move, split meanings, introduce a parameter or value object, encapsulate a field or collection, decompose conditionals, use guard clauses, or substitute a clearer algorithm.
+- Establish or identify a safety net before risky refactoring. Use characterization tests for unclear behavior. Keep test updates aligned with intended behavior. Never delete a failing test to finish cleanup.
+- Use preparatory and follow-up refactoring around feature work. Identify what makes the requested change difficult. First improve that local structure when useful, then change behavior, then remove technical debt introduced by the change.
+- Refactor the current blocking code smell. Examples include duplication, long functions, long parameter lists, globals, divergent change, shotgun surgery, and feature envy. Other examples include primitive obsession, repeated conditionals, temporary fields, middle men, and speculative generality. Do not refactor every visible smell.
+- Prefer the simplest useful named transformation. Options include rename, extract, inline, move, split meanings, and introduce a parameter or value object. Other options include field/collection encapsulation, conditional decomposition, guard clauses, and a clearer algorithm.
 - Make names and functions reveal intent. Rename before deeper work when bad names block understanding; keep functions coherent, at one abstraction level, with tight variable scope and separated phases.
 - Put behavior and state with the concept that owns them. Split classes or modules with multiple reasons to change; separate business policy from formatting, transport, persistence, I/O, frameworks, and integration details.
 - Keep data, mutation, and call contracts explicit. Avoid behavior-switching boolean flags, confusing argument order, parameter reassignment, exposed mutable collections, unnecessary setters, public fields, and duplicated state-transition logic.
-- Simplify conditionals honestly. Use guard clauses, extracted predicates, lookup tables, consolidated duplicate fragments, state, strategy, polymorphism, or null objects only when they reduce repeated branching or clarify variation.
+- Simplify conditionals honestly. Use conditional simplifications only when they reduce repeated branching or clarify variation. Options include guard clauses, extracted predicates, lookup tables, consolidated duplicate fragments, state, strategy, polymorphism, and null objects.
 - Use abstraction and generalization only when current evidence justifies them. Remove pass-through layers, vague utilities, middle men, unused hierarchy, and just-in-case interfaces that do not improve changeability.
 - Preserve error semantics unless intentionally changing behavior. Refactor error handling to reveal the main path and consolidate duplicate validation, cleanup, recovery, or error structures.
 - Keep patch intent reviewable. Group related refactorings, separate structural edits from behavior where practical, and avoid giant patches that rename, move, redesign, and change logic together.
-- Stop when the requested change is easy, the blocking smell is gone, readability and local changeability are clearly better, and the next cleanup would be speculative.
+- Stop when the requested change is easy and the blocking smell is removed. Readability and local changeability must be better. Further cleanup must require speculation.
 
 ## Trigger rules
 

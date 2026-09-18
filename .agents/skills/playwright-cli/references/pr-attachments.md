@@ -4,7 +4,7 @@
 
 ## When to attach
 
-Attach visual evidence when it saves the reviewer a checkout: a screenshot of a UI fix, a before/after pair, a short video of a new user-facing flow, or the failure state when filing a bug. Skip it for refactors, backend-only changes and anything the diff already shows.
+Attach visual evidence when it lets the reviewer avoid a checkout. Examples include a UI-fix screenshot, before/after images, a short video of a new user flow, or a bug-report failure state. Skip it for refactors, backend-only changes and anything the diff already shows.
 
 ## From a local session
 

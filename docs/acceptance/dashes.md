@@ -18,7 +18,7 @@ It also verifies repeat processing and original-source provenance.
 | `10-12`, `5-3`, `well-known`, `- Hola`  | Preserved                               | Preserved                             |
 
 Spaces in the numeric outputs above are U+00A0. Number notation stays unchanged.
-Known unit recognition uses the same complete, case-sensitive catalogue and
+Known unit recognition uses the same complete, case-sensitive catalog and
 `units.additional` additions as number bonds, even with unit formatting disabled.
 `ranges.standalone: true` enables an isolated numeric range; chained signs,
 dates and arithmetic remain ambiguous and produce `typography.ambiguous`.

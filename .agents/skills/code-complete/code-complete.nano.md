@@ -16,7 +16,7 @@ Working code is not enough. Construction must lower defect risk, control complex
 - Make data meaning visible with names, constants, stronger types, closed states, deliberate initialization, units, and ownership.
 - Validate trust boundaries; use assertions, invariants, and contracts for programmer assumptions; keep error handling explicit and diagnosable.
 - Keep branches, loops, exits, exceptions, and table-driven logic simple enough to verify.
-- Build, test, review, debug, refactor, integrate, and tune in small evidence-based loops: root cause before fixes, behavior protection before refactoring, measurement before optimization.
+- Build, test, review, debug, refactor, integrate, and tune in small cycles based on evidence. Find causes before fixes, protect behavior before refactoring, and measure before optimization.
 - Use comments, documentation, tools, and standards to reduce reader or manual effort, never to hide poor structure.
 
 ## Trigger rules

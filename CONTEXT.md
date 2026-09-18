@@ -1,48 +1,55 @@
 # Puncta
 
-Puncta подготавливает текст к публикации по правилам типографики выбранной локали.
+Puncta prepares text for publication with the typography rules of the selected locale.
 
 ## Language
 
-**Типографическая нормализация**:
-Приведение пробелов, кавычек, пунктуационных и других типографских знаков к правилам оформления текста.
+**Typography normalization**:
+Changes to spaces, quotation marks, punctuation, and other typographic characters to follow text formatting rules.
 
-**Типографическая правка**:
-Итоговое изменение текста относительно исходника, вызванное применением типографических правил. Восстановление структуры HTML и изменение формы его записи при сериализации не являются типографическими правками.
+**Typography edit**:
+A change from the source text that results from typography rules. HTML structure recovery and changes to serialized HTML notation are not typography edits.
 
-**Локаль**:
-Язык и регион, для которых определены правила типографики. Первые локали Puncta — британский английский (`en-gb`) и испанский Испании (`es-es`).
+**Locale**:
+A language and region with defined typography rules. The first Puncta locales are British English (`en-gb`) and Spanish from Spain (`es-es`).
 
-**Типографический профиль**:
-Набор настроек типографической нормализации для локали. У каждой локали один профиль по умолчанию; отдельные настройки можно переопределять.
+**Typography profile**:
+A set of typography normalization settings for a locale. Each locale has one default profile. Individual settings can override the defaults.
 
-**Неразрывная связь**:
-Связь между элементами текста, запрещающая разрыв строки между ними, например между числом и единицей измерения.
-_Avoid_: Перенос слов
+**Digit grouping**:
+Separation of integer digits into groups of three, from right to left, with a narrow no-break space.
 
-**Внутрисловный перенос**:
-Разделение слова между строками в допустимой для его языка позиции. Отличается от неразрывной связи и от явного разрыва строки.
+**Narrow no-break space (NNBSP)**:
+The U+202F space character. It separates digit groups and prevents line breaks between them.
+_Avoid_: Short space
 
-**Позиция переноса**:
-Место внутри слова, в котором допускается внутрисловный перенос. Наличие такой позиции не означает, что строка будет разорвана именно там.
+**Non-breaking bond**:
+A connection between text elements that prevents a line break between them. A number and its unit of measurement are one example.
+_Avoid_: Hyphenation
 
-**Языковой эталон переноса**:
-Слово выбранной локали с допустимыми позициями переноса, проверенными по языковым источникам или обоснованным правилам независимо от результата проверяемого алгоритма.
+**Hyphenation**:
+Division of a word across lines at a position permitted by its language. This differs from a non-breaking bond and an explicit line break.
 
-**Обязательная позиция переноса**:
-Допустимая позиция языкового эталона, которую Puncta должна обозначить при заданных настройках. Отличается от допустимой позиции, пропуск которой учитывается, но разрешён критериями приёмки.
+**Hyphenation position**:
+A position inside a word where hyphenation is permitted. This position does not require a line break.
 
-**Мягкий перенос (SHY)**:
-Невидимый в неразорванном слове знак, обозначающий позицию возможного внутрисловного переноса. Не является обычным дефисом или явным разрывом строки.
+**Language reference for hyphenation**:
+A word in the selected locale with permitted hyphenation positions. Language sources or justified rules verify these positions independently of the algorithm under test.
 
-**Область типографики**:
-Фрагмент текста, к которому применяются общие настройки типографики и локаль. Вложенная область наследует явно заданные настройки окружающей области и может переопределить их; значения по умолчанию определяет её собственная локаль.
+**Required hyphenation position**:
+A permitted position in a language reference that Puncta must mark with the specified settings. Acceptance criteria can permit other valid positions to be missing. These omissions are recorded.
 
-**Контекст распознавания**:
-Окружение текста, учитываемое при распознавании слов, цитат и неразрывных связей. Его границы зависят от конструкции: например, разрыв строки прерывает слово, но может сохранять контекст цитаты.
+**Soft hyphen (SHY)**:
+A character that marks a possible hyphenation position. It is invisible when the word has no line break. It is not an ordinary hyphen or an explicit line break.
 
-**Непрозрачный фрагмент**:
-Фрагмент, содержимое которого недоступно для анализа окружающей областью типографики. Он занимает место в тексте, не позволяя соединять слова по его сторонам; внутри него может действовать собственная область типографики.
+**Typography scope**:
+A text fragment with shared typography settings and a locale. A nested scope inherits explicit settings from its enclosing scope and can override them. Its own locale supplies the defaults.
 
-**Защищённый фрагмент**:
-Часть текста, исключённая из типографического анализа и преобразования вместе со всем вложенным содержимым. Может находиться внутри обрабатываемой цитаты, но не участвует в распознавании слов и связей с окружающим текстом.
+**Recognition context**:
+The surrounding text used to recognize words, quotations, and non-breaking bonds. Its boundaries depend on the construct. For example, a line break interrupts a word but can preserve quotation context.
+
+**Opaque fragment**:
+A fragment whose content the enclosing typography scope cannot analyze. It occupies a position in the text and prevents words on its two sides from joining. It can contain its own typography scope.
+
+**Protected fragment**:
+Text excluded from typography analysis and transformation, together with all its nested content. It can occur inside a processed quotation. It does not participate in word or bond recognition with surrounding text.

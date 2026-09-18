@@ -1,9 +1,9 @@
-# Совместная обработка и итоговая диагностика
+# Combined processing and final diagnostics
 
-Срез [#53](https://github.com/PaterSantyago/puncta/issues/53) проверяет совместную
-работу публичных `text`, `html`, `transformReact`, `stripSoftHyphens`,
-`stripSoftHyphensReact` и синхронного `Puncta`/`PunctaProvider` SSR.
-Канонические контракты:
+Task [#53](https://github.com/PaterSantyago/puncta/issues/53) verifies combined
+operation of the public `text`, `html`, `transformReact`, `stripSoftHyphens`,
+`stripSoftHyphensReact`, and synchronous `Puncta`/`PunctaProvider` SSR APIs.
+Canonical contracts:
 [#28](https://github.com/PaterSantyago/puncta/issues/28#issuecomment-5683640825),
 [#29](https://github.com/PaterSantyago/puncta/issues/29#issuecomment-5683906630),
 [#30](https://github.com/PaterSantyago/puncta/issues/30#issuecomment-5685323283),
@@ -11,109 +11,108 @@
 [#32](https://github.com/PaterSantyago/puncta/issues/32#issuecomment-5685627641),
 [#33](https://github.com/PaterSantyago/puncta/issues/33#issuecomment-5695491875).
 
-## Требование → проверка
+## Requirements and checks
 
-Основной файл — `tests/combined-processing.test.mjs`. Таблица связывает
-функциональные контракты с наблюдаемыми проверками; тесты не обращаются к частным
-проходам, таблицам координат или внутренним функциям распознавания.
+The main file is `tests/combined-processing.test.mjs`. The table connects
+functional contracts to observable checks. Tests do not use private passes,
+coordinate tables, or internal recognition functions.
 
-| Контракт                                                                                                  | Проверка и независимое основание                                                                                                                                                                                                                                                                                                                                                                          |
-| --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| #28: кавычки, апострофы, интервалы, многоточие, тире, диапазоны, минус, единицы, проценты и валюты вместе | `combined literal oracle…`: две буквальные строки по профилям #28, а также независимые эталоны backbone/camino; каждый прозрачный стык через HTML, чистый React и `Puncta` SSR; точные U+00A0/U+00AD. Все отдельные утверждённые эталоны остаются в профильных файлах ниже.                                                                                                                               |
-| #28 §8, #31 §4: выключатель группы не выключает её контекст                                               | `each disabled group…`: все десять групп по отдельности отключены, остальные части буквального результата сохранены; единицы по-прежнему распознаются для диапазонов/минуса, апостроф — для кавычек. Профильные тесты дополнительно проверяют normalizeExisting, дополнительные единицы и null/reset.                                                                                                     |
-| #29, #33: языковые эталоны с включённой общей типографикой                                                | `frozen linguistic oracles…`: все 313 английских и 361 испанское слово в окружении кавычек, пробелов, диапазона, единицы и многоточия через три входа; ни одной лишней позиции, все обязательные позиции, исходное написание сохранено. Замороженные корпуса не изменяются.                                                                                                                               |
-| #32 §3–4: итоговые правки и первоначальное происхождение                                                  | `final reports…`: исходные UTF-16 после emoji, отдельные кавычки и SHY, соседние удаления/замены, entity и стык единицы. Испанская окончательная очистка внутренних пробелов представлена одной исходной правкой, без промежуточного схлопывания. `verifyReport` проверяет before по исходным ranges, kind, source IDs и уникальные пары appliedRules.                                                    |
-| #32: последовательная обработка не раскрывает промежуточные координаты                                    | Типографика вычисляет окончательные замены по исходному представлению, переносы анализируют итоговое представление с отображением к исходнику. `combined literal oracle…`, `final reports…` и `generated combined settings…` проверяют оригинальные позиции после других изменений. Независимые правки не объединяются; правило, распознавшее контекст, но не изменившее текст, не добавляется в ruleIds. |
-| #31 §10, #32 §2: hasEdits и outputChanged                                                                 | `verifyReport` проверяет оба признака для строк и наличие edits/appliedRules; React не имеет outputChanged. Сериализация без типографики отдельно проверяется в `html-parsing.test.mjs` и `ellipsis.test.mjs`.                                                                                                                                                                                            |
-| #31 §11, #32 §6–7: все предупреждения и их машинные поля                                                  | `every warning code…`: все девять кодов, source, locale/ruleId, details, виды location; одинаковая причина в двух местах сохраняется дважды, одинаковый вызов повторяет предупреждения. `verifyReport` отвергает дубликаты по всем машинным полям, исключая message. Английский текст проверяется только как непустая строка.                                                                             |
-| #31 §11: все ошибки, отсутствие частичного результата                                                     | `all configuration error codes…`: все десять кодов в обычном/detailed режиме; тип ошибки, fields, отсутствие result и запрещённых ссылок на невыданные sources. Поздняя ошибка разметки после доступного изменяемого текста проверяется в HTML и React.                                                                                                                                                   |
-| #28 §8, #29 §4, #33 §6: идемпотентность и воспроизводимость                                               | Буквальные, корпусные и генерируемые проверки требуют неизменного результата, пустых edits/appliedRules при повторе. Генератор: seed 530, 32-битный LCG с выбором через весь диапазон, 2000 входов, минимум 1901 различных и положительный контроль реально сделанных правок. Проверяется воспроизведение plain-text результата правками исходника.                                                       |
-| #29 §4: новые настройки применяются к исходнику                                                           | `fresh options…`: исходная строка обработана разными локалями, выключателями и настройками переносов через with, call overrides, HTML, pure React и Provider SSR; повторный исходный вызов не меняется. Динамический React lifecycle относится к #54.                                                                                                                                                     |
-| #29 §4, #31 §7: удаление SHY после полной обработки                                                       | `SHY removal after full processing…`: text, default fragment, table context, title context, document и React; сохранены прочая типографика, атрибуты и code, повторное удаление пустое. Точные удаления относятся к входу операции удаления.                                                                                                                                                              |
-| #31 §7: удаление не требует ресурса вставки                                                               | `all configuration error codes…`: экземпляр без ресурса успешно удаляет SHY, включая декларативную область с включёнными переносами в HTML и React; with с включением вставки по-прежнему отвергается до получения экземпляра.                                                                                                                                                                            |
-| #28 §7–8, #29 §4: техническая защита и контекст после SHY                                                 | `removal cannot expose a URI suffix…`: каждый стык URL/www-семейств, обе локали; ведущий SHY перед настоящим URL удаляется, SHY внутри URL сохраняется. `punctuation spacing…` и `all interval rules…`: спорные изменения не освобождают другую группу только на следующем вызове; независимое многоточие продолжает обрабатываться.                                                                      |
-| #30: структурные границы, защита, источники каждого представления                                         | `inline-context.test.mjs`, `protection.test.mjs`, `options-scopes.test.mjs`, профильные all-split проверки и новые общие all-split проверки. Plain text не имеет элементов/атрибутов; parser warnings и inputRange применимы только к HTML; React имеет адреса исходного дерева, не HTML-позиции.                                                                                                         |
+| Contract                                                                                                              | Check and independent basis                                                                                                                                                                                                                                                                                                                                                                                |
+| --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #28: quotes, apostrophes, spacing, ellipses, dashes, ranges, minus signs, units, percentages, and currencies together | `combined literal oracle…`: two literal strings from the #28 profiles and independent backbone/camino references. Each transparent boundary is checked through HTML, pure React, and `Puncta` SSR, with exact U+00A0/U+00AD characters. All separate approved references remain in the corresponding files below.                                                                                          |
+| #28 §8, #31 §4: a group switch does not disable its context                                                           | `each disabled group…`: each of ten groups is disabled separately. Other parts of the literal result stay the same. Units remain available for range/minus recognition, and apostrophes remain available for quote recognition. Group tests also check normalizeExisting, additional units, and null/reset.                                                                                                |
+| #29, #33: language references with general typography enabled                                                         | `frozen linguistic oracles…`: all 313 English and 361 Spanish words through three inputs. Context includes quotes, spaces, a range, a unit, and an ellipsis. There are no extra positions. All required positions are present. Source spelling is unchanged. The fixed corpora are unchanged.                                                                                                              |
+| #32 §3–4: final edits and original provenance                                                                         | `final reports…`: original UTF-16 positions after emoji, separate quotes and SHY, adjacent deletions/replacements, an entity, and a unit boundary. Final Spanish inner-space cleanup is one source edit, without an intermediate collapse. `verifyReport` checks before against source ranges, kind, source IDs, and unique appliedRules pairs.                                                            |
+| #32: sequential processing does not expose intermediate coordinates                                                   | Typography calculates final replacements from the original representation. Hyphenation analyzes the final representation with a mapping to the source. `combined literal oracle…`, `final reports…`, and `generated combined settings…` check original positions after other changes. Independent edits are not combined. A rule that recognizes context but does not change text is not added to ruleIds. |
+| #31 §10, #32 §2: hasEdits and outputChanged                                                                           | `verifyReport` checks both flags for strings and the presence of edits/appliedRules. React has no outputChanged. `html-parsing.test.mjs` and `ellipsis.test.mjs` separately check serialization without typography.                                                                                                                                                                                        |
+| #31 §11, #32 §6–7: all warnings and their machine-readable fields                                                     | `every warning code…`: all nine codes, source, locale/ruleId, details, and location types. The same cause at two positions gives two warnings. An identical call gives the same warnings. `verifyReport` rejects duplicates by all machine-readable fields, excluding message. English text is checked only as a nonempty string.                                                                          |
+| #31 §11: all errors, no partial result                                                                                | `all configuration error codes…`: all ten codes in ordinary/detailed mode. Checks cover error type, fields, absent result, and forbidden references to sources not returned. HTML and React checks include a late markup error after accessible text that can change.                                                                                                                                      |
+| #28 §8, #29 §4, #33 §6: idempotence and repeatability                                                                 | Literal, corpus, and generated checks require unchanged output and empty edits/appliedRules on repeat. Generator: seed 530, 32-bit LCG with selection across the full range, 2000 inputs, and at least 1901 distinct inputs. A positive control verifies actual edits. Source edits must reproduce the plain-text result.                                                                                  |
+| #29 §4: new settings apply to the source                                                                              | `fresh options…`: the source string is processed with different locales, switches, and hyphenation settings. Checks use with, call overrides, HTML, pure React, and Provider SSR. A repeated original call is unchanged. Dynamic React lifecycle belongs to #54.                                                                                                                                           |
+| #29 §4, #31 §7: SHY removal after full processing                                                                     | `SHY removal after full processing…`: text, default fragment, table context, title context, document, and React. Other typography, attributes, and code are preserved. Repeated removal gives no edits. Exact deletions refer to the removal operation's input.                                                                                                                                            |
+| #31 §7: removal does not require an insertion resource                                                                | `all configuration error codes…`: an instance without a resource successfully removes SHY. This includes a declarative scope with hyphenation enabled in HTML and React. with that enables insertion is still rejected before an instance is returned.                                                                                                                                                     |
+| #28 §7–8, #29 §4: technical protection and context after SHY                                                          | `removal cannot expose a URI suffix…`: every boundary of URL/www families in both locales. A leading SHY before a real URL is removed. SHY inside a URL is preserved. `punctuation spacing…` and `all interval rules…`: ambiguous changes do not enable another group only on the next call. Independent ellipsis processing continues.                                                                    |
+| #30: structural boundaries, protection, and sources for each representation                                           | `inline-context.test.mjs`, `protection.test.mjs`, `options-scopes.test.mjs`, group-specific all-split checks, and new combined all-split checks. Plain text has no elements/attributes. Parser warnings and inputRange apply only to HTML. React uses source-tree addresses, not HTML positions.                                                                                                           |
 
-## Каталог диагностики
+## Diagnostic catalog
 
-| Код                                | Публичный сценарий в combined-processing                                                   |
-| ---------------------------------- | ------------------------------------------------------------------------------------------ |
-| typography.ambiguous               | Самостоятельная неоднозначная арифметика; конфликт преобразования с техническим контекстом |
-| quotes.unpaired                    | Непарная кавычка в двух независимых блоках                                                 |
-| currency.order                     | `20€` в en-gb                                                                              |
-| hyphenation.unsupported-characters | Греческое слово в en-gb                                                                    |
-| hyphenation.mixed-scripts          | Смешанные греческие и кириллические буквы                                                  |
-| hyphenation.language-ambiguity     | `atlético` в es-es                                                                         |
-| markup.language-unavailable        | `lang="xx"`, null locale, value/reason                                                     |
-| markup.element-unsupported         | Неподдержанный `widget`, tagName/namespace                                                 |
-| html.parse                         | Повторный атрибут, parserCode и позиция исходного HTML                                     |
-| config.invalid-option              | Неверный тип enabled                                                                       |
-| locale.unavailable                 | Явно неподдержанная локаль                                                                 |
-| locale.incompatible                | Неверный формат модуля                                                                     |
-| locale.duplicate                   | Повторная локаль в реестре                                                                 |
-| hyphenation.resource-unavailable   | Включение переносов без ресурса                                                            |
-| hyphenation.resource-incompatible  | Включение несовместимого ресурса                                                           |
-| instance.missing                   | Чистый React-вызов без instance                                                            |
-| instance.nested                    | Puncta с instance внутри Provider                                                          |
-| markup.invalid-config              | Неверный JSON после доступного текста в HTML/React                                         |
-| protect.invalid-range              | Диапазон, разрезающий emoji                                                                |
+| Code                               | Public scenario in combined-processing                                             |
+| ---------------------------------- | ---------------------------------------------------------------------------------- |
+| typography.ambiguous               | Standalone ambiguous arithmetic; a transformation conflicts with technical context |
+| quotes.unpaired                    | An unpaired quotation mark in two independent blocks                               |
+| currency.order                     | `20€` in en-gb                                                                     |
+| hyphenation.unsupported-characters | A Greek word in en-gb                                                              |
+| hyphenation.mixed-scripts          | Mixed Greek and Cyrillic letters                                                   |
+| hyphenation.language-ambiguity     | `atlético` in es-es                                                                |
+| markup.language-unavailable        | `lang="xx"`, null locale, value/reason                                             |
+| markup.element-unsupported         | Unsupported `widget`, tagName/namespace                                            |
+| html.parse                         | A duplicate attribute, parserCode, and source HTML position                        |
+| config.invalid-option              | An incorrect enabled type                                                          |
+| locale.unavailable                 | An explicitly unsupported locale                                                   |
+| locale.incompatible                | An incorrect module format                                                         |
+| locale.duplicate                   | A duplicate locale in the registry                                                 |
+| hyphenation.resource-unavailable   | Hyphenation enabled without a resource                                             |
+| hyphenation.resource-incompatible  | An incompatible resource enabled                                                   |
+| instance.missing                   | A pure React call without instance                                                 |
+| instance.nested                    | Puncta with instance inside a Provider                                             |
+| markup.invalid-config              | Invalid JSON after accessible text in HTML/React                                   |
+| protect.invalid-range              | A range that splits an emoji                                                       |
 
-## Дополняющие функциональные матрицы
+## Additional functional matrices
 
-- [Пробелы](spacing.md): все буквальные интервалы, NBSP, испанская пунктуация,
-  отступы, табуляция, неоднозначные числа.
-- [Кавычки](quotes.md): все профили, смешанные сохраняемые пары, апострофы,
-  строки/блоки, локали и прозрачные стыки.
-- [Связи чисел](number-bonds.md) и [тире](dashes.md): все единицы, валюты,
-  проценты, специальные интервалы, режимы отключения, общий контекст.
-- [Удаление SHY](strip-soft-hyphens.md): авторские SHY, защита и ошибки форматов.
-- [English](en-gb-hyphenation-result.md) и
-  [español](es-es-hyphenation-result.md): неизменные независимые корпуса,
-  обязательные позиции, отчёты о разрешённых пропусках и подготовленные ресурсы.
+- [Spacing](spacing.md): all literal intervals, NBSP, Spanish punctuation,
+  indentation, tabs, and ambiguous numbers.
+- [Quotes](quotes.md): all profiles, mixed preserved pairs, apostrophes,
+  lines/blocks, locales, and transparent boundaries.
+- [Number bonds](number-bonds.md) and [dashes](dashes.md): all units, currencies,
+  percentages, special intervals, disabled modes, and shared context.
+- [SHY removal](strip-soft-hyphens.md): source SHY, protection, and format errors.
+- [English](en-gb-hyphenation-result.md) and
+  [Spanish](es-es-hyphenation-result.md): unchanged independent corpora,
+  required positions, permitted-omission reports, and prepared resources.
 - `tests/html-parsing.test.mjs`: document/fragment/context, parse5, title/RCDATA,
-  namespaces, восстановленные узлы, entities/CRLF, exact/covering/unavailable,
-  отличие сериализации от типографики.
-- `tests/options-scopes.test.mjs`, `tests/inline-context.test.mjs` и
-  `tests/protection.test.mjs`: наследование, reset, язык, opacity, доступные листья,
-  границы слов/связей/цитат, защита до чтения декларативных настроек.
+  namespaces, recovered nodes, entities/CRLF, exact/covering/unavailable,
+  and the difference between serialization and typography.
+- `tests/options-scopes.test.mjs`, `tests/inline-context.test.mjs`, and
+  `tests/protection.test.mjs`: inheritance, reset, language, opacity, accessible leaves,
+  word/bond/quotation boundaries, and protection before declarative settings are read.
 
-## Исправления и границы результата
+## Corrections and result limits
 
-SHY внутри слова больше не создаёт фиктивную границу перед суффиксом схемы URL или
-www: прежний дефект мог оставить часть SHY до второго чистого экспорта. Комбинируемые
-знаки также продолжают слово: составная буква и её разложенная запись имеют
-одинаковую границу, без нормализации исходных символов. Настоящий URL после
-ведущего SHY остаётся защищённым.
+SHY inside a word no longer creates a false boundary before a URL scheme suffix
+or www. The previous defect could leave some SHY until a second clean export.
+Combining marks also continue a word. A composed letter and its decomposed form
+have the same boundary, without normalization of source characters.
+A real URL after a leading SHY remains protected.
 
-Все группы используют согласованную проверку изменения технического контекста:
-удаление потенциального технического токена из представления слова без SHY так же
-существенно, как создание или изменение такого токена. Это предотвращает случаи,
-когда пробел или NBSP снимал неоднозначность соседнего многоточия/тире только при
-повторном запуске. Спорный локальный интервал сохраняется с предупреждением;
-независимые изменения продолжаются. Каталог автоматически защищённых форм не
-расширен.
+All groups use a consistent check for changes to technical context.
+Removing a possible technical token from the word representation without SHY is
+as significant as creating or changing that token. This prevents a space or NBSP
+from resolving ambiguity for an adjacent ellipsis/dash only on repeat.
+The ambiguous local interval is preserved with a warning. Independent changes
+continue. The catalog of automatically protected forms is unchanged.
 
-Проверяемая среда: Node 24.21.0, React/React DOM 19.3.0, parse5 8.0.0,
-entities 6.0.1, pnpm 12.4.1. Срез не утверждает полную браузерную, streaming,
-hydration или RSC-приёмку: это отдельные #54–#56. Отчёт HTML не является патчем
-исходной разметки; сериализация и восстановление остаются ответственностью parse5.
-Качество языковых позиций подтверждено принятым корпусом, а не обещанием для
-произвольного слова.
+Verified environment: Node 24.21.0, React/React DOM 19.3.0, parse5 8.0.0,
+entities 6.0.1, pnpm 12.4.1. This task does not claim full browser, streaming,
+hydration, or RSC acceptance. Those belong to #54–#56.
+The HTML report is not a source markup patch. parse5 remains responsible for
+serialization and recovery. Language-position quality is verified against the
+accepted corpus. It is not a promise for any arbitrary word.
 
-## Результаты проверок кандидата
+## Candidate verification results
 
-- 12 групп новых совместных тестов прошли; профильный прогон семи файлов —
-  90/90, включая прежние свойства кавычек, пробелов и переносов.
-- Независимый прогон: 54 000 входов в 18 профилях обеих локалей (47 343 различных)
-  и дополнительные 18 000 входов с SHY внутри потенциальных технических форм
-  (15 992 различных). Идемпотентность типографики и удаления SHY, воспроизведение
-  plain-text результата исходными правками: ноль нарушений.
-- 10 800 сравнений text/HTML/pure React/`Puncta` SSR в тех же профилях: ноль
-  расхождений; 222 проверки всех прозрачных стыков регрессионных URI-семейств,
-  полного преобразования с последующим удалением и защиты: успешно.
-- Типы, lint и форматирование проверены. Полный пакетный gate и независимые
-  ревью фиксируются при завершении PR; эти результаты не заменяют отложенную
-  браузерную и серверную матрицу.
+- The 12 new combined test groups passed. The focused run of seven files passed
+  90/90 checks, including previous quote, spacing, and hyphenation properties.
+- Independent run: 54 000 inputs in 18 profiles across both locales, with 47 343
+  distinct inputs. Another 18 000 inputs contained SHY inside possible technical
+  forms, with 15 992 distinct inputs. There were zero failures for typography
+  idempotence, SHY removal idempotence, and plain-text reproduction from source edits.
+- 10 800 comparisons of text/HTML/pure React/`Puncta` SSR in the same profiles:
+  zero differences. All 222 transparent-boundary checks passed for regression URI
+  families, full transformation followed by removal, and protection.
+- Types, lint, and formatting were checked. The full package gate and independent
+  reviews are recorded when the PR is completed. These results do not replace
+  the deferred browser and server matrix.
 
 ## Включённая группировка и числовые связи (#89)
 

@@ -3,7 +3,7 @@
 The installed locale statically includes a Liang table. `node
 scripts/hyphenation/prepare-en-gb.mjs --check` reproduces its bytes without network
 access. Omit `--check` to regenerate from the checked-in fixed input. Generation
-never reads the acceptance corpus. Public APIs do not load files or initialise
+never reads the acceptance corpus. Public APIs do not load files or initialize
 resources at runtime.
 
 ## Sources and preparation
@@ -42,9 +42,7 @@ separate, versioned Puncta-owned language layer. It is **not** described as the
 unchanged research table. Baseline, refinement, combined patterns and compiled
 output have separate hashes in the manifest.
 
-The conservative layer omits both candidate positions around a single consonant
-between vowel letters: `VCV`, where vowels are `aeiou` and consonants are the
-remaining ASCII letters. Before an isolated `h`, baseline positions remain
+The conservative layer omits both candidate positions around a single consonant between vowel letters: `VCV`. Vowels are `aeiou`. Consonants are the remaining ASCII letters. Before an isolated `h`, baseline positions remain
 eligible; after it, omission still applies. These 525 generated patterns have
 weight 8. This is a coverage policy, not a statement that all such divisions are
 wrong. It does not identify ambiguous whole words, infer pronunciation or emit
@@ -76,7 +74,7 @@ supports division at constituent and suffix boundaries subject to pronunciation.
 Independent pointwise family tests were selected before testing this refinement:
 `bathhouse`, `bathwater`, `bathmat`, `bookish`, `bookkeeper`, `bookshelf`,
 `schoolchild`, `stepchild`, `godchild`, `cornfield`, `snowfield`, `infield`,
-`outfield`; forbidden boundary checks cover `bathymetry` and `bathetic`.
+`outfield`. Forbidden boundary checks cover `bathymetry` and `bathetic`.
 [The fixture](../../tests/fixtures/hyphenation/en-gb-refinement.json) records the
 scope and primary sources. These are boundary checks, not exhaustive word oracles.
 
@@ -87,7 +85,7 @@ The complete unchanged corpus, every mandatory position, and all eight removed
 exception words are checked separately. Optional omissions are reported by word
 and category in [the acceptance result](../../docs/acceptance/en-gb-hyphenation-result.md).
 
-## Distribution and licences
+## Distribution and licenses
 
 The English data is MIT, attributed to Dominik Wujastyk and Graham Toal. The OUP
 training list is not redistributed. The kernel and compiler are ISC, attributed
@@ -96,4 +94,4 @@ to Yevhen Tiurin. The English locale archive and core archive contain their own
 checks read these notices from real packed artifacts. The locale also ships
 `hyphenation-manifest.json`, reproduced with its data and checked against the
 installed table hash. Puncta's own code and
-refinement are covered by its MIT licence.
+refinement are covered by its MIT license.

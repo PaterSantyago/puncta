@@ -33,18 +33,14 @@ concluding there is nothing to assert.
 Strength ordering, weakest to strongest:
 `no crash → type preservation → invariant → idempotence → roundtrip / oracle`.
 
-Assert the strongest property the code supports. "No crash" alone rarely justifies the
-dependency — if that is all you can find, either a small rearrangement exposes something
-stronger, or the honest report is that this code is a poor PBT candidate. Rule out the
+Assert the strongest property the code supports. "No crash" alone rarely justifies the dependency. If that is the only property, check whether a small structural change exposes a stronger property. Otherwise, report that the code is a poor PBT candidate. Rule out the
 first before settling for the second.
 
 ## The two ways a property test asserts nothing
 
 - **Tautology.** `assert add(a, b) == a + b` restates the implementation; no bug they
   share can fail it. Pick a property that constrains the function without recomputing
-  it. Note the exception: `f(x) == f(x)` is a genuine determinism property when `f`
-  is not obviously pure — serializers over dicts or sets, hashing, anything reading
-  the clock.
+  it. There is an exception: `f(x) == f(x)` tests determinism when `f` is not clearly pure. Examples include serializers over dicts or sets, hashing, and clock access.
 - **Vacuity.** `assume()` that filters out nearly every input passes without
   exercising anything, and self-contradictory `assume()` passes having run zero cases.
   Push constraints into the strategy so the generator produces valid inputs directly.
@@ -63,6 +59,4 @@ Load the one that matches the task in front of you:
 
 ## Introducing PBT to a project that lacks it
 
-If the project already uses a PBT library, just write the tests in it. If it does not,
-adding one is a dependency decision that belongs to the user — offer it once with the
-specific property you would write, and take the answer either way.
+If the project already uses a PBT library, just write the tests in it. If it does not, the user must decide whether to add the dependency. Offer it once with the specific property you would test. Accept either answer.

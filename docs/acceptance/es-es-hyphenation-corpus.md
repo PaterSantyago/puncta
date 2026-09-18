@@ -49,10 +49,7 @@ is not a representative sample or a claim about accuracy on arbitrary text.
 The 60 required words were selected before the optional category examples.
 Their required positions were fixed before any insertion comparison. Independent
 root and Spec linguistic review preceded corpus-only commit
-`aea82b3` and its hash manifest. The review removed the invalid `su|brayar`
-position: the productive prefix makes the syllable boundary `sub|rayar`
-(DPD §2.6b), so the general morphological alternative rule does not justify
-inventing a different syllable boundary. It also corrected the spelling of the
+`aea82b3` and its hash manifest. The review removed the invalid `su|brayar` position. The productive prefix gives the syllable boundary `sub|rayar` (DPD §2.6b). The general morphological alternative rule does not justify a different syllable boundary. It also corrected the spelling of the
 negative example `decatlón`. All 361 admitted words, 60 mandatory positives and
 32 negatives were reviewed before freezing; no unresolved linguistic findings
 remain. The ordinary forms `domino` (from dominar) and `cubito` (from cubo) are
@@ -81,10 +78,7 @@ win before ambiguity analysis. Existing SHY and original source spelling remain
 unchanged by insertion. Other typography can independently edit punctuation.
 
 The validator runs with `node --test tests/hyphenation-corpus.test.mjs` and through
-`pnpm test:functional` / `pnpm check`. It checks literal evidence consistency,
-not an insertion algorithm: distinct admitted words, mandatory counts, each
-category, actual ch/ll/rr diversity, settings, sorted positions, grapheme
-boundaries, minima, subset containment, sources, reviews and negative coverage.
+`pnpm test:functional` / `pnpm check`. It checks literal evidence consistency, not an insertion algorithm. Checks cover distinct admitted words, mandatory counts, each category, actual ch/ll/rr diversity, and settings. They also cover sorted positions, grapheme boundaries, minima, subset containment, sources, reviews, and negative coverage.
 Deliberately corrupted records exercise failure paths. English fixtures and
 acceptance requirements remain intact.
 

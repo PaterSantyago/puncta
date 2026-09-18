@@ -53,19 +53,16 @@ and [rsc.json](evidence/rsc.json) retain the detailed per-engine results.
 The initial candidate `4b2fca0bdca3dd1bf0fb15f313bcf7e4c48288bf`
 passed its local check, then review found a missing literal `a cat` no-bond oracle.
 The final candidate above adds it to the existing common spacing corpus. The full
-check was repeated after that substantive coverage correction. A separate new
-Node test injects a no-position parser diagnostic at the parse5 boundary while
-retaining real tree construction/serialization; it verifies the defensive
-`unavailable` warning contract without claiming a natural input triggers it.
+check was repeated after that substantive coverage correction. A separate new Node test inserts a parser diagnostic without a position at the parse5 boundary. It retains actual tree construction/serialization. It verifies the defensive `unavailable` warning contract without claiming that a natural input triggers it.
 Neither change alters runtime code, contract or frozen language corpus.
 
 All four packages remain **0.1.0-alpha.0**. Local environment:
-Node **v24.21.0**, npm **11.19.0**, pnpm **12.4.1**,
-React/React DOM **19.3.0**, Playwright **1.58.2**, esbuild **0.28.2**,
-TypeScript **7.0.2**, tsdown **0.23.0**, parse5 **8.0.0**;
-darwin **27.0.0**, **arm64**,
-Apple M3 (8 logical CPUs,
-17179869184 bytes RAM). The lockfile pins the dependency graph.
+
+- Node **v24.21.0**, npm **11.19.0**, and pnpm **12.4.1**.
+- React/React DOM **19.3.0**, Playwright **1.58.2**, and esbuild **0.28.2**.
+- TypeScript **7.0.2**, tsdown **0.23.0**, and parse5 **8.0.0**.
+- darwin **27.0.0**, **arm64**, Apple M3, 8 logical CPUs, and 17179869184 bytes RAM.
+  The lockfile pins the dependency graph.
 
 | Engine   | Observed local version | Playwright revision |
 | -------- | ---------------------- | ------------------- |
@@ -163,11 +160,7 @@ Measured package-own bytes (excluding dependencies; not tree-shaken browser bund
 | @use-puncta/with-react | 0.1.0-alpha.0 |        10956 |               33334 |                 23475 |
 
 The script verifies each packed distribution file equals the workspace file used
-for timing. It records every archive SHA-256, file count and byte total. The
-ordinary `text` examples below show median milliseconds per warm invocation;
-all 74 scenarios (ordinary/detailed text, HTML, pure React, both insertion modes,
-three sizes and separate creation) retain raw samples/minimum/median/maximum in
-[measurements.json](evidence/measurements.json).
+for timing. It records every archive SHA-256, file count and byte total. The ordinary `text` examples below show median milliseconds per warm invocation. All 74 scenarios retain raw samples/minimum/median/maximum in [measurements.json](evidence/measurements.json). Scenarios include ordinary/detailed text, HTML, pure React, both insertion modes, three sizes, and separate creation.
 
 | Locale | Text UTF-16 length | Typography only | Typography + SHY |
 | ------ | -----------------: | --------------: | ---------------: |

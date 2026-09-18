@@ -5,9 +5,7 @@ rather than about what it does. A function that mixes a pure calculation with a 
 write has a property; it just does not have a seam to assert it through. These are the
 rearrangements that expose one, strongest first.
 
-Suggest the refactor, name the property it unlocks, and let the author decide. A change
-to production code to make a test possible is their call, not yours — the same rule that
-governs adding a PBT dependency at all.
+Suggest the refactor, name the property it unlocks, and let the author decide. The author decides whether to change production code to permit a test. The same rule applies to a new PBT dependency.
 
 ## 1. Extract the pure core
 
@@ -75,9 +73,7 @@ def render(q: Query) -> str: ...
 def parse(sql: str) -> Query: ...   # now render/parse is a roundtrip
 ```
 
-This is pattern 2 wearing different clothes, and it is where escaping bugs live: a
-roundtrip over generated filter values finds quoting errors that no hand-written example
-will.
+This is a variant of pattern 2. A roundtrip over generated filter values can find quoting errors missed by handwritten examples.
 
 ## 4. Return a value instead of mutating
 
@@ -95,16 +91,14 @@ the test to have something to hold.
 
 ## 5. Inject the dependency
 
-A function reading a global, a module constant, or `os.environ` can only be tested at
-whatever those happen to be, so the edges of its input domain are unreachable.
+A function that reads a global, module constant, or `os.environ` can only be tested with their current values. Its input-domain boundaries are unreachable.
 
 ```python
 def validate(data: str) -> bool:          return len(data) <= CONFIG.max_length
 def validate(data: str, max_len: int):    return len(data) <= max_len
 ```
 
-Parameterising the bound is what lets a generator drive `max_len` to 0, to 1, and to the
-maximum representable value — the boundaries where validators actually break.
+Parameterize the bound so a generator can set `max_len` to 0, 1, and the maximum representable value. These boundaries can expose validator defects.
 
 ## When not to suggest this
 
@@ -117,4 +111,4 @@ maximum representable value — the boundaries where validators actually break.
 - **The refactor breaks a public API.** Flag it as breaking and offer the
   backwards-compatible version, even when the clean version is obviously nicer.
 - **Existing tests cover the code.** Run them after any refactor and say you did.
-  "Enabled a property test and broke two example tests" is not progress.
+  A new property test does not justify breaking two existing example tests.

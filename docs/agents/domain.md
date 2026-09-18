@@ -1,28 +1,22 @@
 # Domain Docs
 
-## Перед изучением проекта
+## Before you study the project
 
-Используем single-context:
+Use a single context:
 
-- CONTEXT.md в корне — термины и контекст предметной области.
-- docs/adr/ — архитектурные решения; читай относящиеся к текущей задаче.
+- The root `CONTEXT.md` file contains domain terms and context.
+- `docs/adr/` contains architectural decisions. Read the decisions applicable to the current task.
 
-Если впоследствии появится корневой CONTEXT-MAP.md, следуй его
-ссылкам на релевантные CONTEXT.md и проверяй решения в
-src/<context>/docs/adr/.
+If a root `CONTEXT-MAP.md` file is added, follow its links to applicable `CONTEXT.md` files. Check decisions in `src/<context>/docs/adr/`.
 
-Если этих файлов нет, продолжай работу молча.
-Навык domain-modeling создаёт их по мере определения терминов
-и принятия решений.
+If these files do not exist, continue without comment.
+The `domain-modeling` skill creates them as terms and decisions are defined.
 
-## Терминология
+## Terminology
 
-В задачах, предложениях, гипотезах и названиях тестов используй
-термины из CONTEXT.md. Если нужного понятия нет, проверь,
-соответствует ли оно языку проекта; реальные пробелы отмечай
-для domain-modeling.
+Use terms from `CONTEXT.md` in issues, proposals, hypotheses, and test names.
+If a concept is missing, check whether it fits the project language. Record actual gaps for `domain-modeling`.
 
-## Противоречия решениям
+## Conflicts with decisions
 
-Если предложение противоречит ADR, явно укажи номер решения
-и причину, по которой его стоит пересмотреть.
+If a proposal conflicts with an ADR, give the decision number and the reason to review it.
