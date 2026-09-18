@@ -82,7 +82,10 @@ passed. The language review found two groups of P2 issues:
   in package introductions and this report.
 - Perfect and complex passive constructions in compatibility text and this report.
 
-The corrected text uses active constructions and explicit pending status. The
-focused language recheck is pending. `pnpm format:check` passed after the
-corrections. `pnpm docs:check` passed with 11 pages, 66 local links, and six examples. This report does not claim final language
-acceptance. No example source, output, or library behavior changed.
+The separate reviewer checked the corrections at revision
+`af6ede583da338e28909cc4205cc68e46d4ce00d`. The factual and language reviews
+passed for issue 107. No unresolved findings remain in this slice.
+
+`pnpm format:check` passed after the corrections. `pnpm docs:check` passed with
+11 pages, 66 local links, and six examples. No example source, output, or library
+behavior changed.
