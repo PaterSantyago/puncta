@@ -15,7 +15,7 @@ This page separates declared requirements from checked environments.
 The functional documentation follows the current guide. Use the corresponding
 Git tag for earlier documentation. The historical scaffold is described in
 [the first alpha publication record](https://github.com/PaterSantyago/puncta/issues/13).
-Functional release tag links will be added after those tags exist.
+Functional release tag links are pending until those tags exist.
 
 The unreleased archives can carry the same manifest version as the old scaffold.
 A matching version string alone does not prove that an archive has the functional
@@ -48,6 +48,6 @@ Markdown or translate text. HTML parsing is not sanitization. HTML serialization
 can change notation even without typography edits. React processing does not
 inspect the output of a custom component.
 
-The full feature limits and integration environments with test evidence will be added
-with their guide and reference sections. See the
+The full feature limits and integration environments with test evidence are
+pending until their guide and reference sections are complete. See the
 [coverage record](acceptance/documentation-coverage.json) for pending work.

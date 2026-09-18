@@ -36,7 +36,7 @@ Release-specific URLs are pending. These links point to the documentation branch
 
 ## Existing reference material
 
-The following material is retained until the dedicated reference pages are
+These sections contain reference material until the separate reference pages are
 complete. Its migration and full documentation review are pending.
 
 Synchronous ESM typography, with explicitly installed locales and no React or DOM

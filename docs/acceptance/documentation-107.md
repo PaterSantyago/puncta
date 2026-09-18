@@ -56,13 +56,33 @@ coverage audit.
 ## Limits
 
 Public functional installation, release versions, and release-tag links are
-pending. Package README links point to the working documentation branch; their
-remote availability must be checked after that branch is pushed. They must use
-release-matched targets at release. Existing detailed package material is retained
-for later migration and has not received the new complete language review.
+pending. Package README links point to the working documentation branch. All
+three unique URLs returned HTTP 200 on 2026-09-18 after the branch push:
+
+- [Documentation index](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/README.md).
+- [Installation](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/installation.md).
+- [Text and HTML quick start](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/text-and-html.md).
+
+These links must use release-matched targets at release. Existing detailed
+package material remains here for later migration. Its complete language review
+is pending.
 Browser, SSR, and RSC documentation verification is outside this slice.
 
 The author used the
 [official ASD-STE100 Issue 9 rules and dictionary](https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf)
-for a first prose pass. The separate agent review of facts, navigation, and
-language is pending. This report does not claim language acceptance.
+for a first prose pass.
+
+## Separate review
+
+A separate agent reviewed revision `7d4deb6849de99544fbd12fcb3956926db1721b5`
+for facts, navigation, coverage, and ASD-STE100 Issue 9. The specification review
+passed. The language review found two groups of P2 issues:
+
+- Ordinary words that the dictionary does not approve: “following” and “retained”
+  in package introductions and this report.
+- Perfect and complex passive constructions in compatibility text and this report.
+
+The corrected text uses active constructions and explicit pending status. The
+focused language recheck is pending. `pnpm format:check` passed after the
+corrections. `pnpm docs:check` passed with 11 pages, 66 local links, and six examples. This report does not claim final language
+acceptance. No example source, output, or library behavior changed.
