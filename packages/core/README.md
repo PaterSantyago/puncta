@@ -1,6 +1,6 @@
 # @use-puncta/core
 
-Synchronous text and HTML typography with an selected locale.
+Synchronous text and HTML typography with a selected locale.
 
 **Unreleased functional version.** Public `0.1.0-alpha.0` is the historical
 scaffold and does not have this API.
@@ -60,7 +60,7 @@ and [grouping diagnostics and source positions](https://github.com/PaterSantyago
 ## Limits and licensing
 
 The [compatibility page](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/compatibility.md) gives release status and tested environments.
-HTML is not sanitized. SHY marks a line-break opportunity, not a rendered line break.
+Puncta does not sanitize HTML. SHY marks a line-break opportunity, not a rendered line break.
 The selected locale profiles do not include all valid editorial conventions.
 
 MIT licensed, with ISC kernel attribution and Unicode data licensing in `NOTICE.md`.

@@ -4,16 +4,16 @@
 
 Protected text does not receive typography analysis or changes.
 First, [install core and a locale](../getting-started/installation.md).
-All examples below are full programs.
+All examples that follow are full programs.
 
 ## Protect original text ranges
 
 Use `protect` on a plain-text call to protect specified text.
-The offsets refer to the original source, before any typography changes.
+The offsets refer to the original source, before typography changes.
 They count UTF-16 units, as JavaScript string indices do.
 `start` is inclusive and `end` is exclusive.
 
-Both offsets must be grapheme boundaries.
+The two offsets must be grapheme boundaries.
 A grapheme can contain more than one Unicode code point or UTF-16 unit.
 For example, an emoji can have two UTF-16 units.
 An accent can belong to the same grapheme as its preceding letter.
@@ -84,7 +84,7 @@ www.example.com/a... user@example.com 192.0.2.1 v1.2.3 Wait…
 <b>https://example.com/</b><em>a...</em> Wait…
 ```
 
-Technical-token recognition also works across transparent inline leaves.
+Technical-token recognition also operates across transparent inline leaves.
 URL punctuation can belong to a path, query, or fragment.
 Puncta keeps this punctuation.
 
@@ -147,10 +147,10 @@ This is different from a descendant in a protected subtree.
 
 ### Protected and opaque elements
 
-The HTML element categories below apply without CSS inspection.
+The HTML element categories that follow apply without CSS inspection.
 Protection includes all descendants, even HTML descendants in SVG or MathML.
 Unknown elements are opaque and protected, with a `markup.element-unsupported` warning.
-An already protected subtree does not produce additional element warnings from its descendants.
+A protected subtree does not produce additional element warnings from its descendants.
 
 | Category                      | Protected elements                                              |
 | ----------------------------- | --------------------------------------------------------------- |
@@ -165,7 +165,7 @@ The presence of `hidden` protects a subtree, even with `hidden="false"`.
 `contenteditable="false"` cannot cancel protection from an ancestor.
 `aria-hidden` alone does not protect text.
 
-An opaque fragment stops word and bond recognition on both sides.
+An opaque fragment stops word and bond recognition on the two sides.
 Inline protected elements use this boundary.
 Block elements also stop quote context. The `pre` element is an example.
 The `br`, `wbr`, and `hr` elements have no processed text and use their [structural boundaries](html.md#context-boundaries).
@@ -174,7 +174,7 @@ Protection keeps parsed text, not the original HTML bytes.
 Attributes receive no typography changes, but the parser and serializer can change their spelling.
 See [serialization limits](html.md#understand-serialization).
 React uses the same host-element protection rules, with React boolean prop semantics.
-React-specific procedures are in the [adapter instructions](../../packages/with-react/README.md).
+React-specific procedures are in the [React scope instructions](react.md#use-nested-scopes-and-protection).
 
 Related: [HTML guide](html.md), [range API](../reference/core.md#protectedrange),
 [text symptoms](../troubleshooting.md#protected-text-does-not-change).

@@ -2,7 +2,7 @@
 
 [Documentation index](../README.md)
 
-First, follow the [React quick start](../getting-started/react.md).
+First, use the [React quick start](../getting-started/react.md).
 All examples on this page are full TSX programs. They use installed public packages.
 
 ## Process a custom component
@@ -169,7 +169,7 @@ Use the component API when protection must reach a nested `Puncta` through an op
 | Attributes and `dangerouslySetInnerHTML`                  | Stay unchanged. Puncta does not process their text.                                       |
 
 Block elements stop recognition context. Transparent inline elements let Puncta make cross-leaf edits.
-A replacement belongs to the first affected leaf. Empty elements survive.
+A replacement belongs to the first affected leaf. Empty elements stay in the result.
 Puncta does not mutate original props or children.
 
 <!-- puncta:example react-children -->
@@ -365,5 +365,5 @@ See the [runtime acceptance scope](../acceptance/digit-grouping.md#react-runtime
 
 The existing RSC consumer checks server-owned grouping and client-owned grouping independently.
 Client locale or grouping changes do not change server-owned text.
-The [server integration instructions](../../packages/with-react/README.md#server-integration) define the tested boundary and versions.
+The [server guide](server-rendering.md) and [compatibility page](../compatibility.md#server-environments) define the tested boundary and versions.
 These checks do not show support for all framework versions or edge runtimes.

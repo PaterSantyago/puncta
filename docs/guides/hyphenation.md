@@ -289,11 +289,11 @@ hyphenation.remove
 ## Resources and validation
 
 A compatible resource from the selected locale package is necessary for insertion.
-Both supplied locales include their resource. Puncta does not fetch a resource during a call.
+Each supplied locale includes its resource. Puncta does not fetch a resource during a call.
 Missing or incompatible insertion resources cause `hyphenation.resource-unavailable` or `hyphenation.resource-incompatible` before a result returns.
 Use matching functional core and locale packages. Do not construct custom locale objects.
 
-Removal needs no insertion resource, even in nested scopes.
+No insertion resource is necessary for removal, even in nested scopes.
 It validates shared settings, locale selection, minima, and format-specific options.
 `hyphenation.enabled: false` does not disable removal. Shared `enabled: false` does.
 See [locale-change validation](../reference/settings.md#locale-dependent-validation) for a reset example.

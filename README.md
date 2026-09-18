@@ -32,7 +32,7 @@ Wait…
 
 See the [text and HTML quick start](docs/getting-started/text-and-html.md).
 
-## Choose your input
+## Select your input
 
 | Input             | Start here                                                          |
 | ----------------- | ------------------------------------------------------------------- |
@@ -42,8 +42,7 @@ See the [text and HTML quick start](docs/getting-started/text-and-html.md).
 
 ## Documentation
 
-The [documentation index](docs/README.md) lists the available pages and planned
-sections. See [compatibility](docs/compatibility.md) for version status and limits.
+The [documentation index](docs/README.md) lists the available pages. See [compatibility](docs/compatibility.md) for version status and limits.
 
 ## Contribute
 

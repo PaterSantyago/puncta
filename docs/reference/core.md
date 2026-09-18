@@ -23,7 +23,7 @@ function createPuncta(
 ```
 
 `locales` supplies imported locale modules. `locale` selects the active loaded ID.
-Both are required. Other fields use the [shared settings](settings.md#shared-fields).
+The two fields are necessary. Other fields use the [shared settings](settings.md#shared-fields).
 
 The returned instance has `with`, `text`, `html`, and `stripSoftHyphens` methods.
 It creates a snapshot of the registry, locale resources, and explicit settings.
@@ -54,7 +54,7 @@ new PunctaConfigError(
 ```
 
 The readonly fields are `code`, `details`, `optionPath`, and `location`.
-`message` comes from `Error`. Do not depend on its exact English text.
+`message` comes from `Error`. Its exact English text can change.
 Defaults are `{}` for `details`, `[]` for `optionPath`, and
 `{ kind: "unavailable", reason: "Configuration argument" }` for `location`.
 `optionPath` identifies the invalid field. Numeric parts identify array entries.
@@ -164,8 +164,8 @@ interface HtmlOptions extends Omit<TextOptions, "protect"> {
 
 | Parameter  | Default            | Valid input and applicability                             |
 | ---------- | ------------------ | --------------------------------------------------------- |
-| `source`   | Necessary          | String for both methods. An empty string is permitted     |
-| `detailed` | `false`            | Boolean for both methods, selects the return overload     |
+| `source`   | Necessary          | String for the two methods. An empty string is permitted  |
+| `detailed` | `false`            | Boolean for the two methods, selects the return overload  |
 | `protect`  | No explicit ranges | Readonly array of `ProtectedRange`, plain text only       |
 | `mode`     | `"fragment"`       | `"fragment"` or `"document"`, HTML only                   |
 | `context`  | `"div"`            | Supported lowercase HTML element name, fragment mode only |
@@ -189,7 +189,7 @@ See the [mode examples](../guides/html.md#select-fragment-or-document).
 Each range has readonly numeric `start` and `end` fields.
 They refer to the original source in UTF-16 units.
 The interval includes `start` and excludes `end`.
-Both must be integers at grapheme boundaries, with `0 <= start <= end <= source.length`.
+The two offsets must be integers at grapheme boundaries, with `0 <= start <= end <= source.length`.
 Additional range fields, missing fields, and non-object entries are invalid.
 
 Puncta sorts a private copy and combines adjacent or overlapping ranges.
@@ -277,7 +277,7 @@ stripSoftHyphens(source: string, options: StripSoftHyphensOptions): string | Tex
 ```
 
 A boolean `detailed` value gives the format-specific union.
-If both formats are permitted in the options type, both report types are also permitted in the return type.
+If the two formats are permitted in the options type, the two report types are also permitted in the return type.
 The options types have these fields:
 
 | Type                      | Fields and defaults                                                                                                               |
@@ -286,13 +286,13 @@ The options types have these fields:
 | `StripHtmlOptions`        | All `HtmlOptions` fields plus required readonly `format: "html"`. Accepts `mode`, `context`, and `detailed`. Rejects `protect`.   |
 | `StripSoftHyphensOptions` | Union of the two types above. `format` selects the applicable type.                                                               |
 
-Both formats inherit shared settings from the instance.
+The two formats inherit shared settings from the instance.
 See [format parameters](#format-parameters) for mode, context, protection, and detailed defaults and validation.
 A missing options object means `{}`. An object set to `null`, unknown fields, and invalid format values are invalid.
 Settings and locale minima validation apply even when removal is disabled.
 Invalid options throw `PunctaConfigError` with `config.invalid-option` or the applicable locale/protection code.
 
-Removal needs no insertion resource and does not depend on `hyphenation.enabled`.
+No insertion resource is necessary for removal. The `hyphenation.enabled` value does not control removal.
 Shared `enabled: false` prevents removal.
 Protected text, technical tokens, HTML attributes, disabled scopes, and unavailable-language regions keep SHY.
 The HTML parser and serializer also operate.
@@ -397,8 +397,8 @@ config.invalid-option hyphenation.minRight
 
 ## Public type index
 
-All types below are named type exports from `@use-puncta/core`.
-The inventory compares this index with the source exports.
+All types that follow are named type exports from `@use-puncta/core`.
+The [coverage inventory](../acceptance/documentation-coverage.json) maps each source export to its canonical definition.
 Shared report types have one home in [diagnostics](diagnostics.md#result-types).
 
 | Type                                                              | Definition and status                                                                                                                         |

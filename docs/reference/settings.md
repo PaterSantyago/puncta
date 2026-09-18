@@ -29,12 +29,12 @@ See [React procedures](../guides/react.md) and [SHY removal](../guides/hyphenati
 
 `PunctaOptions` has these optional readonly fields:
 
-| Field         | Type and permitted values                          | Initial default                          |
-| ------------- | -------------------------------------------------- | ---------------------------------------- |
-| `locale`      | `LocaleId`: `"en-gb"` or `"es-es"`, must be loaded | Required at creation, otherwise inherits |
-| `enabled`     | `boolean`                                          | `true`                                   |
-| `rules`       | `RulesOptions` object                              | Locale defaults for each group           |
-| `hyphenation` | `HyphenationOptions` object or `null`              | Insertion off                            |
+| Field         | Type and permitted values                          | Initial default                                |
+| ------------- | -------------------------------------------------- | ---------------------------------------------- |
+| `locale`      | `LocaleId`: `"en-gb"` or `"es-es"`, must be loaded | Necessary at creation. Inherits in other calls |
+| `enabled`     | `boolean`                                          | `true`                                         |
+| `rules`       | `RulesOptions` object                              | Locale defaults for each group                 |
+| `hyphenation` | `HyphenationOptions` object or `null`              | Insertion off                                  |
 
 Unknown option names cause an error, even when their value is `undefined`.
 Puncta rejects whole options objects that are `null`, arrays, or non-objects.
@@ -45,11 +45,11 @@ Use `{ enabled: false }` in a rule group.
 ## Rule fields and defaults
 
 `RuleOptions` contains `readonly enabled?: boolean | null`.
-`RulesOptions` has the optional groups below. Each group accepts `null`.
+`RulesOptions` has the optional groups that follow. Each group accepts `null`.
 All group fields are optional and readonly. Each field also accepts `null`.
 An omitted field or explicit `undefined` inherits its explicit parent value.
 
-| Group           | Fields and permitted values                                           | Default in both locales, unless specified                   |
+| Group           | Fields and permitted values                                           | Default in the two locales, unless specified                |
 | --------------- | --------------------------------------------------------------------- | ----------------------------------------------------------- |
 | `quotes`        | `enabled: boolean`, `normalizeExisting: boolean`                      | `true`, `true`                                              |
 | `apostrophes`   | `enabled: boolean`                                                    | `true`                                                      |
@@ -222,10 +222,10 @@ See [nested examples](../guides/html.md#use-markers-and-languages) and [protecti
 ## Digit grouping
 
 `rules.digitGrouping` uses the [configuration surfaces](#configuration-surfaces) and [reset rules](#inheritance-and-reset) on this page.
-`minDigits` must be a safe integer from `4` through `Number.MAX_SAFE_INTEGER`. Both limits are permitted.
+`minDigits` must be a safe integer from `4` through `Number.MAX_SAFE_INTEGER`. The two limits are permitted.
 Fractions, `NaN`, infinities, and out-of-range values are invalid.
 `enabled` and `normalizeExisting` accept booleans.
-The defaults in the rule table apply to both locales.
+The defaults in the rule table apply to the two locales.
 
 All three fields accept `null` and `undefined`.
 The group accepts an object, `null`, or `undefined`. Boolean shorthand is invalid.
@@ -242,7 +242,7 @@ See the [notation rules](locales-and-rules.md#digit-grouping) for recognition an
 
 Invalid explicit settings cause `PunctaConfigError` with `code: "config.invalid-option"`, even when processing or the rule is disabled.
 `details.reason` is `"type"` for an incorrect type, `"value"` for an invalid number, or `"unknown"` for an unknown field.
-`optionPath` identifies the field. The program below checks disabled processing.
+`optionPath` identifies the field. The program that follows checks disabled processing.
 
 <!-- puncta:example grouping-validation -->
 
@@ -271,6 +271,6 @@ config.invalid-option rules.digitGrouping.minDigits value
 
 Puncta does not inspect protected declarative content.
 An HTML `data-puncta="off"` marker has priority over options on the same host.
-Running React components still validate their own props.
+When React renders components, they still validate their own props.
 SHY removal validates shared settings but does not group digits or produce grouping warnings.
 See [protection](../guides/protection.md) and [React validation](react.md#check-configuration-failures).

@@ -562,9 +562,29 @@
     },
     {
       "id": "complete-acceptance",
-      "status": "pending",
+      "status": "covered",
       "issue": 115,
-      "scope": "Complete export/type/option/default/rule/code inventory source comparison; reader journeys; language review; release candidate."
+      "scope": "Full public export/type/option/default/rule/diagnostic semantic audit, accepted reader journeys, corrected full-document language review, candidate checks, and publication handoff. Public installation remains in issue 116.",
+      "pages": [
+        "docs/acceptance/documentation-115.md",
+        "docs/compatibility.md",
+        "docs/reference/core.md",
+        "docs/reference/react.md",
+        "docs/reference/settings.md",
+        "docs/reference/locales-and-rules.md",
+        "docs/reference/diagnostics.md"
+      ],
+      "examples": ["first-result", "react-start"],
+      "integrations": [
+        "server-string",
+        "server-hydrate",
+        "server-pipeable",
+        "server-readable",
+        "rsc-server",
+        "rsc-client",
+        "rsc-provider",
+        "server-expected"
+      ]
     },
     {
       "id": "public-installation",

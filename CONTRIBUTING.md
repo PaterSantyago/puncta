@@ -176,6 +176,6 @@ If no user documentation change is necessary, explain why in the change descript
 The [coverage inventory](docs/acceptance/documentation-coverage.json) maps source contracts to canonical pages.
 `pnpm docs:check` detects missing exports, diagnostic codes, source changes, and broken local links.
 A matching source hash does not establish semantic coverage. Review the definitions and examples as well.
-`pnpm check` compiles and runs displayed examples in both installed consumers.
+`pnpm check` compiles and runs displayed examples in the two installed consumers.
 Run `pnpm test:browser` and `pnpm test:rsc` separately when rendering or integration claims change.
 See [documentation acceptance](docs/acceptance/documentation-115.md) for release checks and the publication handoff.

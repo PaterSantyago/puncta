@@ -4,7 +4,7 @@
 
 The component entry is `@use-puncta/with-react`. It has a `"use client"` directive.
 The pure entry is `@use-puncta/with-react/pure`. It has no client directive, hooks, or Context.
-Both entries use the same core instance and locale modules.
+The two entries use the same core instance and locale modules.
 
 ## Exports and public types
 
@@ -34,7 +34,7 @@ See [child boundaries and state limits](../guides/react.md#understand-child-boun
 
 ## Component props
 
-`PunctaProviderProps` is an alias of `PunctaProps`. Both types have these readonly fields.
+`PunctaProviderProps` is an alias of `PunctaProps`. The two types have these readonly fields.
 
 | Prop       | Type                                            | Default and behavior                                                                                                       |
 | ---------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
@@ -52,7 +52,8 @@ Use the [shared settings definitions](settings.md) for allowed values, defaults,
 
 Unknown props and unknown `options` fields are invalid.
 `options={null}` and array options are invalid.
-A root without a valid instance throws `PunctaConfigError` with `instance.missing`.
+A root with no instance throws `PunctaConfigError` with `instance.missing`.
+An invalid instance throws `config.invalid-option`.
 An explicit instance in existing Puncta Context throws `instance.nested`, even if it is the same instance.
 Other invalid props throw `config.invalid-option` or the applicable core configuration error.
 
@@ -122,6 +123,7 @@ Import this function from `@use-puncta/with-react/pure`.
 Call it synchronously with a `ReactNode` and `ReactTransformOptions`. Supply an explicit instance.
 It removes U+00AD from text that it can process, without typography or digit grouping.
 It does not read Context, install a Provider, or mutate the input tree.
+These declarations show all three overloads:
 
 ```ts
 function stripSoftHyphensReact(

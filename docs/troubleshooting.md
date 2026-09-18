@@ -2,17 +2,17 @@
 
 [Documentation index](README.md)
 
-Select the symptom below. Use the [diagnostic catalog](reference/diagnostics.md) for codes, fields, and source positions.
+Select the symptom from this page. Use the [diagnostic catalog](reference/diagnostics.md) for codes, fields, and source positions.
 
 ## The API is missing
 
 Public `0.1.0-alpha.0` is the historical scaffold, without the functional API.
-Check the [release status](compatibility.md#release-status) and
+Examine the [release status](compatibility.md#release-status) and
 [installation contract](getting-started/installation.md).
 
 ## Packages do not agree
 
-Check that core, the adapter, and locale packages come from the same compatible functional release.
+Make sure that core, the adapter, and locale packages come from the same compatible functional release.
 The manifest version alone does not distinguish local functional archives from the public scaffold.
 An adapter archive can resolve an incompatible public core package.
 Install the full matching set from the [installation contract](getting-started/installation.md).
@@ -20,7 +20,7 @@ Use the [release status](compatibility.md#release-status) before you select a ve
 
 ## Text does not change
 
-Check `enabled`, the related rule group, and inherited overrides.
+Examine `enabled`, the related rule group, and inherited overrides.
 A call override changes one call. A variant does not change its parent.
 Use a [null reset](reference/settings.md#inheritance-and-reset) to remove an explicit override.
 Then compare the input with the [rule limits](reference/locales-and-rules.md#unchanged-and-ambiguous-input).
@@ -49,7 +49,7 @@ For `locale.duplicate`, remove the duplicate registry entry.
 For `locale.incompatible`, use the matching supported package export.
 
 For other codes, use the [error catalog](reference/diagnostics.md#errors).
-For `config.invalid-option`, check the [valid surfaces and values](reference/settings.md).
+For `config.invalid-option`, examine the [valid surfaces and values](reference/settings.md).
 Incorrect types, unknown fields, and whole-object null resets are invalid.
 
 An inherited hyphenation minimum can become invalid in a different locale.
@@ -67,7 +67,7 @@ Use the [warning catalog](reference/diagnostics.md#warnings) to identify the rul
 
 ## HTML output has unexpected markup
 
-Check the [mode and context](guides/html.md#select-fragment-or-document).
+Examine the [mode and context](guides/html.md#select-fragment-or-document).
 Document mode can add `html`, `head`, and `body` elements.
 Use the correct table context for the rows or cells in a fragment.
 The parser can repair markup and change entity or attribute spelling.
@@ -79,19 +79,19 @@ See [serialization limits](guides/html.md#understand-serialization).
 
 ## Protected text does not change
 
-Check for [protected elements](guides/protection.md#protected-and-opaque-elements), `hidden`, editable content, and ancestor off markers.
+Examine the input tree for [protected elements](guides/protection.md#protected-and-opaque-elements), `hidden`, editable content, and ancestor off markers.
 A descendant cannot cancel inherited protection.
-Check `lang` and the loaded locales if the result has `markup.language-unavailable`.
+If the result has `markup.language-unavailable`, examine `lang` and the loaded locales.
 Use a supported loaded language or an explicit locale marker for that region.
 
-For plain text, check explicit ranges against the original source.
+For plain text, examine explicit ranges against the original source.
 Do not count Unicode code points or use offsets from a previous result.
 For `protect.invalid-range`, use full graphemes in the source bounds.
 See [range validation](reference/core.md#protectedrange).
 
 A URL can keep punctuation that looks like sentence punctuation.
 That punctuation can be part of the URL itself.
-Use the intended source delimiter and check the [technical-token limits](guides/protection.md#automatic-technical-text-protection).
+Use the intended source delimiter and examine the [technical-token limits](guides/protection.md#automatic-technical-text-protection).
 
 ## An inline edit stops at an element
 
@@ -103,7 +103,7 @@ See [context boundaries](guides/html.md#context-boundaries).
 ## Text in a custom React component stays unchanged
 
 An outer `Puncta` cannot inspect the component's rendered output.
-Put `Puncta` in the custom component and supply an instance through a Provider.
+Put `Puncta` in the custom component. Supply an instance through a Provider.
 See the [checked component example](guides/react.md#process-a-custom-component).
 A Provider alone supplies settings but does not transform text.
 
@@ -117,18 +117,18 @@ See [React configuration failures](reference/react.md#check-configuration-failur
 ## State resets after a protection change
 
 A protection change above multiple hosts can remount deeper stateful children.
-Do not depend on state preservation across arbitrary deep protection changes.
+Arbitrary deep protection changes do not always keep state.
 See [the reconciliation limit](guides/react.md#preserve-state-during-updates).
 
 ## Digit grouping does not change a number
 
 Set `rules.digitGrouping.enabled: true`.
-Check the integer digit count against `minDigits`. Fractional digits do not count.
-Use [the configuration example](guides/configuration.md#enable-digit-grouping) to check threshold and reset behavior.
+Examine the integer digit count against `minDigits`. Fractional digits do not count.
+Use [the configuration example](guides/configuration.md#enable-digit-grouping) to examine threshold and reset behavior.
 An explicit scope, protection, or opaque component can stop a number across leaves.
 See [HTML boundaries](guides/html.md#group-digits-across-inline-elements) and [React boundaries](guides/react.md#group-digits-in-react).
 
-Check the [locale notation and exclusions](reference/locales-and-rules.md#digit-grouping).
+Examine the [locale notation and exclusions](reference/locales-and-rules.md#digit-grouping).
 Leading zeros, unknown suffixes, scientific notation, and unsupported numeric structures stay ungrouped.
 These exclusions do not cause grouping warnings.
 Malformed groups cause `typography.ambiguous` even with a high threshold or disabled normalization.
@@ -136,8 +136,8 @@ Use [the grouping diagnostic example](reference/diagnostics.md#digit-grouping) t
 
 ## Existing group separators do not change
 
-Check `normalizeExisting` and the integer threshold.
-Below the threshold, existing separators stay unchanged. Puncta does not remove existing groups.
+Examine `normalizeExisting` and the integer threshold.
+If the digit count is less than the threshold, existing separators stay unchanged. Puncta does not remove existing groups.
 `normalizeExisting: false` keeps the full grouped spelling.
 An existing U+202F produces no grouping edit.
 The U+00A0 bond between a number and its unit belongs to the units rule, not digit grouping.
@@ -152,13 +152,13 @@ To recompute a React result without grouping, keep the original children as inpu
 
 ## No soft hyphens or no line breaks
 
-Set `hyphenation.enabled: true` and select a loaded locale.
-Check the [minima](reference/settings.md#hyphenation), [word admission](reference/locales-and-rules.md#hyphenation), and protection boundaries.
+Set `hyphenation.enabled: true`. Select a loaded locale.
+Examine the [minima](reference/settings.md#hyphenation), [word admission](reference/locales-and-rules.md#hyphenation), and protection boundaries.
 Existing SHY prevents more insertion in that word.
-Use a detailed call to check unsupported-character, mixed-script, or Spanish `tl` warnings.
+Use a detailed call to examine unsupported-character, mixed-script, or Spanish `tl` warnings.
 An unchanged word without a warning can be an expected exclusion or omission.
 
-Check the result for U+00AD before you change layout settings.
+Examine the result for U+00AD before you change layout settings.
 SHY marks an opportunity. Fonts, width, CSS, and the rendering environment control the line breaks.
 Use the [checked insertion examples](guides/hyphenation.md#enable-insertion) to compare text output.
 
@@ -170,7 +170,7 @@ For an invalid minimum after a locale change, [reset the inherited field](refere
 
 Use the removal operation for the input format.
 For HTML, use `format: "html"`. For React, use the pure removal function and an explicit instance.
-Check protected text, automatic technical tokens, attributes, disabled scopes, unavailable languages, and opaque React components.
+Examine protected text, automatic technical tokens, attributes, disabled scopes, unavailable languages, and opaque React components.
 These regions keep SHY. A child cannot cancel inherited protection.
 See [separate removal examples](guides/hyphenation.md#remove-shy-from-text).
 
@@ -179,13 +179,13 @@ See [separate removal examples](guides/hyphenation.md#remove-shy-from-text).
 Compare the original server and client children, locale packages, and settings.
 Create a local instance in each environment from the same inputs.
 Do not serialize an instance or locale module as a prop.
-Check for React recoverable errors with the [shared hydration integration](guides/server-rendering.md#hydration-and-ownership).
+Use the [shared hydration integration](guides/server-rendering.md#hydration-and-ownership) to find React recoverable errors.
 
 ## Stream content does not arrive with the shell
 
 A pending Suspense boundary can emit its fallback first.
 `renderToString` does not wait for the content.
-With a stream API, check React's document envelope and transport buffering.
+With a stream API, examine React's document envelope and transport buffering.
 See [streaming and Suspense](guides/server-rendering.md#streaming-and-suspense).
 Puncta does not control when the transport sends bytes.
 

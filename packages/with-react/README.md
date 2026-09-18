@@ -9,7 +9,7 @@ The declared React peer range is `^19.3.0`. Your application supplies React DOM.
 The functional API is unreleased. The public `0.1.0-alpha.0` scaffold does not have this API.
 Use matching core, adapter, and locale packages from the functional version.
 Declare core directly when your application imports it.
-Follow the [npm or pnpm installation procedure](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/installation.md).
+Use the [npm or pnpm installation procedure](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/installation.md).
 
 ## Example
 

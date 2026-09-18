@@ -1,0 +1,111 @@
+{
+  "commit": "6b9ea52fcac3b37e177b30d68bc43cb55d11b1f5",
+  "node": "v24.21.0",
+  "next": "16.3.5",
+  "react": "19.3.0",
+  "reactDom": "19.3.0",
+  "playwright": "1.58.2",
+  "browsers": [
+    {
+      "name": "chromium",
+      "version": "145.0.7632.6",
+      "executablePath": "/Users/yuryglushkov/Library/Caches/ms-playwright/chromium-1208/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing",
+      "registry": {
+        "name": "chromium",
+        "revision": "1208",
+        "installByDefault": true,
+        "browserVersion": "145.0.7632.6",
+        "title": "Chrome for Testing"
+      },
+      "serverReact": "19.3.0-canary-cbb046ab-20260731",
+      "clientReact": "19.3.0-canary-cbb046ab-20260731",
+      "checks": [
+        "Flight client reference",
+        "server HTML without JavaScript",
+        "hydration",
+        "text/locale/hyphenation updates",
+        "independent server configuration",
+        "grouping numeric leaves, enable/disable, source and locale updates",
+        "no runtime warnings"
+      ]
+    },
+    {
+      "name": "firefox",
+      "version": "146.0.1",
+      "executablePath": "/Users/yuryglushkov/Library/Caches/ms-playwright/firefox-1509/firefox/Nightly.app/Contents/MacOS/firefox",
+      "registry": {
+        "name": "firefox",
+        "revision": "1509",
+        "installByDefault": true,
+        "browserVersion": "146.0.1",
+        "title": "Firefox"
+      },
+      "serverReact": "19.3.0-canary-cbb046ab-20260731",
+      "clientReact": "19.3.0-canary-cbb046ab-20260731",
+      "checks": [
+        "Flight client reference",
+        "server HTML without JavaScript",
+        "hydration",
+        "text/locale/hyphenation updates",
+        "independent server configuration",
+        "grouping numeric leaves, enable/disable, source and locale updates",
+        "no runtime warnings"
+      ]
+    },
+    {
+      "name": "webkit",
+      "version": "26.0",
+      "executablePath": "/Users/yuryglushkov/Library/Caches/ms-playwright/webkit-2248/pw_run.sh",
+      "registry": {
+        "name": "webkit",
+        "revision": "2248",
+        "installByDefault": true,
+        "revisionOverrides": {
+          "debian11-x64": "2105",
+          "debian11-arm64": "2105",
+          "ubuntu20.04-x64": "2092",
+          "ubuntu20.04-arm64": "2092"
+        },
+        "browserVersion": "26.0",
+        "title": "WebKit"
+      },
+      "serverReact": "19.3.0-canary-cbb046ab-20260731",
+      "clientReact": "19.3.0-canary-cbb046ab-20260731",
+      "checks": [
+        "Flight client reference",
+        "server HTML without JavaScript",
+        "hydration",
+        "text/locale/hyphenation updates",
+        "independent server configuration",
+        "grouping numeric leaves, enable/disable, source and locale updates",
+        "no runtime warnings"
+      ]
+    }
+  ],
+  "documentedIntegrations": [
+    {
+      "id": "rsc-server",
+      "file": "docs/guides/server-rendering.md",
+      "source": "examples/rsc/app/page.tsx",
+      "job": "rsc",
+      "sourceSha256": "1b364dec05b5492cc22deec1911cf5315b275f590dd7e6b9f8b2fb85dd96c205",
+      "excerptSha256": "04c98bccb8bd430a180ba71911192f8bd086657ddd1decc8e82836f7a4a5e7c3"
+    },
+    {
+      "id": "rsc-client",
+      "file": "docs/guides/server-rendering.md",
+      "source": "examples/rsc/app/client-panel.tsx",
+      "job": "rsc",
+      "sourceSha256": "bf6824727615eb2752d3093bbd856a3ce9f191a4e3afd61338298d6f3668b654",
+      "excerptSha256": "53018e99d487afc1e8b54713192a6753cb9bcd8f34abd3f0cae1b96329121783"
+    },
+    {
+      "id": "rsc-provider",
+      "file": "docs/guides/server-rendering.md",
+      "source": "examples/rsc/app/client-panel.tsx",
+      "job": "rsc",
+      "sourceSha256": "bf6824727615eb2752d3093bbd856a3ce9f191a4e3afd61338298d6f3668b654",
+      "excerptSha256": "7a8fd999a801a7c80885ceb11e44f10c1e5ceade4796000a0cdf9b1b0f0d66c6"
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 [Documentation index](../README.md)
 
-First, [install core and a locale](installation.md). The examples below use
+First, [install core and a locale](installation.md). The examples that follow use
 British English. Each example has all necessary imports and returns a string.
 
 ## Process text

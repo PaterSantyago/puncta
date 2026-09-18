@@ -11,7 +11,7 @@ This guide describes the unreleased functional version.
 2. [Process text or HTML](getting-started/text-and-html.md).
 3. Read [compatibility and version status](compatibility.md).
 
-For React, follow the [React quick start](getting-started/react.md).
+For React, use the [React quick start](getting-started/react.md).
 
 ## Complete a task
 

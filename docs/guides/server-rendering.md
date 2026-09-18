@@ -11,7 +11,7 @@ The functional API is unreleased.
 ## Synchronous server calls
 
 Core text and HTML calls return their results synchronously.
-They need explicit locale modules and settings, but no DOM or initialization step.
+Explicit locale modules and settings are necessary. A DOM and an initialization step are not necessary.
 This full TSX program uses public imports.
 It prints a core result and the HTML from `renderToString`.
 
@@ -45,7 +45,7 @@ Wait…
 
 For HTML strings, use the [HTML guide](html.md) and [core reference](../reference/core.md).
 For React elements, the adapter processes children that it can access during the render.
-It does not need an effect or a later DOM repair step.
+An effect and a later DOM repair step are not necessary.
 A Provider supplies settings but does not transform text directly in it.
 
 ## Hydration and ownership
@@ -101,7 +101,7 @@ window.hydrationRoot = hydrateRoot(
 ```
 
 All three browser engines check shell and protected text after shell hydration.
-For both streaming modes, they check fallback text before content is released.
+For the two streaming modes, they check fallback text before content is released.
 They then check resolved content after hydration and check that the shell/content nodes are the same.
 They also check shell child identity and no hydration errors.
 This includes NBSP, NNBSP, SHY, locale scopes, and protected text.
@@ -109,7 +109,7 @@ This includes NBSP, NNBSP, SHY, locale scopes, and protected text.
 The shared tree file gives these expected text values.
 JavaScript escapes identify NBSP, NNBSP, and SHY.
 The browser checks shell, content, and protected values in all three SSR modes.
-It checks fallback values in both streaming modes.
+It checks fallback values in the two streaming modes.
 
 <!-- puncta:integration server-expected -->
 
@@ -169,7 +169,7 @@ Put `Puncta` in an opaque custom component to process its output.
 See [React child boundaries](react.md#understand-child-boundaries).
 
 The browser check detects transformed shell and fallback text before it releases content.
-It then checks transformed content and hydration for both stream APIs.
+It then checks transformed content and hydration for the two stream APIs.
 The Node suite also checks concurrent requests, abort/retry, and original-source reports.
 `renderToString` does not wait for suspended content. It gives the fallback.
 
@@ -271,7 +271,7 @@ See [opaque components](react.md#process-a-custom-component) and [pure calls](..
 
 ## Run the checks
 
-Use the pinned repository tools and install dependencies from the lockfile.
+Use the pinned repository tools. Install dependencies from the lockfile.
 Run `pnpm build` before the integration jobs.
 Install Chromium, Firefox, and WebKit with `pnpm exec playwright install chromium firefox webkit`.
 On Linux, use the `--with-deps` option for system dependencies.

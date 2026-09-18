@@ -11,7 +11,7 @@ The functional version is **unreleased**. The historical public version,
 `0.1.0-alpha.0`, does not have this API. Do not use its version number or a
 moving npm tag as a substitute for the functional release.
 
-The commands below are templates for the functional release. Replace each
+The commands that follow are templates for the functional release. Replace each
 uppercase version field with its compatible release version when that
 release is available. The fields can have different values. These public
 installation commands stay pending until publication.
@@ -33,14 +33,13 @@ pnpm add --save-exact @use-puncta/core@CORE_VERSION @use-puncta/with-en-gb@EN_GB
 ```
 
 For Spanish, replace the British English package with
-`@use-puncta/with-es-es@ES_ES_VERSION`. Install both locale packages only if the
-application uses both locales. If you import `createPuncta`, install
+`@use-puncta/with-es-es@ES_ES_VERSION`. If the application uses the two locales, install the two locale packages. If you import `createPuncta`, install
 `@use-puncta/core` as a direct dependency.
 
 For React, also install `@use-puncta/with-react@REACT_ADAPTER_VERSION` and a
 compatible `react` version. The declared React peer range is `^19.3.0`.
 If a DOM renderer is necessary, the application supplies `react-dom`.
-See the [current React instructions](../../packages/with-react/README.md).
+See the [React quick start](react.md).
 
 ## Requirements
 
@@ -48,7 +47,7 @@ Use ESM imports. Packages include TypeScript declarations. CommonJS support is
 not specified. The package manifests do not declare a minimum Node version.
 
 Node 24 is the tested consumer baseline. Node 24.21.0 and pnpm 12.4.1 are repository
-tool versions; the repository build tools are not necessary for application users.
+tool versions. The repository build tools are not necessary for application users.
 See [declared and tested requirements](../compatibility.md#requirements).
 
 ## Installation check

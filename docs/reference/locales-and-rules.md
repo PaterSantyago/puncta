@@ -28,11 +28,11 @@ See [installation](../getting-started/installation.md) and
 
 ## Rule examples
 
-All ten groups below are on by default in both locales.
+All ten groups that follow are on by default in the two locales.
 Optional [digit grouping](#digit-grouping) is off.
 Hyphenation insertion and removal are different operations. See the [hyphenation guide](../guides/hyphenation.md).
 
-This full example runs the same input through both locales.
+This full example runs the same input through the two locales.
 The output has columns for the group, en-gb, and es-es.
 The `visible` function writes each U+00A0 as `\u00a0` so that bonds are explicit.
 Actual results contain NBSP characters, not six-character escape strings.
@@ -270,13 +270,13 @@ The minus rule operates independently and can change an ASCII minus sign.
 | Existing group widths    | 1–3 digits first, then exactly three per group                    | Same                    |
 
 Mixtures of the four permitted group spaces are valid.
-`normalizeExisting: true` changes valid separators to U+202F when the integer digit count is at or above `minDigits`.
+`normalizeExisting: true` changes valid separators to U+202F when the integer digit count is equal to or more than `minDigits`.
 `false` keeps the full existing grouped spelling.
-Puncta does not remove existing groups below the threshold.
+If the digit count is less than the threshold, Puncta keeps existing groups.
 An existing U+202F that stays unchanged produces no edit.
 See [canonical option definitions](settings.md#digit-grouping).
 
-This full program compares both locales. Install both locale packages.
+This full program compares the two locales. Install the two locale packages.
 The output uses escapes for invisible separators.
 
 <!-- puncta:example grouping-notation -->
@@ -356,7 +356,7 @@ Currency order, percent spacing, and minus formatting keep their own rules and w
 An en-dash range can contain two valid endpoints.
 An ASCII hyphen is eligible only with a known unit or `rules.ranges.standalone: true`.
 U+2212 is a minus sign, not a range separator.
-Both endpoints must be eligible before one or both endpoints can change.
+The two endpoints must be eligible before one or two endpoints can change.
 The threshold and normalization choice then apply independently to each endpoint.
 
 An invalid endpoint keeps the full range ungrouped.
@@ -475,7 +475,7 @@ See [grouping diagnostics](diagnostics.md#digit-grouping) for checked warnings a
 
 ## Hyphenation
 
-Hyphenation is opt-in for both locales. See [settings and minima](settings.md#hyphenation).
+Hyphenation is opt-in for the two locales. See [settings and minima](settings.md#hyphenation).
 Each locale includes an immutable Liang pattern resource with a conservative Puncta refinement and no whole-word exception table.
 The locale package's `hyphenation-manifest.json` identifies the resource and refinement.
 Its `NOTICE.md` identifies upstream sources and licenses.

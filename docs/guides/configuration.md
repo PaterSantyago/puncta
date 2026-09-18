@@ -4,7 +4,7 @@
 
 Use instance settings for common choices. Use call settings for one result.
 First, [install core and each required locale](../getting-started/installation.md).
-Install both locale packages to run these examples.
+Install the two locale packages to run these examples.
 
 ## Change settings and create a variant
 

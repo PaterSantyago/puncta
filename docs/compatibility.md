@@ -8,7 +8,7 @@ This page separates declared requirements from checked environments.
 
 | Version                   | Status                                                                   |
 | ------------------------- | ------------------------------------------------------------------------ |
-| Public `0.1.0-alpha.0`    | Historical scaffold; it does not have the functional API in this guide.  |
+| Public `0.1.0-alpha.0`    | Historical scaffold. It does not have the functional API in this guide.  |
 | Functional candidate      | Unreleased. Source baseline: `83b8c7acd5d6cfbe33c47f87c4c26f050628415f`. |
 | Functional public release | Versions, release tags, and public installation checks are pending.      |
 
@@ -32,17 +32,17 @@ public scaffold packages.
 
 ## Requirements
 
-| Declared requirement | Contract                                                                      |
-| -------------------- | ----------------------------------------------------------------------------- |
-| Modules              | Public ESM imports and TypeScript declarations.                               |
-| Core use             | Core plus each selected locale as direct dependencies.                        |
-| React adapter        | React peer range `^19.3.0`; add core directly if application code imports it. |
-| Node                 | Public package manifests declare no minimum Node version.                     |
+| Declared requirement | Contract                                                                         |
+| -------------------- | -------------------------------------------------------------------------------- |
+| Modules              | Public ESM imports and TypeScript declarations.                                  |
+| Core use             | Core plus each selected locale as direct dependencies.                           |
+| React adapter        | React peer range `^19.3.0`. If application code imports core, add core directly. |
+| Node                 | Public package manifests declare no minimum Node version.                        |
 
 | Checked environment    | Evidence or limit                                                                                                                                                 |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Node 24 consumer       | Existing isolated npm/pnpm package checks.                                                                                                                        |
-| Documentation examples | Matching local archives; exact environment and results in the [acceptance report](acceptance/documentation-115.md).                                               |
+| Documentation examples | Matching local archives. See the [acceptance report](acceptance/documentation-115.md) for the exact environment and results.                                      |
 | Browser, SSR, and RSC  | Historical reports are in the [first-version acceptance record](acceptance/first-version.md). See the current [server evidence](acceptance/documentation-113.md). |
 
 Repository tool versions are Node 24.21.0 and pnpm 12.4.1. These pins do not define

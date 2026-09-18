@@ -4,7 +4,7 @@
 
 Use `html()` to apply typography to text in an HTML string.
 First, [install core and the necessary locales](../getting-started/installation.md).
-All examples below are full programs.
+All examples that follow are full programs.
 
 HTML parsing does not sanitize input. Puncta does not remove scripts or event attributes.
 Use an HTML sanitizer that operates independently when your application must produce safe HTML.
@@ -152,7 +152,7 @@ An existing space stays in its original leaf.
 Each edit range refers to original decoded text in one leaf.
 Its `inputRange` refers to the original HTML string.
 Tags between leaves are not part of these ranges.
-Both coordinates use UTF-16 units.
+The two coordinates use UTF-16 units.
 See [diagnostic fields and original source positions](../reference/diagnostics.md#result-types) for the full report schemas.
 
 ### Context boundaries

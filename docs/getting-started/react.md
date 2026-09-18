@@ -3,7 +3,7 @@
 [Documentation index](../README.md)
 
 Install core, the React adapter, and a locale from the same functional package set.
-Follow the [npm or pnpm installation procedure](installation.md).
+Use the [npm or pnpm installation procedure](installation.md).
 This guide describes the unreleased functional version, not the public scaffold.
 Your application supplies React and React DOM.
 
