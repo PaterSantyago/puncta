@@ -27,8 +27,8 @@ function PunctaProvider(props: PunctaProviderProps): ReactNode;
 ```
 
 `Puncta` processes accessible children and supplies Context for nested components.
-`PunctaProvider` supplies settings and protection without transforming direct text children or host text.
-Neither component adds a DOM wrapper.
+`PunctaProvider` supplies settings and protection. It does not transform direct text children or host text.
+The two components do not add DOM wrappers.
 Nested components receive original children and use their own scope.
 See [child boundaries and state limits](../guides/react.md#understand-child-boundaries).
 
@@ -36,13 +36,13 @@ See [child boundaries and state limits](../guides/react.md#understand-child-boun
 
 `PunctaProviderProps` is an alias of `PunctaProps`. Both types have these readonly fields.
 
-| Prop       | Type                                            | Default and behavior                                                                                                   |
-| ---------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `children` | `ReactNode`                                     | Optional. Missing children produce no text.                                                                            |
-| `instance` | `PunctaInstance`                                | Optional in the type for nested use. Necessary at a root with no Puncta Context. Forbidden when Puncta Context exists. |
-| `locale`   | `PunctaOptions["locale"]`                       | Inherited. Must select a loaded locale when supplied.                                                                  |
-| `enabled`  | `boolean`                                       | Inherited. `false` protects descendants. A child cannot cancel inherited protection.                                   |
-| `options`  | `Pick<PunctaOptions, "rules" \| "hyphenation">` | Optional. Inherits settings and permits field/group overrides and resets.                                              |
+| Prop       | Type                                            | Default and behavior                                                                                                       |
+| ---------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `children` | `ReactNode`                                     | Optional. Missing children produce no text.                                                                                |
+| `instance` | `PunctaInstance`                                | Optional in the type for nested use. Necessary at a root with no Puncta Context. Not permitted when Puncta Context exists. |
+| `locale`   | `PunctaOptions["locale"]`                       | Inherited. Must select a loaded locale when supplied.                                                                      |
+| `enabled`  | `boolean`                                       | Inherited. `false` protects descendants. A child cannot cancel inherited protection.                                       |
+| `options`  | `Pick<PunctaOptions, "rules" \| "hyphenation">` | Optional. Inherits settings. Field/group overrides and resets are permitted.                                               |
 
 Use `locale` and `enabled` as props, not in `options`.
 `rules` and `hyphenation` belong in `options`, not as props.
@@ -106,7 +106,7 @@ Missing or invalid instances throw `instance.missing`.
 
 Pure calls validate settings and `detailed` even when processing is disabled.
 Core settings errors also apply to pure calls.
-An unavailable declarative language preserves text and produces a warning.
+An unavailable declarative language keeps text unchanged and produces a warning.
 Invalid visited markup options can throw `markup.invalid-config`.
 Pure calls do not inspect protected declarative content.
 
@@ -118,7 +118,7 @@ All fields are readonly.
 | Field          | Type                       | Meaning                                                        |
 | -------------- | -------------------------- | -------------------------------------------------------------- |
 | `result`       | `ReactNode`                | Transformed input tree. Render this field for a detailed call. |
-| `hasEdits`     | `boolean`                  | Whether typography edits occurred.                             |
+| `hasEdits`     | `boolean`                  | `true` if typography edits occurred.                           |
 | `sources`      | `readonly Source[]`        | Original accessible source leaves.                             |
 | `edits`        | `readonly Edit[]`          | Typography edits with original source ranges.                  |
 | `appliedRules` | `readonly AppliedRule[]`   | Applied rule IDs and locale IDs.                               |

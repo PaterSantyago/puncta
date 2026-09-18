@@ -27,7 +27,7 @@ These are not the public scaffold archives.
 
 | Command or check                  | Result                                                                                                                                                                         |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `pnpm docs:check`                 | Passed: 24 pages, 243 local links/anchors, 30 displayed programs. Six coverage groups stay pending.                                                                            |
+| `pnpm docs:check`                 | Passed: 24 pages, 244 local links/anchors, 30 displayed programs. Six coverage groups stay pending.                                                                            |
 | `pnpm typecheck`                  | Passed for the workspace and SSR consumer.                                                                                                                                     |
 | Focused displayed React programs  | All eight documented outputs matched public distribution exports.                                                                                                              |
 | `pnpm check`                      | Passed: lint, formatting, documentation, types, build, archive checks, 286 functional tests, three release tests, six publication tests, installation, and release validation. |
@@ -52,12 +52,26 @@ This evidence does not promise state preservation for arbitrary deep protection 
 
 ## Review and limits
 
-Independent factual, navigation, coverage, and ASD-STE100 Issue 9 review is pending.
+A different agent checked revision `02f64d6ea096e107cc085049ba1818d05dc2abb9` against the implementation base.
+The review used the official ASD-STE100 Issue 9 rules and dictionary.
+It found two groups of P2 language issues and one P3 navigation issue.
+The author applied all eight wording corrections and replaced the stale README pointer with the canonical state-limit link.
+Independent review of these corrections is pending.
+
 The author used the official Issue 9 rules and dictionary for a first prose pass.
 No new project dictionary applies.
 Public functional installation and release-specific links stay pending until publication.
-New documentation-branch URLs must be checked after the branch push.
+The coordinator checked 13 package documentation URLs after the branch push on 2026-09-18.
+All returned HTTP 200. Local checks also verify the new state-limit anchor.
 
 Existing server, grouping, and removal sections in the package entry await their respective documentation slices.
 Their migration and full language review are outside issue 110.
 No publication, release tag, RSC check, or new support promise is part of this result.
+
+## Review corrections
+
+The language corrections replace unapproved ordinary words and one verbal -ing construction.
+The navigation correction links the retained numeric-update section to the React guide's state and protection-change limits.
+Code and output fences are identical to the reviewed revision.
+Focused `pnpm docs:check` and `pnpm format:check` passed after these prose corrections.
+The full suite was not repeated.

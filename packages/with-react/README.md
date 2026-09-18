@@ -186,8 +186,8 @@ Changing locale, grouping settings or children recomputes from original children
 Disabling grouping removes automatically inserted separators; source separators
 remain subject to the ordinary rules and normalization contract. It does not strip
 explicit U+202F or restore source commas from a previously transformed string
-passed back as new input. Keys, refs and state follow the existing reconciliation
-contract above, including its protection-toggle limitation.
+passed back as new input. For keys, refs, state, and protection-change limits, see
+[state during updates](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/react.md#preserve-state-during-updates).
 
 The RSC consumer exercises explicit server-owned grouping separately from the
 client Provider, numeric client children and Flight children slots. Client locale

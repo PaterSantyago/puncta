@@ -153,7 +153,7 @@ console.log(report.hasEdits, "outputChanged" in report);
 true false
 ```
 
-Pure calls preserve protected tree structure but do not install Context for future components.
+Pure calls keep protected tree structure but do not install Context for future components.
 Use the component API when protection must reach a nested `Puncta` through an opaque component.
 
 ## Understand child boundaries
@@ -168,7 +168,7 @@ Use the component API when protection must reach a nested `Puncta` through an op
 | `Suspense`                                                | Content, fallback, and surrounding text have independent recognition contexts.            |
 | Attributes and `dangerouslySetInnerHTML`                  | Stay unchanged. Puncta does not process their text.                                       |
 
-Block elements stop recognition context. Transparent inline elements permit cross-leaf edits.
+Block elements stop recognition context. Transparent inline elements let Puncta make cross-leaf edits.
 A replacement belongs to the first affected leaf. Empty elements survive.
 Puncta does not mutate original props or children.
 
