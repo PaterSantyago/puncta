@@ -20,7 +20,7 @@ functional source, not the public scaffold.
 | Multiple locales, explicit overrides, variants that operate independently, nested reset, custom units, array snapshots | [Configuration](../guides/configuration.md), four configuration examples, including `configuration-scopes`                                                    |
 | Package entries, navigation, symptoms                                                                                  | Core and locale READMEs, [index](../README.md), [troubleshooting](../troubleshooting.md)                                                                      |
 | Displayed-source checks and source comparison                                                                          | [Coverage inventory](documentation-coverage.json), [documentation checker](../../scripts/documentation.mjs), [installed consumers](../../scripts/install.mjs) |
-| Independent factual and language review                                                                                | Pending, coordinator assigns a independent reviewer                                                                                                           |
+| Independent factual and language review                                                                                | Passed after correction review                                                                                                                                |
 
 ## Checks
 
@@ -69,7 +69,7 @@ for the prose pass, including verb forms, active voice, sentence length, and ord
 API identifiers and literal input/output remain exact.
 An independent agent reviewed revision `de71514a4814abb858df55942b11fe59409d6218`.
 The review found gaps in export checks, the currency attachment definition, and three groups of language issues.
-The author applied the corrections below. Independent recheck is pending.
+The author applied the corrections below.
 
 The installed check caught an incorrect initial Spanish dash expectation.
 A single `word -- word` is ambiguous in es-es. A paired insertion supplies the changed-output example.
@@ -102,4 +102,10 @@ After these corrections, `pnpm lint`, `pnpm typecheck`, `pnpm docs:check`,
 and `pnpm format:check` passed.
 `pnpm test:install` compiled and ran all 14 displayed examples with npm and pnpm.
 The two currency cases matched their stated results. All eight adapter consumer combinations also passed.
-Independent review of the corrections is pending.
+
+An independent agent reviewed revision
+`5a331c69a106a4eb0e6b6e35c9805fd7d516982c` against the issue 108 specification
+and the official ASD-STE100 Issue 9 rules and dictionary.
+The export-inventory, currency-definition, and language findings are resolved.
+The facts, navigation, assigned coverage, and language review passed.
+Later documentation slices and post-publication checks remain pending.
