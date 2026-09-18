@@ -29,8 +29,7 @@ See [installation](../getting-started/installation.md) and
 ## Rule examples
 
 All ten groups below are on by default in both locales.
-Optional digit grouping is off. Its dedicated section is pending.
-See [existing grouping details](../../packages/core/README.md#opt-in-digit-grouping).
+Optional [digit grouping](#digit-grouping) is off.
 Hyphenation insertion and removal are different operations. Their guide is pending.
 
 This complete example runs the same input through both locales.
@@ -254,3 +253,222 @@ word — word
 
 Use [configuration](../guides/configuration.md) to select or override a profile.
 Use [troubleshooting](../troubleshooting.md) when an expected change is missing.
+
+## Digit grouping
+
+The `digitGrouping` rule inserts U+202F NNBSP in eligible integer digits, in groups of three from the right.
+It does not change digits, decimal signs, or fractional digits.
+Grouping is text processing, not numeric conversion.
+An optional leading `+`, `-`, or U+2212 `−` is permitted.
+The independent minus rule can change an ASCII minus sign.
+
+| Input notation           | en-gb                                                             | es-es                   |
+| ------------------------ | ----------------------------------------------------------------- | ----------------------- |
+| Decimal sign             | `.`                                                               | `.` or `,`              |
+| Existing space separator | One U+0020 SPACE, U+00A0 NBSP, U+2009 THIN SPACE, or U+202F NNBSP | Same                    |
+| Existing comma separator | Permitted, without space separators in the same number            | Comma is a decimal sign |
+| Existing group widths    | 1–3 digits first, then exactly three per group                    | Same                    |
+
+Mixtures of the four permitted group spaces are valid.
+`normalizeExisting: true` changes valid separators to U+202F when the integer digit count is at or above `minDigits`.
+`false` keeps the full existing grouped spelling.
+Existing groups are not removed below the threshold.
+An existing U+202F that stays unchanged produces no edit.
+See [canonical option definitions](settings.md#digit-grouping).
+
+This full program compares both locales. Install both locale packages.
+The output uses escapes for invisible separators.
+
+<!-- puncta:example grouping-notation -->
+
+```ts
+import { createPuncta } from "@use-puncta/core";
+import { enGb } from "@use-puncta/with-en-gb";
+import { esEs } from "@use-puncta/with-es-es";
+const visible = (text: string) =>
+  text
+    .replaceAll("\u202f", "\\u202f")
+    .replaceAll("\u00a0", "\\u00a0")
+    .replaceAll("\u2009", "\\u2009");
+const puncta = createPuncta({
+  locales: [enGb, esEs],
+  locale: enGb.id,
+  rules: { digitGrouping: { enabled: true } },
+});
+for (const source of [
+  "12345.6700",
+  "12345,6700",
+  "1,234",
+  "12,345.00",
+  "12 345",
+  "1.234,50",
+  "1234 567",
+  "12\u2009345\u00a0678",
+]) {
+  console.log(
+    visible(source),
+    "|",
+    visible(puncta.text(source)),
+    "|",
+    visible(puncta.text(source, { locale: esEs.id })),
+  );
+}
+console.log(
+  visible(puncta.text("1,234", { rules: { digitGrouping: { minDigits: 4 } } })),
+);
+console.log(
+  visible(
+    puncta.text("12 345", {
+      rules: { digitGrouping: { normalizeExisting: false } },
+    }),
+  ),
+);
+console.log(visible(puncta.text("1 234")));
+```
+
+<!-- puncta:output grouping-notation -->
+
+```text
+12345.6700 | 12\u202f345.6700 | 12\u202f345.6700
+12345,6700 | 12345,6700 | 12\u202f345,6700
+1,234 | 1,234 | 1,234
+12,345.00 | 12\u202f345.00 | 12,345.00
+12 345 | 12\u202f345 | 12\u202f345
+1.234,50 | 1.234,50 | 1.234,50
+1234 567 | 1234 567 | 1234 567
+12\u2009345\u00a0678 | 12\u202f345\u202f678 | 12\u202f345\u202f678
+1\u202f234
+12 345
+1 234
+```
+
+In es-es, `1,234` is a decimal. `1.234,50` has conflicting signs.
+In en-gb, `12345,6700` is malformed grouping.
+Terminal punctuation and lists are outside each number. For example, `12345, 67890` contains two eligible integers.
+
+### Number bonds and ranges
+
+Known units, percentages, angular degrees, and currencies supply numeric recognition context.
+The full designation must be known. Composite units and explicit additions are included.
+Internal U+202F group separators and exterior U+00A0 number bonds have different functions.
+Currency order, percent spacing, and minus formatting keep their own rules and warnings.
+
+An en-dash range can contain two valid endpoints.
+An ASCII hyphen is eligible only with a known unit or `rules.ranges.standalone: true`.
+U+2212 is a minus sign, not a range separator.
+Both endpoints must be eligible before either endpoint can change.
+The threshold and normalization choice then apply independently to each endpoint.
+
+An invalid endpoint keeps the full range ungrouped.
+A leading-zero or technical endpoint causes no grouping warning, even if the other endpoint has malformed grouping.
+If no endpoint is excluded, malformed grouping causes one warning for the full range.
+Disabling units, ranges, percentages, or currencies formatting does not remove their recognition context.
+Grouping does not convert the range separator itself.
+Recognized prose dashes bound numeric context even when dash formatting is disabled.
+
+Grouping operates with quotes, spacing, ellipsis, and optional hyphenation in text, HTML, and accessible React children.
+
+<!-- puncta:example grouping-bonds -->
+
+```ts
+import { createPuncta } from "@use-puncta/core";
+import { enGb } from "@use-puncta/with-en-gb";
+const visible = (text: string) =>
+  text
+    .replaceAll("\u202f", "\\u202f")
+    .replaceAll("\u00a0", "\\u00a0")
+    .replaceAll("\u2009", "\\u2009");
+const puncta = createPuncta({
+  locales: [enGb],
+  locale: enGb.id,
+  rules: {
+    digitGrouping: { enabled: true },
+    units: { additional: ["widget/s"] },
+  },
+});
+for (const source of [
+  "12345kg",
+  "12345 km/h",
+  "12345widget/s",
+  "12345 °",
+  "12345 %",
+  "EUR12345",
+  "12345-67890kg",
+  "1234–67890",
+  "00123–123456",
+  "12 34–123456",
+  "12345-67890",
+  "12345−67890",
+]) {
+  console.log(visible(puncta.text(source)));
+}
+console.log(
+  visible(
+    puncta.text("1,234–56789", {
+      rules: { digitGrouping: { normalizeExisting: false } },
+    }),
+  ),
+);
+console.log(
+  visible(
+    puncta.text("12345-67890", {
+      rules: { ranges: { standalone: true, enabled: false } },
+    }),
+  ),
+);
+console.log(
+  visible(
+    puncta.text("12345-67890kg; 12345%; EUR12345", {
+      rules: {
+        ranges: { enabled: false },
+        units: { enabled: false },
+        percentages: { enabled: false },
+        currencies: { enabled: false },
+      },
+    }),
+  ),
+);
+```
+
+<!-- puncta:output grouping-bonds -->
+
+```text
+12\u202f345\u00a0kg
+12\u202f345\u00a0km/h
+12\u202f345\u00a0widget/s
+12\u202f345°
+12\u202f345%
+EUR\u00a012\u202f345
+12\u202f345–67\u202f890\u00a0kg
+1234–67\u202f890
+00123–123456
+12 34–123456
+12345-67890
+12345−67890
+1,234–56\u202f789
+12\u202f345-67\u202f890
+12\u202f345-67\u202f890kg; 12\u202f345%; EUR12\u202f345
+```
+
+### Excluded and ambiguous numbers
+
+Malformed groups, conflicting separators, and spaces before numeric punctuation keep the full candidate unchanged.
+Examples are `1234 567`, `12 34`, and `1 , 234`.
+Each candidate produces one grouping ambiguity warning.
+A high threshold or `normalizeExisting: false` does not stop this warning.
+
+The following forms are excluded without grouping warnings:
+
+- Leading zeros, missing integer parts, and non-ASCII or mixed digits.
+- Combining marks, identifiers, unknown suffixes, and scientific notation.
+- Slash/colon numeric structures, arithmetic expressions, and three or more dotted or hyphenated segments.
+
+Puncta does not guess years or telephone numbers.
+A four-digit year stays unchanged at the default threshold but can change with `minDigits: 4`.
+Use [protection](../guides/protection.md) for text that must not change.
+Other rules can still produce their own changes or warnings on excluded input.
+
+With grouping enabled, repeated group spaces, tabs, and line breaks keep their separation on repeated processing.
+Space cleanup keeps malformed candidate spelling and normalized groups.
+With grouping disabled, ordinary spacing rules apply.
+See [grouping diagnostics](diagnostics.md#digit-grouping) for checked warnings and source positions.

@@ -178,3 +178,68 @@ See [settings and validation](../reference/settings.md),
 [core signatures](../reference/core.md), and
 [locale rules and examples](../reference/locales-and-rules.md).
 For configuration failures, see [troubleshooting](../troubleshooting.md).
+
+## Enable digit grouping
+
+Digit grouping inserts U+202F NNBSP between integer digit groups.
+The number/unit bond uses U+00A0 NBSP.
+Install core and en-gb to run this full program.
+The output writes these invisible characters as escapes.
+Actual strings contain the characters, not the escape notation.
+
+Set `enabled: true` explicitly. A threshold change alone does not enable the rule.
+Use strings for exact input digits. Grouping does not convert text to a number.
+It cannot give exact digits after JavaScript precision loss.
+
+<!-- puncta:example grouping-options -->
+
+```ts
+import { createPuncta } from "@use-puncta/core";
+import { enGb } from "@use-puncta/with-en-gb";
+const visible = (text: string) =>
+  text.replaceAll("\u202f", "\\u202f").replaceAll("\u00a0", "\\u00a0");
+const puncta = createPuncta({ locales: [enGb], locale: enGb.id });
+const grouped = puncta.with({ rules: { digitGrouping: { enabled: true } } });
+console.log(puncta.text("12345"));
+console.log(visible(grouped.text("12345.6700")));
+console.log(grouped.text("1234.567890"));
+console.log(
+  visible(grouped.text("1234", { rules: { digitGrouping: { minDigits: 4 } } })),
+);
+const compact = grouped.with({
+  rules: { digitGrouping: { minDigits: 4, normalizeExisting: false } },
+});
+const paused = compact.with({ rules: { digitGrouping: { enabled: false } } });
+console.log(
+  visible(
+    paused.text("1234; 12 345", {
+      rules: { digitGrouping: { enabled: true } },
+    }),
+  ),
+);
+console.log(
+  compact.text("1234", { rules: { digitGrouping: { minDigits: null } } }),
+);
+console.log(compact.text("12345", { rules: { digitGrouping: null } }));
+```
+
+<!-- puncta:output grouping-options -->
+
+```text
+12345
+12\u202f345.6700
+1234.567890
+1\u202f234
+1\u202f234; 12 345
+1234
+12345
+```
+
+The decimal sign and fractional trailing zeros stay unchanged.
+Only the integer digits count for `minDigits`.
+A field reset uses the current locale default. A group reset also disables grouping.
+Disabling only the rule keeps explicit settings for later use.
+See [settings](../reference/settings.md#digit-grouping),
+[notation and exclusions](../reference/locales-and-rules.md#digit-grouping),
+[HTML scopes](html.md#group-digits-across-inline-elements), and
+[React children](react.md#group-digits-in-react).

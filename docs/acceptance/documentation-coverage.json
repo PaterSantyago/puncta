@@ -18,7 +18,9 @@
     "docs/getting-started/react.md",
     "docs/guides/react.md",
     "docs/reference/react.md",
-    "docs/acceptance/documentation-110.md"
+    "docs/acceptance/documentation-110.md",
+    "docs/reference/diagnostics.md",
+    "docs/acceptance/documentation-111.md"
   ],
   "examples": [
     {
@@ -231,6 +233,54 @@
         "@use-puncta/with-react",
         "@use-puncta/with-en-gb"
       ]
+    },
+    {
+      "id": "grouping-options",
+      "file": "docs/guides/configuration.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "grouping-validation",
+      "file": "docs/reference/settings.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "grouping-notation",
+      "file": "docs/reference/locales-and-rules.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-es-es"
+      ]
+    },
+    {
+      "id": "grouping-bonds",
+      "file": "docs/reference/locales-and-rules.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "grouping-html",
+      "file": "docs/guides/html.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "grouping-react",
+      "file": "docs/guides/react.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-en-gb",
+        "@use-puncta/with-react"
+      ]
+    },
+    {
+      "id": "grouping-warnings",
+      "file": "docs/reference/diagnostics.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "grouping-positions",
+      "file": "docs/reference/diagnostics.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
     }
   ],
   "coverage": [
@@ -334,9 +384,28 @@
     },
     {
       "id": "digit-grouping",
-      "status": "pending",
+      "status": "covered",
       "issue": 111,
-      "scope": "Rule defaults, locale differences, exclusions and diagnostics."
+      "scope": "Defaults, validation, inheritance/reset, exact NNBSP, locale notation, complete bonds/ranges, exclusions, diagnostics, source ownership, HTML/React boundaries and existing runtime limits.",
+      "pages": [
+        "docs/guides/configuration.md",
+        "docs/reference/settings.md",
+        "docs/reference/locales-and-rules.md",
+        "docs/guides/html.md",
+        "docs/guides/react.md",
+        "docs/reference/diagnostics.md"
+      ],
+      "examples": [
+        "grouping-options",
+        "grouping-validation",
+        "grouping-notation",
+        "grouping-bonds",
+        "grouping-html",
+        "grouping-react",
+        "grouping-warnings",
+        "grouping-positions"
+      ],
+      "rules": ["digitGrouping"]
     },
     {
       "id": "hyphenation",
@@ -511,7 +580,7 @@
       "name": "RulesOptions",
       "sha256": "5eea03447834cb1e1c40ef659f66de64ee2d35d36934c8365a85ebcce1dc083d",
       "target": "docs/reference/settings.md#rule-fields-and-defaults",
-      "status": "partial",
+      "status": "covered",
       "issue": 111
     },
     {
@@ -735,7 +804,7 @@
       "name": "ruleDefaults",
       "sha256": "719767f0fbe073126ba1a00f6f29d7456e6006bac70c62dcde97d642e6278fbe",
       "target": "docs/reference/settings.md#rule-fields-and-defaults",
-      "status": "partial",
+      "status": "covered",
       "issue": 111
     },
     {

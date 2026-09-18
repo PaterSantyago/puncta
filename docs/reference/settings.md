@@ -2,9 +2,9 @@
 
 [Documentation index](../README.md)
 
-This page defines shared settings and the ten standard typography rule groups.
+This page defines shared settings and all eleven typography rule groups.
 The [configuration guide](../guides/configuration.md) shows complete examples.
-The digit-grouping and hyphenation guides are pending.
+The hyphenation guide is pending.
 Their current details remain in the [core package instructions](../../packages/core/README.md).
 
 ## Configuration surfaces
@@ -50,19 +50,19 @@ Use `{ enabled: false }` inside a rule group.
 All group fields are optional and readonly. Each field also accepts `null`.
 An omitted field or explicit `undefined` inherits its explicit parent value.
 
-| Group           | Fields and permitted values                         | Default in both locales, unless specified                                        |
-| --------------- | --------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `quotes`        | `enabled: boolean`, `normalizeExisting: boolean`    | `true`, `true`                                                                   |
-| `apostrophes`   | `enabled: boolean`                                  | `true`                                                                           |
-| `spaces`        | `enabled: boolean`                                  | `true`                                                                           |
-| `ellipsis`      | `enabled: boolean`                                  | `true`                                                                           |
-| `dashes`        | `enabled: boolean`, `normalizeExisting: boolean`    | `true`, `true`                                                                   |
-| `ranges`        | `enabled: boolean`, `standalone: boolean`           | `true`, `false`                                                                  |
-| `minus`         | `enabled: boolean`                                  | `true`                                                                           |
-| `units`         | `enabled: boolean`, `additional: readonly string[]` | `true`, `[]`                                                                     |
-| `percentages`   | `enabled: boolean`, `space: "none" \| "nbsp"`       | `true`, `"none"` in en-gb, `"nbsp"` in es-es                                     |
-| `currencies`    | `enabled: boolean`                                  | `true`                                                                           |
-| `digitGrouping` | Dedicated reference pending                         | Off, see [existing details](../../packages/core/README.md#opt-in-digit-grouping) |
+| Group           | Fields and permitted values                                           | Default in both locales, unless specified                   |
+| --------------- | --------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `quotes`        | `enabled: boolean`, `normalizeExisting: boolean`                      | `true`, `true`                                              |
+| `apostrophes`   | `enabled: boolean`                                                    | `true`                                                      |
+| `spaces`        | `enabled: boolean`                                                    | `true`                                                      |
+| `ellipsis`      | `enabled: boolean`                                                    | `true`                                                      |
+| `dashes`        | `enabled: boolean`, `normalizeExisting: boolean`                      | `true`, `true`                                              |
+| `ranges`        | `enabled: boolean`, `standalone: boolean`                             | `true`, `false`                                             |
+| `minus`         | `enabled: boolean`                                                    | `true`                                                      |
+| `units`         | `enabled: boolean`, `additional: readonly string[]`                   | `true`, `[]`                                                |
+| `percentages`   | `enabled: boolean`, `space: "none" \| "nbsp"`                         | `true`, `"none"` in en-gb, `"nbsp"` in es-es                |
+| `currencies`    | `enabled: boolean`                                                    | `true`                                                      |
+| `digitGrouping` | `enabled: boolean`, `minDigits: number`, `normalizeExisting: boolean` | `false`, `5`, `true`. See [digit grouping](#digit-grouping) |
 
 `normalizeExisting: false` keeps existing formatted quote pairs or dash styles.
 It still converts straight quotes or explicit double-hyphen markers.
@@ -197,3 +197,59 @@ Protection has priority over all descendant markers.
 Puncta does not read their JSON or locale values.
 The same exclusion applies to automatically protected elements and disabled HTML input.
 See [nested examples](../guides/html.md#use-markers-and-languages) and [protection](../guides/protection.md).
+
+## Digit grouping
+
+`rules.digitGrouping` uses the [configuration surfaces](#configuration-surfaces) and [reset rules](#inheritance-and-reset) on this page.
+`minDigits` must be a safe integer from `4` through `Number.MAX_SAFE_INTEGER`. Both limits are permitted.
+Fractions, `NaN`, infinities, and out-of-range values are invalid.
+`enabled` and `normalizeExisting` accept booleans.
+The defaults in the rule table apply to both locales.
+
+All three fields accept `null` and `undefined`.
+The group accepts an object, `null`, or `undefined`. Boolean shorthand is invalid.
+Omitted or `undefined` fields inherit explicit values.
+
+A `null` field removes its explicit value and uses the current locale default.
+A `null` group resets all three fields. `rules: null` is invalid.
+
+`minDigits` and `normalizeExisting` do not enable grouping by themselves.
+A locale change keeps explicit values and resolves unset fields from the new locale.
+Rule disable/enable changes keep explicit threshold and normalization settings.
+With `normalizeExisting: false`, existing groups keep their spelling, but ungrouped eligible numbers can change.
+See the [notation rules](locales-and-rules.md#digit-grouping) for recognition and threshold details.
+
+Invalid explicit settings cause `PunctaConfigError` with `code: "config.invalid-option"`, even when processing or the rule is disabled.
+`details.reason` is `"type"` for an incorrect type, `"value"` for an invalid number, or `"unknown"` for an unknown field.
+`optionPath` identifies the field. The program below checks disabled processing.
+
+<!-- puncta:example grouping-validation -->
+
+```ts
+import { createPuncta } from "@use-puncta/core";
+import { enGb } from "@use-puncta/with-en-gb";
+
+import { PunctaConfigError } from "@use-puncta/core";
+const puncta = createPuncta({ locales: [enGb], locale: enGb.id });
+try {
+  puncta.text("12345", {
+    enabled: false,
+    rules: { digitGrouping: { minDigits: 3 } },
+  });
+} catch (error) {
+  if (!(error instanceof PunctaConfigError)) throw error;
+  console.log(error.code, error.optionPath.join("."), error.details.reason);
+}
+```
+
+<!-- puncta:output grouping-validation -->
+
+```text
+config.invalid-option rules.digitGrouping.minDigits value
+```
+
+Protected declarative content is not inspected.
+An HTML `data-puncta="off"` marker has priority over options on the same host.
+Running React components still validate their own props.
+SHY removal validates shared settings but does not group digits or produce grouping warnings.
+See [protection](../guides/protection.md) and [React validation](react.md#check-configuration-failures).

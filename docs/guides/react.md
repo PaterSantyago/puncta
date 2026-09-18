@@ -225,7 +225,7 @@ bigint 12
 ```
 
 This example enables digit grouping to show numeric type changes.
-The output shows U+202F NNBSP as an escape. Full grouping details are pending.
+The output shows U+202F NNBSP as an escape. See [digit grouping](#group-digits-in-react) for notation and boundary rules.
 Bigints keep their exact decimal digits.
 Puncta cannot recover numeric precision lost before the call.
 
@@ -248,3 +248,121 @@ Puncta does not inspect protected descendants to keep those bridges.
 See the [React API](../reference/react.md), [protection guide](protection.md), and
 [browser acceptance procedure](../../tests/browser/README.md).
 Server rendering and SHY removal guides are pending.
+
+## Group digits in React
+
+Use `options.rules.digitGrouping` on `Puncta` or `PunctaProvider`.
+The Provider supplies settings but does not transform its direct children.
+For pure calls, supply the instance explicitly. Pure calls do not use Provider Context.
+See [shared settings](../reference/settings.md#digit-grouping) for the full defaults and reset rules.
+
+Arrays, Fragments, and transparent host elements share numeric recognition context.
+A nested explicit scope or opaque component stops a number.
+Insertion at a transparent boundary belongs to the left nonempty leaf.
+A replacement separator stays in its original leaf. The input children are not mutated.
+
+This full TSX program checks component output and a pure transformation.
+`renderToStaticMarkup` writes the HTML. The output shows U+202F as an escape.
+
+<!-- puncta:example grouping-react -->
+
+```tsx
+import { createPuncta } from "@use-puncta/core";
+import { enGb } from "@use-puncta/with-en-gb";
+
+import { Puncta, PunctaProvider } from "@use-puncta/with-react";
+import { transformReact } from "@use-puncta/with-react/pure";
+import { renderToStaticMarkup } from "react-dom/server";
+const visible = (text: string) =>
+  text.replaceAll("\u202f", "\\u202f").replaceAll("\u00a0", "\\u00a0");
+const instance = createPuncta({ locales: [enGb], locale: enGb.id });
+const grouped = instance.with({ rules: { digitGrouping: { enabled: true } } });
+console.log(
+  visible(
+    renderToStaticMarkup(
+      <Puncta instance={grouped}>
+        {"12"}
+        <em>345</em>
+      </Puncta>,
+    ),
+  ),
+);
+console.log(
+  visible(
+    renderToStaticMarkup(
+      <Puncta instance={grouped}>
+        {"12"}
+        <em> </em>
+        {"345"}
+      </Puncta>,
+    ),
+  ),
+);
+console.log(
+  visible(
+    renderToStaticMarkup(
+      <Puncta instance={grouped}>
+        {"12"}
+        <Puncta>{"345"}</Puncta>
+      </Puncta>,
+    ),
+  ),
+);
+console.log(
+  visible(
+    renderToStaticMarkup(
+      <PunctaProvider
+        instance={instance}
+        options={{ rules: { digitGrouping: { enabled: true, minDigits: 4 } } }}
+      >
+        <Puncta options={{ rules: { digitGrouping: { enabled: false } } }}>
+          <span>1234</span>
+          <Puncta options={{ rules: { digitGrouping: { enabled: true } } }}>
+            <b>1234</b>
+          </Puncta>
+        </Puncta>
+      </PunctaProvider>,
+    ),
+  ),
+);
+const report = transformReact(["12", <em key="digits">345</em>], {
+  instance: grouped,
+  detailed: true,
+});
+console.log(JSON.stringify(report.edits[0]?.ranges));
+console.log(
+  visible(String(transformReact(12345678901234567890n, { instance: grouped }))),
+);
+```
+
+<!-- puncta:output grouping-react -->
+
+```text
+12\u202f<em>345</em>
+12<em>\u202f</em>345
+12345
+<span>1234</span><b>1\u202f234</b>
+[{"sourceId":0,"start":2,"end":2}]
+12\u202f345\u202f678\u202f901\u202f234\u202f567\u202f890
+```
+
+A number or bigint contributes `String(value)` to recognition.
+Changed numeric leaves become strings. Unchanged leaves keep their number or bigint type.
+Bigints keep exact decimal digits. Exponential number strings, for example `1e21`, are excluded.
+Puncta cannot give exact digits after JavaScript precision loss.
+
+Locale, options, and child updates recompute from original children.
+Disabling grouping removes inserted separators when the original source had none.
+It does not strip explicit U+202F or change separators back to commas in transformed text supplied as new input.
+See [state and protection-change limits](#preserve-state-during-updates).
+
+The existing browser checks verify grouping updates and hydration in Chromium, Firefox, and WebKit.
+They check supported state, ref, and DOM identity behavior.
+Server checks include grouping in shell, fallback, and resolved content for all three supported SSR renderers.
+Concurrent requests have independent options, locales, and reports. An abort/retry starts from original children.
+See the [runtime acceptance scope](../acceptance/digit-grouping.md#react-runtime-slice-91).
+
+The existing RSC consumer checks server-owned grouping and client-owned grouping independently.
+Client locale or grouping changes do not change server-owned text.
+The [server integration instructions](../../packages/with-react/README.md#server-integration) define the tested boundary and versions.
+This does not promise support for all framework versions or edge runtimes.

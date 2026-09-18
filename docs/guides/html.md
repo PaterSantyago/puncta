@@ -241,3 +241,52 @@ With this special case, a later parse does not read new closing tags as plaintex
 
 Related: [Protection](protection.md), [core API](../reference/core.md),
 [HTML symptoms](../troubleshooting.md#html-output-has-unexpected-markup).
+
+## Group digits across inline elements
+
+Enable grouping on the instance or through shared call options.
+Transparent elements, comments, and same-locale `lang` aliases keep numeric recognition context.
+An explicit typography scope stops that context, even with unchanged settings.
+Line breaks, `br`/`wbr`, blocks, changed locales, opaque fragments, and protection also stop a number.
+Protected content cannot supply digits or grouping warnings.
+
+This full program prints serialized HTML with invisible characters as escapes.
+New separators at transparent boundaries belong to the end of the left nonempty text leaf.
+Replacement separators stay in their original leaf. Digits stay in their original leaves.
+
+<!-- puncta:example grouping-html -->
+
+```ts
+import { createPuncta } from "@use-puncta/core";
+import { enGb } from "@use-puncta/with-en-gb";
+const visible = (text: string) =>
+  text.replaceAll("\u202f", "\\u202f").replaceAll("\u00a0", "\\u00a0");
+const puncta = createPuncta({
+  locales: [enGb],
+  locale: enGb.id,
+  rules: { digitGrouping: { enabled: true } },
+});
+for (const source of [
+  "12<em>345</em>",
+  "12<em>&#32;</em>345",
+  '12<!-- note --><span lang="en">345</span>',
+  '12<span data-puncta="">345</span>',
+  "12<br>345",
+  "12<code>345</code>",
+])
+  console.log(visible(puncta.html(source)));
+```
+
+<!-- puncta:output grouping-html -->
+
+```text
+12\u202f<em>345</em>
+12<em>\u202f</em>345
+12\u202f<!-- note --><span lang="en">345</span>
+12<span data-puncta="">345</span>
+12<br>345
+12<code>345</code>
+```
+
+Use [source reports](../reference/diagnostics.md#grouping-source-positions) to locate each insertion or replacement.
+Use [shared settings](../reference/settings.md#digit-grouping) for inheritance, reset, and validation.

@@ -2,8 +2,8 @@
 
 [Documentation index](README.md)
 
-This page covers installation, settings, HTML, protection, and the ten standard rule groups.
-React, grouping, hyphenation, and detailed diagnostic procedures are pending.
+This page covers installation, settings, HTML, protection, and all eleven rule groups.
+Hyphenation and the full diagnostic procedures are pending.
 
 ## The API is missing
 
@@ -111,3 +111,33 @@ See [React configuration failures](reference/react.md#check-configuration-failur
 A protection change above multiple hosts can remount deeper stateful children.
 Do not depend on state preservation across arbitrary deep protection changes.
 See [the reconciliation limit](guides/react.md#preserve-state-during-updates).
+
+## Digit grouping does not change a number
+
+Set `rules.digitGrouping.enabled: true` explicitly.
+Check the integer digit count against `minDigits`. Fractional digits do not count.
+Use [the configuration example](guides/configuration.md#enable-digit-grouping) to check threshold and reset behavior.
+An explicit scope, protection, or opaque component can stop a number across leaves.
+See [HTML boundaries](guides/html.md#group-digits-across-inline-elements) and [React boundaries](guides/react.md#group-digits-in-react).
+
+Check the [locale notation and exclusions](reference/locales-and-rules.md#digit-grouping).
+Leading zeros, unknown suffixes, scientific notation, and unsupported numeric structures stay ungrouped.
+These exclusions do not cause grouping warnings.
+Malformed groups cause `typography.ambiguous` even with a high threshold or disabled normalization.
+Use [the grouping diagnostic example](reference/diagnostics.md#digit-grouping) to identify the full candidate.
+
+## Existing group separators do not change
+
+Check `normalizeExisting` and the integer threshold.
+Below the threshold, existing separators stay unchanged. Puncta does not remove existing groups.
+`normalizeExisting: false` keeps the full grouped spelling.
+An existing U+202F produces no grouping edit.
+The U+00A0 bond between a number and its unit belongs to the units rule, not digit grouping.
+
+## Grouping does not correct lost digits
+
+Puncta does not convert numeric values. It cannot give exact digits after JavaScript precision loss.
+Supply a string or exact bigint when the original digits matter.
+An exponential numeric representation is excluded.
+A transformed string supplied as new input has its own explicit separators.
+To recompute a React result without grouping, keep the original children as input.

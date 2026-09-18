@@ -16,6 +16,7 @@ For React, follow the [React quick start](getting-started/react.md).
 ## Complete a task
 
 - [Configure settings, variants, and locales](guides/configuration.md).
+- [Enable digit grouping](guides/configuration.md#enable-digit-grouping).
 - [Compare locale rules](reference/locales-and-rules.md).
 - [Process HTML fragments and documents](guides/html.md).
 - [Protect text ranges and markup](guides/protection.md).
@@ -34,7 +35,8 @@ and [React package instructions](../packages/with-react/README.md).
 
 - [React components, pure functions, and public types](reference/react.md).
 
-The diagnostics reference is pending.
+The [grouping diagnostics](reference/diagnostics.md#digit-grouping) are available.
+The full diagnostic catalog is pending.
 Core format-specific and diagnostic definitions remain partly pending.
 
 ## Solve a problem

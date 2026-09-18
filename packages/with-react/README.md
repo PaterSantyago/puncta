@@ -98,100 +98,18 @@ MIT.
 
 ## Opt-in digit grouping
 
-The shared nullable `rules.digitGrouping` option is available through component
-`options`, Provider/instance settings and `transformReact`. Both locales default to
-`{ enabled: false, minDigits: 5, normalizeExisting: true }`.
-
-```tsx
-<Puncta
-  instance={instance}
-  options={{ rules: { digitGrouping: { enabled: true } } }}
->
-  {"12"}
-  <em>345</em>
-</Puncta>;
-// Server text: "12\u202f<em>345</em>"
-transformReact("12345", {
-  instance,
-  rules: { digitGrouping: { enabled: true } },
-});
-// "12\u202f345"
-```
-
-Standalone integers, existing groups and locale decimals work through transparent
-leaves, including arrays and Fragment. Insertions at a leaf boundary belong to the
-left leaf; a replaced group separator remains in its original leaf. Invalid
-candidates retain their text and detailed reports locate the whole candidate
-across its source leaves. Protection and opaque components stop recognition; the
-original children are not mutated. Known number bonds and eligible two-endpoint
-ranges share that transparent context, including disabled exterior formatting.
-Grouping and normalization are delivered by `renderToString`,
-`renderToPipeableStream` and `renderToReadableStream`, including shell/fallback
-before suspended content resolves. Concurrent requests isolate grouping options,
-locales and reports; abort/retry starts again from original children.
-The mixed corpus includes normalized groups, ranges, exterior bonds and surrounding
-typography in independent shell/fallback/content scopes. Chromium, Firefox and
-WebKit checks cover hydration and updates without DOM repair,
-extra wrappers or replacement of the original shell/content nodes. See
-[core settings and current limits](../core/README.md#opt-in-digit-grouping).
+Use the [grouping guide](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/configuration.md#enable-digit-grouping)
+and [notation, bonds, ranges, and exclusions](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/locales-and-rules.md#digit-grouping).
+The [settings reference](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/reference/settings.md#digit-grouping)
+defines defaults, validation, inheritance, and reset.
 
 ### Inheritance and grouping reports
 
-`PunctaProvider` passes grouping settings without transforming its immediate text;
-`Puncta` transforms its accessible children. Both accept the shared nullable
-`options.rules.digitGrouping`. For example, an outer explicit threshold survives
-pausing and re-enabling the rule in nested components:
-
-```tsx
-<PunctaProvider
-  instance={instance}
-  options={{ rules: { digitGrouping: { enabled: true, minDigits: 4 } } }}
->
-  <Puncta options={{ rules: { digitGrouping: { enabled: false } } }}>
-    1234
-    <Puncta options={{ rules: { digitGrouping: { enabled: true } } }}>
-      1234
-    </Puncta>
-  </Puncta>
-</PunctaProvider>
-```
-
-The outer number stays `1234`; the inner number becomes `1\u202f234`.
-A null field restores the current locale's default; a null group resets every
-field and disables grouping. Changing locale retains explicit fields. A fully
-disabled ancestor remains inherited protection, even if a child enables the rule
-or processing. Running components still validate their own props; declarative
-options in content protected from traversal are not read.
-
-Pure `transformReact` uses its required explicit instance, independently of any
-Context where the returned tree is later rendered. Arrays and Fragment preserve
-accessible numeric context; nested scopes and opaque components interrupt it.
-Reports keep original source paths, UTF-16 offsets and separate separator edits.
-A warning can address several original leaves. Insertions at transparent seams
-belong to the left nonempty leaf; digits remain in their original children.
-React reports have `hasEdits` and no `outputChanged`. Original children are not
-mutated. `stripSoftHyphensReact` validates these shared options while only
-removing SHY, without grouping or its warnings.
+See [grouping in React](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/react.md#group-digits-in-react)
+for component and pure calls, scopes, source paths, and separator ownership.
 
 ### Numeric children and runtime updates
 
-A number or bigint contributes `String(value)`. Changed leaves become strings;
-unchanged leaves keep their original number/bigint type, including when grouping
-is disabled. Bigints retain their exact decimal digits. Exponential number
-representations such as `1e21` are excluded from grouping. Precision already lost
-before calling Puncta cannot be recovered. Transparent seams between numeric and
-string/host leaves use the same left-leaf insertion ownership as ordinary text.
-
-Changing locale, grouping settings or children recomputes from original children.
-Disabling grouping removes automatically inserted separators; source separators
-remain subject to the ordinary rules and normalization contract. It does not strip
-explicit U+202F or restore source commas from a previously transformed string
-passed back as new input. For keys, refs, state, and protection-change limits, see
-[state during updates](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/react.md#preserve-state-during-updates).
-
-The RSC consumer exercises explicit server-owned grouping separately from the
-client Provider, numeric client children and Flight children slots. Client locale
-or grouping updates do not change server-owned text. Pure transforms still require
-an explicit instance and do not read Context. See
-[digit grouping runtime acceptance](../../docs/acceptance/digit-grouping.md#react-runtime-slice-91)
-for the test matrix and execution evidence.
+See [numeric children](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/react.md#group-digits-in-react)
+and [state during updates](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/react.md#preserve-state-during-updates).
+These sections define precision, recomputation, and protection-change limits.
