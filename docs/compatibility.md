@@ -54,7 +54,7 @@ pending until their guide and reference sections are complete. See the
 
 ## Server environments
 
-The [server guide](guides/server-rendering.md) covers the checked integration paths.
+The [server guide](guides/server-rendering.md) includes the checked integration paths.
 These are tested environments, not general runtime guarantees.
 
 | Path              | Checked environment                                                      | Scope                                                                                                       |
@@ -64,10 +64,10 @@ These are tested environments, not general runtime guarantees.
 | RSC               | Next.js 16.3.5 production App Router, application React/React DOM 19.3.0 | Flight client references, HTML without JavaScript, hydration, client updates, separate server configuration |
 | Framework React   | `19.3.0-canary-cbb046ab-20260731`                                        | Next's bundled server and client React, recorded separately from application dependencies                   |
 
-The [slice evidence](acceptance/documentation-113.md) records exact browser versions, revisions, commands, and limits.
+The [slice evidence](acceptance/documentation-113.md) records browser versions, revisions, commands, and limits.
 The repository lockfile pins these dependencies.
-The browser and RSC commands remain separate from `pnpm check`.
-No general Next.js-version or edge-runtime support promise follows from this fixture.
+The browser and RSC commands are separate from `pnpm check`.
+This fixture gives no general promise of support for Next.js versions or edge runtimes.
 
 The client entry supplies no server Provider or server JSX adapter.
 An instance or locale module cannot cross the RSC boundary as a serialized prop.

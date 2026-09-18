@@ -75,5 +75,4 @@ Wait…
 - [Look up props, options, and results](../reference/react.md).
 - [Change settings and locales](../guides/configuration.md).
 
-The server-rendering guide is pending. Existing runnable integrations are in the
-[SSR entry](../../examples/ssr/src/index.ts) and [RSC example](../../examples/rsc/README.md).
+- [Use SSR, hydration, streaming, and RSC](../guides/server-rendering.md).

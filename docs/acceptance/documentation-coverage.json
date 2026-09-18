@@ -443,7 +443,7 @@
       "id": "react",
       "status": "covered",
       "issue": 110,
-      "scope": "Issue 110: components, transformReact, public props/options/results, child boundaries, scopes, protection and mounted state. SHY removal remains pending in issue 112. Server integration remains pending in issue 113.",
+      "scope": "Issue 110: components, transformReact, public props/options/results, child boundaries, scopes, protection and mounted state. SHY removal is covered in issue 112. Server integration is covered in issue 113.",
       "pages": [
         "docs/getting-started/react.md",
         "docs/guides/react.md",

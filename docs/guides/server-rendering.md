@@ -44,9 +44,9 @@ Wait…
 ```
 
 For HTML strings, use the [HTML guide](html.md) and [core reference](../reference/core.md).
-For React elements, the adapter processes accessible children during the render.
+For React elements, the adapter processes children that it can access during the render.
 It does not need an effect or a later DOM repair step.
-A Provider supplies settings but does not transform its immediate text.
+A Provider supplies settings but does not transform text directly inside it.
 
 ## Hydration and ownership
 
@@ -59,9 +59,9 @@ See [React updates](react.md#preserve-state-during-updates).
 The [HTTP integration](../../tests/browser/hydration-server.mjs) shares its
 [tree source](../../tests/browser/hydration-tree.mjs) with the
 [hydration client](../../tests/browser/hydration-client.mjs).
-The following excerpts are partial integration source, not standalone programs.
+These excerpts are parts of the integration source. They are not complete programs.
 Use the complete files and [browser prerequisites](../../tests/browser/README.md) to run them.
-The check compares each displayed excerpt with that exact source before the browser run.
+The check compares each displayed excerpt with the same source before the browser run.
 
 The synchronous route calls `renderToString` with the shared document tree:
 
@@ -100,12 +100,15 @@ window.hydrationRoot = hydrateRoot(
 );
 ```
 
-All three browser engines check the text before and after hydration.
-They also check shell and content element identity, shell child identity, and no hydration errors.
+All three browser engines check shell and protected text after shell hydration.
+For both streaming modes, they check fallback text before content is released.
+They then check resolved content after hydration and check that the shell/content nodes are the same.
+They also check shell child identity and no hydration errors.
 This includes NBSP, NNBSP, SHY, locale scopes, and protected text.
-The shared tree file gives these exact expected text values.
+The shared tree file gives these expected text values.
 JavaScript escapes identify NBSP, NNBSP, and SHY.
-The browser compares these values with actual DOM text in all three SSR modes.
+The browser checks shell, content, and protected values in all three SSR modes.
+It checks fallback values in both streaming modes.
 
 <!-- puncta:integration server-expected -->
 
@@ -126,9 +129,9 @@ The checked Node integration uses `react-dom/server.node` from React DOM 19.3.0.
 It supports `renderToPipeableStream` and `renderToReadableStream` in that environment.
 The API names do not give a support guarantee for an untested edge runtime.
 
-These excerpts belong to the same HTTP handler as the synchronous route.
+These excerpts are from the same HTTP handler as the synchronous route.
 `app` is the shared document tree, and `response` is the Node HTTP response.
-The handler creates `options`, tracks abort callbacks, and releases its test gate only after the browser observes the shell.
+The handler creates `options`, records abort callbacks, and releases its test gate only after the browser finds the shell.
 The complete source includes error and cleanup paths.
 
 <!-- puncta:integration server-pipeable -->
@@ -183,7 +186,7 @@ Client ownership also applies when the framework renders the client module durin
 
 The [runnable Next integration](../../examples/rsc/README.md#run) gives the build and server commands.
 It uses the public package exports without source aliases.
-The following partial excerpts come from its complete, type-checked source files.
+These excerpts are from its complete, type-checked source files.
 The RSC job checks their source relation and runs the production build in all three browsers.
 
 In [app/page.tsx](../../examples/rsc/app/page.tsx), `ServerText` processes Spanish text explicitly:
@@ -209,7 +212,7 @@ function ServerText() {
 ```
 
 The first paragraph contains `«ca\u00admi\u00adno»…` before JavaScript runs.
-The escapes identify actual SHY characters.
+The escapes identify SHY characters.
 They do not always cause a visible line break.
 
 In [app/client-panel.tsx](../../examples/rsc/app/client-panel.tsx), the client module owns its resources:
@@ -245,10 +248,10 @@ The same component supplies its local instance and state to the Provider.
       >
 ```
 
-The server passes a source string and ordinary Flight children slots to `ClientPanel`.
+The server passes a source string and Flight children slots to `ClientPanel`.
 Only serializable data crosses as configuration.
 Do not pass instances, locale modules, or callbacks from server code as props.
-Plain serializable settings can configure the client's local instance.
+Serializable settings can configure the client's local instance.
 
 The initial client text is `‘back\u00adbone’…`.
 Client controls change text, locale, hyphenation, and digit grouping.
@@ -257,7 +260,7 @@ The raw server sibling stays `"camino"...`.
 A client Provider does not supply server Context.
 
 The integration also imports `Puncta` in a server module as a Flight client reference.
-The package preserves `"use client"` for this boundary.
+The package keeps `"use client"` for this boundary.
 That reference can receive the client Provider's Context.
 It is not a server Provider or a server JSX adapter.
 
@@ -282,7 +285,7 @@ pnpm test:rsc
 `pnpm check` includes the Node SSR tests and installed documentation examples.
 The browser and RSC jobs are separate commands.
 The browser job checks all three SSR modes in each engine.
-The RSC job checks real Flight data, HTML without JavaScript, hydration, and interactive updates.
+The RSC job checks Flight data, HTML without JavaScript, hydration, and interactive updates.
 
 See the [browser instructions](../../tests/browser/README.md),
 [RSC instructions](../../examples/rsc/README.md), and
