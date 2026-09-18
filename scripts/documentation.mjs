@@ -50,6 +50,52 @@ export async function documentationExamples() {
   );
 }
 
+// Integration excerpts retain their complete runnable source as the execution boundary.
+export async function documentationIntegrations(job) {
+  const inventory = JSON.parse(
+    await readFile(join(root, inventoryPath), "utf8"),
+  );
+  const entries = inventory.integrations ?? [];
+  assert.equal(new Set(entries.map(({ id }) => id)).size, entries.length);
+  return Promise.all(
+    entries
+      .filter((entry) => !job || entry.job === job)
+      .map(async (entry) => {
+        assert.ok(
+          ["browser", "rsc"].includes(entry.job),
+          `${entry.id}: integration job required`,
+        );
+        const markdown = await readFile(join(root, entry.file), "utf8");
+        const marker = `<!-- puncta:integration ${entry.id} -->`;
+        assert.equal(
+          markdown.split(marker).length,
+          2,
+          `${entry.id}: unique integration marker required`,
+        );
+        const excerpt = markdown
+          .slice(markdown.indexOf(marker) + marker.length)
+          .match(/^\s*```(?:js|tsx)\n([\s\S]*?)\n```/)?.[1];
+        assert.ok(
+          excerpt,
+          `${entry.id}: displayed integration source required`,
+        );
+        const source = await readFile(join(root, entry.source), "utf8");
+        assert.equal(
+          source
+            .replace(/^[ \t]+/gm, "")
+            .split(excerpt.replace(/^[ \t]+/gm, "").trimEnd()).length,
+          2,
+          `${entry.id}: excerpt must occur exactly once in canonical source`,
+        );
+        return {
+          ...entry,
+          sourceSha256: createHash("sha256").update(source).digest("hex"),
+          excerptSha256: createHash("sha256").update(excerpt).digest("hex"),
+        };
+      }),
+  );
+}
+
 // The existing isolated registry owns package installation and command execution.
 // This module owns the relation between displayed source and checked output.
 export async function checkInstalledDocumentation({ cwd, env, run, packages }) {
@@ -244,6 +290,7 @@ export async function checkDocumentation() {
     );
   }
   const examples = await documentationExamples();
+  const integrations = await documentationIntegrations();
   assert.equal(
     new Set(examples.map((example) => example.id)).size,
     examples.length,
@@ -252,6 +299,16 @@ export async function checkDocumentation() {
   let links = 0;
   for (const file of pages) {
     const markdown = await readFile(join(root, file), "utf8");
+    for (const match of markdown.matchAll(
+      /^<!-- puncta:integration ([\w-]+) -->$/gm,
+    )) {
+      assert.ok(
+        integrations.some(
+          (entry) => entry.id === match[1] && entry.file === file,
+        ),
+        `${file}: unregistered integration ${match[1]}`,
+      );
+    }
     for (const match of markdown.matchAll(
       /^<!-- puncta:example ([\w-]+) -->$/gm,
     )) {
@@ -307,6 +364,11 @@ export async function checkDocumentation() {
       );
       for (const page of entry.pages)
         assert.ok(pages.has(page), `${entry.id}: unregistered page ${page}`);
+      for (const id of entry.integrations ?? [])
+        assert.ok(
+          integrations.some((integration) => integration.id === id),
+          `${entry.id}: missing integration ${id}`,
+        );
       for (const id of entry.examples)
         assert.ok(
           examples.some((example) => example.id === id),
@@ -315,7 +377,7 @@ export async function checkDocumentation() {
     }
   }
   console.log(
-    `Documentation: ${pages.size} pages, ${links} local file/anchor links, ${examples.length} displayed examples; ${inventory.coverage.filter((entry) => entry.status === "pending").length} coverage groups pending`,
+    `Documentation: ${pages.size} pages, ${links} local file/anchor links, ${examples.length} displayed examples, ${integrations.length} integration excerpts; ${inventory.coverage.filter((entry) => entry.status === "pending").length} coverage groups pending`,
   );
 }
 

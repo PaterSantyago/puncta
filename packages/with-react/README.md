@@ -56,36 +56,10 @@ and [pure removal reference](https://github.com/PaterSantyago/puncta/blob/codex/
 
 ## Server integration
 
-The server-rendering slice will move the existing integration details below to its guide.
-
-Node 24.21.0 and React/React DOM 19.3.0 checks cover `renderToString`,
-`renderToPipeableStream` and `renderToReadableStream` through the compatible
-`react-dom/server.node` entry. Controlled Suspense delays verify transformed bytes
-before content resolves, independent contexts, concurrent requests and abort/retry
-with original source ownership. See `docs/acceptance/ssr-streaming.md` in the repository
-for commands and React document-preamble buffering limits. The full Chromium,
-Firefox and WebKit suite (`pnpm test:browser`) covers the shared corpus, mounted
-updates/reorders and hydration for all three SSR modes. See
-`tests/browser/README.md` for the pinned browser builds and scope.
-
-In React Server Components, call `instance.text(source, options)` explicitly
-with server-owned locale modules and configuration. Import `Puncta` and
-`PunctaProvider` from the client entry in a client module, where you import its
-locales and create its own instance. Only serializable data and ordinary Flight
-children slots cross the boundary; never pass instances, locale modules or
-callbacks from the server. The client Provider supplies no server Context.
-The `/pure` entry does not turn arbitrary RSC trees into accessible JSX.
-
-The private `examples/rsc` consumer verifies this boundary using pinned Next.js
-16.3.5, application React/React DOM 19.3.0 and Node 24.21.0. Next App Router
-uses its bundled React; this fixture observes `19.3.0-canary-cbb046ab-20260731`
-on both server and client and records it separately. Its production build imports the
-public ESM exports without source aliases; actual Flight client references,
-HTML before JavaScript, hydration and interactive updates are checked in all
-three browsers (`pnpm build && pnpm test:rsc`). See
-[the integration instructions](../../examples/rsc/README.md). This is a tested
-consumer, not a guarantee for all framework versions or edge runtimes; no server
-JSX component or server Provider is supplied.
+Use the [server-rendering guide](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/guides/server-rendering.md)
+for synchronous SSR, hydration, streaming, Suspense, and RSC ownership.
+See [checked environments](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/compatibility.md#server-environments)
+and [the runnable RSC integration](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/examples/rsc/README.md).
 
 ## License
 

@@ -22,7 +22,9 @@
     "docs/reference/diagnostics.md",
     "docs/acceptance/documentation-111.md",
     "docs/guides/hyphenation.md",
-    "docs/acceptance/documentation-112.md"
+    "docs/acceptance/documentation-112.md",
+    "docs/guides/server-rendering.md",
+    "docs/acceptance/documentation-113.md"
   ],
   "examples": [
     {
@@ -348,6 +350,15 @@
         "@use-puncta/with-en-gb",
         "@use-puncta/with-react"
       ]
+    },
+    {
+      "id": "server-sync",
+      "file": "docs/guides/server-rendering.md",
+      "packages": [
+        "@use-puncta/core",
+        "@use-puncta/with-react",
+        "@use-puncta/with-en-gb"
+      ]
     }
   ],
   "coverage": [
@@ -498,9 +509,21 @@
     },
     {
       "id": "server-rendering",
-      "status": "pending",
+      "status": "covered",
       "issue": 113,
-      "scope": "SSR/hydration/streaming/RSC examples and actual browser checks."
+      "scope": "Synchronous core/SSR, three hydration modes, streaming/Suspense and separate RSC ownership. Canonical integration excerpts bind browser/RSC evidence to displayed source.",
+      "pages": ["docs/guides/server-rendering.md", "docs/compatibility.md"],
+      "examples": ["server-sync"],
+      "integrations": [
+        "server-string",
+        "server-hydrate",
+        "server-pipeable",
+        "server-readable",
+        "rsc-server",
+        "rsc-client",
+        "rsc-provider",
+        "server-expected"
+      ]
     },
     {
       "id": "diagnostics",
@@ -905,6 +928,56 @@
       "target": "docs/reference/settings.md#rule-fields-and-defaults",
       "status": "covered",
       "issue": 108
+    }
+  ],
+  "integrations": [
+    {
+      "id": "server-string",
+      "file": "docs/guides/server-rendering.md",
+      "source": "tests/browser/hydration-server.mjs",
+      "job": "browser"
+    },
+    {
+      "id": "server-hydrate",
+      "file": "docs/guides/server-rendering.md",
+      "source": "tests/browser/hydration-client.mjs",
+      "job": "browser"
+    },
+    {
+      "id": "server-pipeable",
+      "file": "docs/guides/server-rendering.md",
+      "source": "tests/browser/hydration-server.mjs",
+      "job": "browser"
+    },
+    {
+      "id": "server-readable",
+      "file": "docs/guides/server-rendering.md",
+      "source": "tests/browser/hydration-server.mjs",
+      "job": "browser"
+    },
+    {
+      "id": "rsc-server",
+      "file": "docs/guides/server-rendering.md",
+      "source": "examples/rsc/app/page.tsx",
+      "job": "rsc"
+    },
+    {
+      "id": "rsc-client",
+      "file": "docs/guides/server-rendering.md",
+      "source": "examples/rsc/app/client-panel.tsx",
+      "job": "rsc"
+    },
+    {
+      "id": "rsc-provider",
+      "file": "docs/guides/server-rendering.md",
+      "source": "examples/rsc/app/client-panel.tsx",
+      "job": "rsc"
+    },
+    {
+      "id": "server-expected",
+      "file": "docs/guides/server-rendering.md",
+      "source": "tests/browser/hydration-tree.mjs",
+      "job": "browser"
     }
   ]
 }

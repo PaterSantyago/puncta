@@ -31,11 +31,11 @@ public scaffold packages.
 | React adapter        | React peer range `^19.3.0`; add core directly if application code imports it. |
 | Node                 | Public package manifests declare no minimum Node version.                     |
 
-| Checked environment    | Evidence or limit                                                                                                                                    |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Node 24 consumer       | Existing isolated npm/pnpm package checks.                                                                                                           |
-| Documentation examples | Matching local archives; exact environment and results in the [slice report](acceptance/documentation-107.md).                                       |
-| Browser, SSR, and RSC  | Existing reports remain in the [first-version acceptance record](acceptance/first-version.md). Documentation-specific integration review is pending. |
+| Checked environment    | Evidence or limit                                                                                                                                                  |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Node 24 consumer       | Existing isolated npm/pnpm package checks.                                                                                                                         |
+| Documentation examples | Matching local archives; exact environment and results in the [slice report](acceptance/documentation-107.md).                                                     |
+| Browser, SSR, and RSC  | Existing reports remain in the [first-version acceptance record](acceptance/first-version.md). See the current [server evidence](acceptance/documentation-113.md). |
 
 Repository tool versions are Node 24.21.0 and pnpm 12.4.1. These pins do not define
 application runtime requirements. Support for CommonJS and untested environments is not
@@ -51,3 +51,25 @@ inspect the output of a custom component.
 The full feature limits and integration environments with test evidence are
 pending until their guide and reference sections are complete. See the
 [coverage record](acceptance/documentation-coverage.json) for pending work.
+
+## Server environments
+
+The [server guide](guides/server-rendering.md) covers the checked integration paths.
+These are tested environments, not general runtime guarantees.
+
+| Path              | Checked environment                                                      | Scope                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| Node SSR          | Node 24.21.0, React/React DOM 19.3.0                                     | `renderToString`, `renderToPipeableStream`, `renderToReadableStream` through `react-dom/server.node`        |
+| Browser hydration | Playwright 1.58.2, Chromium, Firefox, WebKit                             | All three SSR modes, early shell/fallback, resolved content, node identity, no hydration errors             |
+| RSC               | Next.js 16.3.5 production App Router, application React/React DOM 19.3.0 | Flight client references, HTML without JavaScript, hydration, client updates, separate server configuration |
+| Framework React   | `19.3.0-canary-cbb046ab-20260731`                                        | Next's bundled server and client React, recorded separately from application dependencies                   |
+
+The [slice evidence](acceptance/documentation-113.md) records exact browser versions, revisions, commands, and limits.
+The repository lockfile pins these dependencies.
+The browser and RSC commands remain separate from `pnpm check`.
+No general Next.js-version or edge-runtime support promise follows from this fixture.
+
+The client entry supplies no server Provider or server JSX adapter.
+An instance or locale module cannot cross the RSC boundary as a serialized prop.
+Opaque component output stays outside an outer Puncta transformation.
+The pure entry does not provide arbitrary RSC-tree traversal.

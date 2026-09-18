@@ -8,7 +8,10 @@ import { arch, platform, release } from "node:os";
 import { dirname, resolve } from "node:path";
 import { build } from "esbuild";
 import { chromium, firefox, webkit } from "playwright";
-import { documentationExamples } from "../../scripts/documentation.mjs";
+import {
+  documentationExamples,
+  documentationIntegrations,
+} from "../../scripts/documentation.mjs";
 import { createHydrationServer } from "./hydration-server.mjs";
 import { expected } from "./hydration-tree.mjs";
 
@@ -102,6 +105,7 @@ window.runDocumentationCheck = async () => {
   ],
 });
 bundles.set("/documentation.js", documentationBundle.outputFiles[0].text);
+const documentedIntegrations = await documentationIntegrations("browser");
 const hydration = createHydrationServer();
 const server = createServer((request, response) => {
   if (/^\/(ssr|pipeable|readable)\//.test(request.url)) {
@@ -307,6 +311,7 @@ try {
           output: documentation,
         },
         hydration: hydrationChecks,
+        documentedIntegrations,
       };
       report.browsers.push(result);
       console.log(JSON.stringify({ ...result, shared: shared.length }));

@@ -8,6 +8,9 @@ import { dirname, resolve } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { chromium, firefox, webkit } from "playwright";
 
+import { documentationIntegrations } from "../../scripts/documentation.mjs";
+
+const documentedIntegrations = await documentationIntegrations("rsc");
 const consumer = resolve("examples/rsc");
 const require = createRequire(`${consumer}/package.json`);
 const workspaceRequire = createRequire(import.meta.url);
@@ -66,6 +69,7 @@ const report = {
   reactDom: require("react-dom/package.json").version,
   playwright: workspaceRequire("playwright/package.json").version,
   browsers: [],
+  documentedIntegrations,
 };
 const initial = {
   "client-text": "‘back\u00adbone’…",

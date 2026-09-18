@@ -165,3 +165,26 @@ For HTML, use `format: "html"`. For React, use the pure removal function and an 
 Check protected text, automatic technical tokens, attributes, disabled scopes, unavailable languages, and opaque React components.
 These regions keep SHY. A child cannot cancel inherited protection.
 See [separate removal examples](guides/hyphenation.md#remove-shy-from-text).
+
+## Hydration output does not match
+
+Compare the original server and client children, locale packages, and settings.
+Create a local instance in each environment from the same inputs.
+Do not serialize an instance or locale module as a prop.
+Check for React recoverable errors with the [shared hydration integration](guides/server-rendering.md#hydration-and-ownership).
+
+## Stream content does not arrive with the shell
+
+A pending Suspense boundary can emit its fallback first.
+`renderToString` does not wait for the content.
+With a stream API, check React's document envelope and transport buffering.
+See [streaming and Suspense](guides/server-rendering.md#streaming-and-suspense).
+Puncta does not control when the transport sends bytes.
+
+## Client settings do not change Server Component text
+
+A Server Component uses server configuration before the client attaches.
+Client Provider changes cannot reprocess that server-owned text.
+Use explicit server calls or let a client component own the source and instance.
+See [RSC ownership](guides/server-rendering.md#react-server-components).
+An outer `Puncta` or `/pure` call does not inspect arbitrary component output.

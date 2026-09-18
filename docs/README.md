@@ -25,9 +25,7 @@ For React, follow the [React quick start](getting-started/react.md).
 
 - [Insert and remove soft hyphens](guides/hyphenation.md).
 
-The server rendering guide is pending.
-Existing details remain in the [core package instructions](../packages/core/README.md)
-and [React package instructions](../packages/with-react/README.md).
+- [Use SSR, hydration, streaming, and Server Components](guides/server-rendering.md).
 
 ## Look up the API
 
