@@ -1,0 +1,211 @@
+import assert from "node:assert/strict";
+import { readdir, readFile, mkdir, writeFile } from "node:fs/promises";
+import { dirname, join, relative, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = fileURLToPath(new URL("../", import.meta.url));
+const inventoryPath = "docs/acceptance/documentation-coverage.json";
+
+export async function documentationExamples() {
+  const inventory = JSON.parse(
+    await readFile(join(root, inventoryPath), "utf8"),
+  );
+  return Promise.all(
+    inventory.examples.map(async ({ id, file, packages }) => {
+      const markdown = await readFile(join(root, file), "utf8");
+      function block(kind) {
+        const marker = `<!-- puncta:${kind} ${id} -->`;
+        assert.equal(
+          markdown.split(marker).length,
+          2,
+          `${file}: unique ${marker}`,
+        );
+        const match = markdown
+          .slice(markdown.indexOf(marker) + marker.length)
+          .match(/^\s*```([^\n]+)\n([\s\S]*?)\n```/);
+        assert.ok(match, `${file}: fenced block must follow ${marker}`);
+        return { language: match[1], source: match[2] };
+      }
+      const source = block("example");
+      const output = block("output");
+      assert.ok(
+        ["ts", "tsx"].includes(source.language),
+        `${id}: TypeScript source required`,
+      );
+      assert.equal(
+        output.language,
+        "text",
+        `${id}: output must be labelled text`,
+      );
+      return {
+        id,
+        file,
+        packages,
+        language: source.language,
+        source: source.source,
+        output: `${output.source}\n`,
+      };
+    }),
+  );
+}
+
+// The existing isolated registry owns package installation and command execution.
+// This module owns the relation between displayed source and checked output.
+export async function checkInstalledDocumentation({ cwd, env, run, packages }) {
+  const examples = (await documentationExamples()).filter((example) =>
+    example.packages.every((name) => packages.includes(name)),
+  );
+  assert.ok(examples.length, "No documentation examples match this consumer");
+  const directory = join(cwd, "documentation");
+  await mkdir(directory, { recursive: true });
+  for (const example of examples) {
+    await writeFile(
+      join(directory, `${example.id}.${example.language}`),
+      example.source,
+    );
+  }
+  await writeFile(
+    join(directory, "tsconfig.json"),
+    JSON.stringify({
+      compilerOptions: {
+        target: "ES2022",
+        module: "NodeNext",
+        moduleResolution: "NodeNext",
+        jsx: "react-jsx",
+        strict: true,
+        outDir: "compiled",
+      },
+      include: ["*.ts", "*.tsx"],
+    }),
+  );
+  await run(
+    join(cwd, "node_modules/.bin/tsc"),
+    ["--project", join(directory, "tsconfig.json")],
+    cwd,
+    env,
+  );
+  for (const example of examples) {
+    const output = await run(
+      process.execPath,
+      [join(directory, "compiled", `${example.id}.js`)],
+      cwd,
+      env,
+    );
+    assert.equal(
+      output,
+      example.output,
+      `${example.file}: ${example.id} documented output`,
+    );
+  }
+  console.log(
+    `Documentation: ${examples.length} displayed examples type-checked and executed (${packages.join(", ")})`,
+  );
+}
+
+function headings(markdown) {
+  const seen = new Map();
+  const anchors = new Set();
+  for (const match of markdown
+    .replace(/```[\s\S]*?```/g, "")
+    .matchAll(/^#{1,6}\s+(.+)$/gm)) {
+    const slug = match[1]
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}_\-\s]/gu, "")
+      .replace(/\s/g, "-");
+    const count = seen.get(slug) ?? 0;
+    seen.set(slug, count + 1);
+    anchors.add(count ? `${slug}-${count}` : slug);
+  }
+  return anchors;
+}
+
+export async function checkDocumentation() {
+  const inventory = JSON.parse(
+    await readFile(join(root, inventoryPath), "utf8"),
+  );
+  const pages = new Set(["README.md", "CONTRIBUTING.md", ...inventory.pages]);
+  for (const name of await readdir(join(root, "packages"))) {
+    if ((await readdir(join(root, "packages", name))).includes("README.md"))
+      pages.add(`packages/${name}/README.md`);
+  }
+  const examples = await documentationExamples();
+  assert.equal(
+    new Set(examples.map((example) => example.id)).size,
+    examples.length,
+    "Unique example IDs required",
+  );
+  let links = 0;
+  for (const file of pages) {
+    const markdown = await readFile(join(root, file), "utf8");
+    for (const match of markdown.matchAll(
+      /^<!-- puncta:example ([\w-]+) -->$/gm,
+    )) {
+      assert.ok(
+        examples.some(
+          (example) => example.id === match[1] && example.file === file,
+        ),
+        `${file}: unregistered example ${match[1]}`,
+      );
+    }
+    for (const match of markdown
+      .replace(/```[\s\S]*?```/g, "")
+      .matchAll(/\[[^\]]*\]\(([^)\s]+)\)/g)) {
+      let href = match[1];
+      const branchPrefix =
+        "https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/";
+      let base = dirname(join(root, file));
+      if (href.startsWith(branchPrefix)) {
+        href = href.slice(branchPrefix.length);
+        base = root;
+      } else if (/^[a-z]+:/i.test(href)) continue;
+      const [path, fragment] = href.split("#");
+      const target = resolve(
+        base,
+        decodeURIComponent(path || file.split("/").at(-1)),
+      );
+      assert.ok(
+        !relative(root, target).startsWith(".."),
+        `${file}: link outside repository`,
+      );
+      const contents = await readFile(target, "utf8");
+      if (fragment)
+        assert.ok(
+          headings(contents).has(decodeURIComponent(fragment)),
+          `${file}: missing anchor ${href}`,
+        );
+      links++;
+    }
+  }
+  for (const entry of inventory.coverage) {
+    assert.ok(
+      ["covered", "pending"].includes(entry.status),
+      `${entry.id}: coverage status`,
+    );
+    assert.ok(
+      entry.issue && entry.scope,
+      `${entry.id}: issue and scope required`,
+    );
+    if (entry.status === "covered") {
+      assert.ok(
+        entry.pages?.length && entry.examples?.length,
+        `${entry.id}: checked coverage needs pages and examples`,
+      );
+      for (const page of entry.pages)
+        assert.ok(pages.has(page), `${entry.id}: unregistered page ${page}`);
+      for (const id of entry.examples)
+        assert.ok(
+          examples.some((example) => example.id === id),
+          `${entry.id}: missing example ${id}`,
+        );
+    }
+  }
+  console.log(
+    `Documentation: ${pages.size} pages, ${links} local file/anchor links, ${examples.length} displayed examples; ${inventory.coverage.filter((entry) => entry.status === "pending").length} coverage groups pending`,
+  );
+}
+
+if (
+  process.argv[1] &&
+  resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+)
+  await checkDocumentation();

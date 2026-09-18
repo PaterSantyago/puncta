@@ -1,0 +1,117 @@
+{
+  "baseline": "83b8c7acd5d6cfbe33c47f87c4c26f050628415f",
+  "pages": [
+    "docs/README.md",
+    "docs/getting-started/installation.md",
+    "docs/getting-started/text-and-html.md",
+    "docs/compatibility.md",
+    "docs/acceptance/documentation-107.md"
+  ],
+  "examples": [
+    {
+      "id": "first-result",
+      "file": "README.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "text-start",
+      "file": "docs/getting-started/text-and-html.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "html-start",
+      "file": "docs/getting-started/text-and-html.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "package-core",
+      "file": "packages/core/README.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "package-with-en-gb",
+      "file": "packages/with-en-gb/README.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-en-gb"]
+    },
+    {
+      "id": "package-with-es-es",
+      "file": "packages/with-es-es/README.md",
+      "packages": ["@use-puncta/core", "@use-puncta/with-es-es"]
+    }
+  ],
+  "coverage": [
+    {
+      "id": "installation-first-result",
+      "status": "covered",
+      "issue": 107,
+      "scope": "Displayed text/HTML first results; direct core and selected locale imports; local archive installation. Public release remains pending.",
+      "pages": [
+        "README.md",
+        "docs/getting-started/installation.md",
+        "docs/getting-started/text-and-html.md"
+      ],
+      "examples": [
+        "first-result",
+        "text-start",
+        "html-start",
+        "package-core",
+        "package-with-en-gb",
+        "package-with-es-es"
+      ]
+    },
+    {
+      "id": "core-settings-locales",
+      "status": "pending",
+      "issue": 108,
+      "scope": "All public core exports/types/overloads, configuration surfaces/defaults/reset and ten non-grouping typography rules; compare source/declarations."
+    },
+    {
+      "id": "html-protection",
+      "status": "pending",
+      "issue": 109,
+      "scope": "HTML modes/context/markers and UTF-16/grapheme protection."
+    },
+    {
+      "id": "react",
+      "status": "pending",
+      "issue": 110,
+      "scope": "All React exports/types/scopes, pure functions, mounted behavior."
+    },
+    {
+      "id": "digit-grouping",
+      "status": "pending",
+      "issue": 111,
+      "scope": "Rule defaults, locale differences, exclusions and diagnostics."
+    },
+    {
+      "id": "hyphenation",
+      "status": "pending",
+      "issue": 112,
+      "scope": "Insertion and text/HTML/React removal, minima, resources and language evidence."
+    },
+    {
+      "id": "server-rendering",
+      "status": "pending",
+      "issue": 113,
+      "scope": "SSR/hydration/streaming/RSC examples and actual browser checks."
+    },
+    {
+      "id": "diagnostics",
+      "status": "pending",
+      "issue": 114,
+      "scope": "Complete error/warning catalogue, result/source/edit/range types, source comparison, troubleshooting."
+    },
+    {
+      "id": "complete-acceptance",
+      "status": "pending",
+      "issue": 115,
+      "scope": "Complete export/type/option/default/rule/code inventory source comparison; reader journeys; language review; release candidate."
+    },
+    {
+      "id": "public-installation",
+      "status": "pending",
+      "issue": 116,
+      "scope": "Functional release versions/tags; npm/pnpm public installation; blocked until publication."
+    }
+  ]
+}

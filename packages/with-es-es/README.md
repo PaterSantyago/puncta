@@ -1,5 +1,44 @@
 # @use-puncta/with-es-es
 
+The Spanish from Spain locale for Puncta. Named ESM export: `esEs`.
+
+**Unreleased functional version.** Public `0.1.0-alpha.0` is the historical
+scaffold and does not have this API.
+
+## Start
+
+Install `@use-puncta/core` and `@use-puncta/with-es-es` as direct dependencies.
+Use the compatible functional release versions when they are available. The
+[installation page](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/installation.md)
+contains the npm and pnpm command templates and current release status.
+
+<!-- puncta:example package-with-es-es -->
+
+```ts
+import { createPuncta } from "@use-puncta/core";
+import { esEs } from "@use-puncta/with-es-es";
+
+const puncta = createPuncta({ locales: [esEs], locale: esEs.id });
+console.log(puncta.text("Wait..."));
+```
+
+Output:
+
+<!-- puncta:output package-with-es-es -->
+
+```text
+Wait…
+```
+
+See the [quick start](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/text-and-html.md)
+and [documentation index](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/README.md).
+Release-specific URLs are pending. These links point to the documentation branch.
+
+## Existing reference material
+
+The following material is retained until the dedicated reference pages are
+complete. Its migration and full documentation review are pending.
+
 Explicitly installed es-es locale module. Named ESM export: `esEs`.
 
 ```ts

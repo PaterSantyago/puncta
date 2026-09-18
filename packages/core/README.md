@@ -1,5 +1,44 @@
 # @use-puncta/core
 
+Synchronous text and HTML typography with an explicitly selected locale.
+
+**Unreleased functional version.** Public `0.1.0-alpha.0` is the historical
+scaffold and does not have this API.
+
+## Start
+
+Install `@use-puncta/core` and `@use-puncta/with-en-gb` as direct dependencies.
+Use the compatible functional release versions when they are available. The
+[installation page](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/installation.md)
+contains the npm and pnpm command templates and current release status.
+
+<!-- puncta:example package-core -->
+
+```ts
+import { createPuncta } from "@use-puncta/core";
+import { enGb } from "@use-puncta/with-en-gb";
+
+const puncta = createPuncta({ locales: [enGb], locale: enGb.id });
+console.log(puncta.text("Wait..."));
+```
+
+Output:
+
+<!-- puncta:output package-core -->
+
+```text
+Wait…
+```
+
+See the [quick start](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/getting-started/text-and-html.md)
+and [documentation index](https://github.com/PaterSantyago/puncta/blob/codex/user-documentation/docs/README.md).
+Release-specific URLs are pending. These links point to the documentation branch.
+
+## Existing reference material
+
+The following material is retained until the dedicated reference pages are
+complete. Its migration and full documentation review are pending.
+
 Synchronous ESM typography, with explicitly installed locales and no React or DOM
 requirement. The implementation covers quotes, apostrophes, ordinary spaces, punctuation intervals,
 ellipses, dashes, ranges, minus, units, percentages and currencies, plus optional

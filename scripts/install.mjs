@@ -10,6 +10,7 @@ import {
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { checkInstalledDocumentation } from "./documentation.mjs";
 import { isolatedPackageEnvironment } from "./package-environment.mjs";
 import { registryFixture } from "./registry-fixture.mjs";
 import { publicPackages } from "./workspace.mjs";
@@ -168,6 +169,40 @@ try {
     await publish(core.archive);
     for (const { archive, name } of archives) {
       if (name !== core.name && name !== adapter.name) await publish(archive);
+    }
+  }
+  // First-result consumers have only the documented core/locale dependencies.
+  for (const manager of ["npm", "pnpm"]) {
+    for (const id of ["en-gb", "es-es"]) {
+      const cwd = join(temporary, `${manager}-documentation-${id}`);
+      await mkdir(cwd);
+      const names = [core.name, `@use-puncta/with-${id}`];
+      await writeFile(
+        join(cwd, "package.json"),
+        JSON.stringify({
+          name: `documentation-${id}`,
+          private: true,
+          type: "module",
+          dependencies: Object.fromEntries(
+            names.map((name) => [
+              name,
+              archives.find((archive) => archive.name === name).version,
+            ]),
+          ),
+          devDependencies: { typescript: "7.0.2" },
+        }),
+      );
+      const env = isolatedPackageEnvironment(cwd, environment);
+      const args = ["install", "--ignore-scripts", "--registry", registry];
+      if (manager === "pnpm")
+        args.push(
+          "--store-dir",
+          join(cwd, "store"),
+          "--strict-peer-dependencies",
+        );
+      await run(manager, args, cwd, env);
+      await checkInstalledDocumentation({ cwd, env, run, packages: names });
+      console.log(`${manager}: first-result core/${id} consumer verified`);
     }
   }
   for (const manager of ["npm", "pnpm"]) {
