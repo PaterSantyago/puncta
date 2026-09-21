@@ -8,10 +8,11 @@ This page separates declared requirements from checked environments.
 
 | Version         | Status                                                                           |
 | --------------- | -------------------------------------------------------------------------------- |
+| `0.1.0-alpha.2` | Documentation correction. The API is unchanged from `0.1.0-alpha.1`.             |
 | `0.1.0-alpha.1` | Published functional alpha for all four packages. Public npm/pnpm checks passed. |
 | `0.1.0-alpha.0` | Historical scaffold. It does not have the functional API in this guide.          |
 
-The functional release tags identify commit `932ab23b959c92eef435cca7fb55a08ec12d93bc`:
+The original `0.1.0-alpha.1` functional release tags identify commit `932ab23b959c92eef435cca7fb55a08ec12d93bc`:
 
 - [Core release documentation](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fcore%400.1.0-alpha.1/docs/README.md).
 - [React release documentation](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/README.md).
@@ -20,13 +21,14 @@ The functional release tags identify commit `932ab23b959c92eef435cca7fb55a08ec12
 
 The [successful publication run](https://github.com/PaterSantyago/puncta/actions/runs/35367122861)
 and [public-installation report](acceptance/documentation-116.md) record the checks.
-At publication, `next` selects `0.1.0-alpha.1` and `latest` selects `0.1.0-alpha.0`.
+At the original `0.1.0-alpha.1` publication, `next` selects `0.1.0-alpha.1` and `latest` selects `0.1.0-alpha.0`.
 Use the exact versions in the [current installation instructions](getting-started/installation.md).
 
-The immutable release snapshots and README files inside the published archives
-keep their original pre-publication notices and installation placeholders.
-Their API examples match `alpha.1`. This current guide corrects the notices and
-commands; it does not replace published archives or move release tags.
+The immutable `0.1.0-alpha.1` snapshots and archives keep their original
+pre-publication notices and installation placeholders. Their API examples match
+`alpha.1`. Version `0.1.0-alpha.2` corrects the README notices, installation
+commands, and links to version-specific documentation. Earlier archives and tags
+are unchanged.
 
 For historical scaffold documentation, use these tags at commit
 `01362421c190d80719932e5a878fdc99762bbd70`:
@@ -50,7 +52,7 @@ See [the scaffold publication record](https://github.com/PaterSantyago/puncta/is
 | Checked environment    | Evidence or limit                                                                                                                                                 |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Node 24 consumer       | Public npm/pnpm installation checks for `0.1.0-alpha.1`.                                                                                                          |
-| Documentation examples | Published packages. See the [public-installation report](acceptance/documentation-116.md) for the environment and results.                                        |
+| Documentation examples | Published `0.1.0-alpha.1` packages. See the [public-installation report](acceptance/documentation-116.md) for the environment and results.                        |
 | Browser, SSR, and RSC  | Historical reports are in the [first-version acceptance record](acceptance/first-version.md). See the current [server evidence](acceptance/documentation-113.md). |
 
 Repository tool versions are Node 24.21.0 and pnpm 12.4.1. These pins do not define

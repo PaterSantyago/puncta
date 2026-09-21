@@ -6,7 +6,7 @@ Use this guide after the [React quick start](../getting-started/react.md).
 Install matching functional core, adapter, and selected locale packages.
 Your application must supply React and React DOM for SSR.
 See [installation](../getting-started/installation.md) and [checked environments](../compatibility.md#server-environments).
-The functional API is available in `0.1.0-alpha.1`.
+The functional API is available in `0.1.0-alpha.2`.
 
 ## Synchronous server calls
 

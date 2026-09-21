@@ -3,7 +3,7 @@
 [Product entry](../README.md)
 
 Use Puncta to apply the typography rules of a selected locale.
-This guide describes functional alpha `0.1.0-alpha.1`.
+This guide describes functional alpha `0.1.0-alpha.2`.
 
 ## Start
 

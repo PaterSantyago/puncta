@@ -4,7 +4,7 @@
 
 Install core, the React adapter, and a locale from the same functional package set.
 Use the [npm or pnpm installation procedure](installation.md).
-This guide describes functional alpha `0.1.0-alpha.1`.
+This guide describes functional alpha `0.1.0-alpha.2`.
 Your application supplies React and React DOM.
 
 ## Prepare an instance and process children

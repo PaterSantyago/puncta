@@ -3,7 +3,7 @@
 Puncta prepares text for publication with the typography rules of the selected
 locale. Use it with plain text, HTML strings, or React children.
 
-**Functional alpha `0.1.0-alpha.1` is published.** Install the exact versions in the
+This guide is for functional alpha `0.1.0-alpha.2`. Install the exact versions in the
 [installation instructions](docs/getting-started/installation.md).
 The earlier `0.1.0-alpha.0` packages contain the scaffold and do not have this API.
 
