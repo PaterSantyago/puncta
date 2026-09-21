@@ -27,7 +27,8 @@
     "docs/acceptance/documentation-113.md",
     "docs/acceptance/documentation-114.md",
     "docs/acceptance/documentation-115.md",
-    "docs/acceptance/documentation-116.md"
+    "docs/acceptance/documentation-116.md",
+    "docs/acceptance/documentation-116-alpha2.md"
   ],
   "examples": [
     {
@@ -388,7 +389,7 @@
       "id": "installation-first-result",
       "status": "covered",
       "issue": 107,
-      "scope": "Displayed text/HTML first results; direct core and selected locale imports; local archive installation. Public release remains pending.",
+      "scope": "Displayed text/HTML first results; direct core and selected locale imports; local archive installation. Public installation evidence is recorded in the public-installation group.",
       "pages": [
         "README.md",
         "docs/getting-started/installation.md",
@@ -589,10 +590,11 @@
     },
     {
       "id": "public-installation",
-      "status": "pending",
+      "status": "covered",
       "issue": 116,
-      "scope": "Public alpha.1 installation, examples, archive hashes, provenance, and tag/link checks passed. Current source notices are corrected. Acceptance remains pending for immutable published README notices and documentation-branch links; no publication or scope waiver is authorized.",
+      "scope": "Public alpha.2 installation, displayed examples, archive README contents, hashes, provenance, and release/tag links passed. The explicitly authorized corrective publication resolves the alpha.1 README limitation.",
       "pages": [
+        "docs/acceptance/documentation-116-alpha2.md",
         "docs/acceptance/documentation-116.md",
         "docs/getting-started/installation.md",
         "docs/compatibility.md"
