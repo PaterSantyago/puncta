@@ -127,6 +127,465 @@ async function fixture() {
   }
   return { ...f, cwd, bundle, state, plan, archives, commit, run };
 }
+
+// Keep real npm writes and archive bytes; intercept only the registry boundary.
+async function publicationProxy(f, intercept) {
+  const { createServer, request: forward } = await import("node:http");
+  const proxy = createServer(async (request, response) => {
+    if (await intercept(request, response)) {
+      request.resume();
+      return;
+    }
+    const upstream = forward(
+      `${f.registry}${request.url}`,
+      {
+        method: request.method,
+        headers: {
+          ...request.headers,
+          host: new URL(f.registry).host,
+          "accept-encoding": "identity",
+        },
+      },
+      (received) => {
+        const chunks = [];
+        received.on("data", (chunk) => chunks.push(chunk));
+        received.on("end", () => {
+          let body = Buffer.concat(chunks);
+          if (received.headers["content-type"]?.includes("application/json"))
+            body = Buffer.from(
+              body.toString().replaceAll(f.registry, registry),
+            );
+          const headers = {
+            ...received.headers,
+            "content-length": body.length,
+          };
+          delete headers["transfer-encoding"];
+          response.writeHead(received.statusCode, headers);
+          response.end(body);
+        });
+      },
+    );
+    upstream.on("error", () => {
+      response.writeHead(502);
+      response.end();
+    });
+    request.pipe(upstream);
+  });
+  await new Promise((done) => proxy.listen(0, "127.0.0.1", done));
+  const registry = `http://127.0.0.1:${proxy.address().port}`;
+  const npmrc = join(f.directory, "readiness-npmrc");
+  await writeFile(
+    npmrc,
+    (await readFile(f.env.NPM_CONFIG_USERCONFIG, "utf8")).replaceAll(
+      new URL(f.registry).host,
+      new URL(registry).host,
+    ),
+  );
+  return {
+    registry,
+    env: {
+      ...f.env,
+      NPM_CONFIG_USERCONFIG: npmrc,
+      NPM_CONFIG_FETCH_RETRIES: "0",
+    },
+    close: () => new Promise((done) => proxy.close(done)),
+  };
+}
+
+test("publication waits for delayed version, archive, tags and index without another publish", async () => {
+  const f = await fixture();
+  const core = f.plan.packages.find((p) => p.name === "@use-puncta/core");
+  let published = false;
+  const writes = [];
+  const delayed = new Set();
+  const proxy = await publicationProxy(f, (request, response) => {
+    const path = decodeURIComponent(request.url);
+    if (request.method === "PUT" && !path.startsWith("/-/")) {
+      writes.push(path);
+      published = true;
+    }
+    if (request.method !== "GET") return false;
+    // Stop at the next package, after all readiness gates for core have passed.
+    if (path.startsWith("/@use-puncta/with-en-gb")) {
+      response.writeHead(401);
+      response.end();
+      return true;
+    }
+    const stage =
+      path === `/@use-puncta/core/${core.version}`
+        ? "version"
+        : path.endsWith(".tgz")
+          ? "archive"
+          : path === "/-/package/@use-puncta/core/dist-tags"
+            ? "tags"
+            : path === "/@use-puncta/core"
+              ? "index"
+              : undefined;
+    if (!published || !stage || delayed.has(stage)) return false;
+    delayed.add(stage);
+    response.writeHead(stage === "tags" || stage === "index" ? 200 : 404, {
+      "content-type": "application/json",
+    });
+    response.end(
+      JSON.stringify(
+        stage === "index"
+          ? { name: core.name, versions: {}, "dist-tags": {} }
+          : {},
+      ),
+    );
+    return true;
+  });
+  try {
+    const result = await f.run(["--registry", proxy.registry], proxy.env);
+    assert.notEqual(result.code, 0);
+    assert.match(
+      result.output,
+      /Registry lookup failed for @use-puncta\/with-en-gb: 401/,
+    );
+    assert.deepEqual([...delayed].sort(), [
+      "archive",
+      "index",
+      "tags",
+      "version",
+    ]);
+    assert.deepEqual(writes, ["/@use-puncta/core"]);
+    const report = JSON.parse(await readFile(join(f.state, "result.json")));
+    assert.equal(report.packages[0].status, "published");
+    assert.equal(report.packages[0].distTags.next, core.version);
+    assert.equal(git(f.cwd, "tag", "--list"), "");
+  } finally {
+    await proxy.close();
+    await f.close();
+  }
+});
+test("accepted publication survives readiness timeouts and repeated recovery without republishing", async () => {
+  const f = await fixture();
+  const core = f.plan.packages.find((p) => p.name === "@use-puncta/core");
+  let hidden = true;
+  const writes = [];
+  const proxy = await publicationProxy(f, (request, response) => {
+    const path = decodeURIComponent(request.url);
+    if (request.method === "PUT" && !path.startsWith("/-/")) writes.push(path);
+    if (request.method !== "GET") return false;
+    if (hidden && path === `/@use-puncta/core/${core.version}`) {
+      response.writeHead(404);
+      response.end();
+      return true;
+    }
+    if (path.startsWith("/@use-puncta/with-en-gb")) {
+      response.writeHead(403);
+      response.end();
+      return true;
+    }
+    return false;
+  });
+  try {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const result = await f.run(
+        ["--registry", proxy.registry, "--registry-wait-ms", "2500"],
+        proxy.env,
+      );
+      assert.notEqual(result.code, 0);
+      assert.match(result.output, /Registry readiness timed out/);
+      const report = JSON.parse(await readFile(join(f.state, "result.json")));
+      assert.equal(report.status, "incomplete");
+      assert.equal(report.packages[0].accepted, true);
+      assert.deepEqual(writes, ["/@use-puncta/core"]);
+      assert.equal(git(f.cwd, "tag", "--list"), "");
+    }
+    hidden = false;
+    const recovered = await f.run(["--registry", proxy.registry], proxy.env);
+    assert.match(
+      recovered.output,
+      /Registry lookup failed for @use-puncta\/with-en-gb: 403/,
+    );
+    const report = JSON.parse(await readFile(join(f.state, "result.json")));
+    assert.equal(report.packages[0].status, "matched");
+    assert.deepEqual(writes, ["/@use-puncta/core"]);
+  } finally {
+    await proxy.close();
+    await f.close();
+  }
+});
+
+test("an existing version with a delayed archive is remembered before recovery", async () => {
+  const f = await fixture();
+  const core = f.archives.find((p) => p.name === "@use-puncta/core");
+  execFileSync(
+    "npm",
+    [
+      "publish",
+      join(f.bundle, core.file),
+      "--registry",
+      f.registry,
+      "--tag",
+      "next",
+      "--ignore-scripts",
+    ],
+    { env: f.env, stdio: "pipe" },
+  );
+  let hideVersion = false;
+  const writes = [];
+  const proxy = await publicationProxy(f, (request, response) => {
+    const path = decodeURIComponent(request.url);
+    if (request.method === "PUT" && !path.startsWith("/-/")) writes.push(path);
+    if (
+      request.method === "GET" &&
+      (path.endsWith(".tgz") ||
+        (hideVersion && path === `/@use-puncta/core/${core.version}`))
+    ) {
+      response.writeHead(404);
+      response.end();
+      return true;
+    }
+    return false;
+  });
+  try {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const result = await f.run(
+        ["--registry", proxy.registry, "--registry-wait-ms", "1000"],
+        proxy.env,
+      );
+      assert.match(result.output, /Registry readiness timed out/);
+      const report = JSON.parse(await readFile(join(f.state, "result.json")));
+      assert.equal(report.packages[0].accepted, true);
+      assert.deepEqual(writes, []);
+      hideVersion = true;
+    }
+  } finally {
+    await proxy.close();
+    await f.close();
+  }
+});
+
+test("recovery remembers accepted packages from attempts that a later timeout never reached", async () => {
+  const f = await fixture();
+  const core = f.plan.packages.find((p) => p.name === "@use-puncta/core");
+  const locale = f.plan.packages.find(
+    (p) => p.name === "@use-puncta/with-en-gb",
+  );
+  let hideCore = false;
+  const writes = [];
+  const proxy = await publicationProxy(f, (request, response) => {
+    const path = decodeURIComponent(request.url);
+    if (request.method === "PUT" && !path.startsWith("/-/")) writes.push(path);
+    if (
+      request.method === "GET" &&
+      (path === `/@use-puncta/with-en-gb/${locale.version}` ||
+        (hideCore && path === `/@use-puncta/core/${core.version}`))
+    ) {
+      response.writeHead(404);
+      response.end();
+      return true;
+    }
+    return false;
+  });
+  try {
+    for (const [hidden, budget] of [
+      [false, "3000"],
+      [true, "500"],
+      [false, "500"],
+    ]) {
+      hideCore = hidden;
+      const result = await f.run(
+        ["--registry", proxy.registry, "--registry-wait-ms", budget],
+        proxy.env,
+      );
+      assert.match(result.output, /Registry readiness timed out/);
+      assert.deepEqual(writes, [
+        "/@use-puncta/core",
+        "/@use-puncta/with-en-gb",
+      ]);
+    }
+    const report = JSON.parse(await readFile(join(f.state, "result.json")));
+    assert.equal(report.packages[1].accepted, true);
+    assert.equal(report.attempts[1].packages.length, 1);
+  } finally {
+    await proxy.close();
+    await f.close();
+  }
+});
+
+test("temporary registry failures retry but authorization failures stop before publication", async () => {
+  const f = await fixture();
+  const statuses = [503, 429, 401];
+  const observed = [];
+  const proxy = await publicationProxy(f, (request, response) => {
+    const status = statuses[observed.length] ?? 401;
+    observed.push(request.method);
+    response.writeHead(status);
+    response.end();
+    return true;
+  });
+  try {
+    const result = await f.run(["--registry", proxy.registry], proxy.env);
+    assert.notEqual(result.code, 0);
+    assert.match(
+      result.output,
+      /Registry lookup failed for @use-puncta\/core: 401/,
+    );
+    assert.deepEqual(observed, ["GET", "GET", "GET"]);
+    assert.equal(git(f.cwd, "tag", "--list"), "");
+  } finally {
+    await proxy.close();
+    await f.close();
+  }
+});
+
+test("registry waiting deadline includes a response body that never finishes", async () => {
+  const f = await fixture();
+  const methods = [];
+  const proxy = await publicationProxy(f, (request, response) => {
+    methods.push(request.method);
+    response.writeHead(200, { "content-type": "application/json" });
+    response.write('{"name":');
+    return true;
+  });
+  try {
+    const start = performance.now();
+    const result = await f.run(
+      ["--registry", proxy.registry, "--registry-wait-ms", "250"],
+      proxy.env,
+    );
+    assert.notEqual(result.code, 0);
+    assert.match(result.output, /Registry readiness timed out/);
+    assert.ok(performance.now() - start < 5000, result.output);
+    assert.deepEqual(methods, ["GET"]);
+    assert.equal(git(f.cwd, "tag", "--list"), "");
+  } finally {
+    await proxy.close();
+    await f.close();
+  }
+});
+
+test("invalid archive metadata stops immediately instead of waiting for the registry", async () => {
+  const f = await fixture();
+  const core = f.plan.packages.find((p) => p.name === "@use-puncta/core");
+  const methods = [];
+  const proxy = await publicationProxy(f, (request, response) => {
+    methods.push(request.method);
+    response.writeHead(200, { "content-type": "application/json" });
+    response.end(
+      JSON.stringify({
+        name: core.name,
+        version: core.version,
+        dist: { tarball: "not a URL" },
+      }),
+    );
+    return true;
+  });
+  try {
+    const result = await f.run(
+      ["--registry", proxy.registry, "--registry-wait-ms", "250"],
+      proxy.env,
+    );
+    assert.notEqual(result.code, 0);
+    assert.match(result.output, /Invalid archive URL/);
+    assert.doesNotMatch(
+      result.output,
+      /Waiting for|Registry readiness timed out/,
+    );
+    assert.deepEqual(methods, ["GET"]);
+  } finally {
+    await proxy.close();
+    await f.close();
+  }
+});
+
+test("malformed installation index fails immediately without another publication", async () => {
+  const f = await fixture();
+  const core = f.archives.find((p) => p.name === "@use-puncta/core");
+  execFileSync(
+    "npm",
+    [
+      "publish",
+      join(f.bundle, core.file),
+      "--registry",
+      f.registry,
+      "--tag",
+      "next",
+      "--ignore-scripts",
+    ],
+    { env: f.env, stdio: "pipe" },
+  );
+  let versions = "invalid";
+  const writes = [];
+  const proxy = await publicationProxy(f, (request, response) => {
+    const path = decodeURIComponent(request.url);
+    if (request.method === "PUT") writes.push(path);
+    if (request.method === "GET" && path === "/@use-puncta/core") {
+      response.writeHead(200, { "content-type": "application/json" });
+      response.end(
+        JSON.stringify({
+          name: core.name,
+          versions,
+          "dist-tags": { next: core.version },
+        }),
+      );
+      return true;
+    }
+    return false;
+  });
+  try {
+    for (const invalid of ["invalid", { [core.version]: true }]) {
+      versions = invalid;
+      const result = await f.run(
+        ["--registry", proxy.registry, "--registry-wait-ms", "1000"],
+        proxy.env,
+      );
+      assert.notEqual(result.code, 0);
+      assert.match(result.output, /Invalid registry package index/);
+      assert.doesNotMatch(
+        result.output,
+        /Waiting for|Registry readiness timed out/,
+      );
+      assert.deepEqual(writes, []);
+      assert.equal(git(f.cwd, "tag", "--list"), "");
+    }
+  } finally {
+    await proxy.close();
+    await f.close();
+  }
+});
+
+test("readiness waiting budget excludes time spent submitting the package", async () => {
+  const f = await fixture();
+  const writes = [];
+  const proxy = await publicationProxy(f, async (request, response) => {
+    const path = decodeURIComponent(request.url);
+    if (request.method === "PUT" && !path.startsWith("/-/")) {
+      writes.push(path);
+      await new Promise((done) => setTimeout(done, 1200));
+    }
+    if (
+      request.method === "GET" &&
+      path.startsWith("/@use-puncta/with-en-gb")
+    ) {
+      response.writeHead(401);
+      response.end();
+      return true;
+    }
+    return false;
+  });
+  try {
+    const result = await f.run(
+      ["--registry", proxy.registry, "--registry-wait-ms", "1000"],
+      proxy.env,
+    );
+    assert.match(
+      result.output,
+      /Registry lookup failed for @use-puncta\/with-en-gb: 401/,
+    );
+    assert.doesNotMatch(result.output, /Registry readiness timed out/);
+    assert.deepEqual(writes, ["/@use-puncta/core"]);
+    const report = JSON.parse(await readFile(join(f.state, "result.json")));
+    assert.equal(report.packages[0].status, "published");
+  } finally {
+    await proxy.close();
+    await f.close();
+  }
+});
+
 test("verified archives publish core first, next tags and immutable Git tags, then pass consumers", async () => {
   const f = await fixture();
   try {
@@ -423,11 +882,14 @@ test("a published version with an unavailable package index retains tags and res
   );
   const env = { ...f.env, NPM_CONFIG_USERCONFIG: npmrc };
   try {
-    const first = await f.run(["--registry", registry], env);
+    const first = await f.run(
+      ["--registry", registry, "--registry-wait-ms", "1500"],
+      env,
+    );
     assert.notEqual(first.code, 0);
     assert.match(
       first.output,
-      /Package index not visible: @use-puncta\/core.*rerun the same bundle/,
+      /Registry readiness timed out.*package index.*resume the same bundle and state/,
     );
     const partial = JSON.parse(await readFile(join(f.state, "result.json")));
     assert.equal(partial.status, "incomplete");
