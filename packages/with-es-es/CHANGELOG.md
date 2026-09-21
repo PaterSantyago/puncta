@@ -1,5 +1,11 @@
 # @use-puncta/with-es-es
 
+## 0.1.0-alpha.2
+
+### Patch Changes
+
+- Correct package README installation instructions and version-specific documentation links (#116)
+
 ## 0.1.0-alpha.1
 
 ### Patch Changes
