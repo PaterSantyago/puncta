@@ -1,0 +1,161 @@
+{
+  "schema": 1,
+  "baseCommit": "b763c513b241b8611a7dbcff7b3031f4b3552656",
+  "tag": "next",
+  "packages": [
+    {
+      "name": "@use-puncta/core",
+      "version": "0.1.0-alpha.2",
+      "changelogSha256": "b096c00bc2a9ad6430aef748fa089cbfdb8b751913c2f84434be7200ea674f1f",
+      "manifest": {
+        "name": "@use-puncta/core",
+        "version": "0.1.0-alpha.2",
+        "type": "module",
+        "license": "MIT",
+        "files": ["dist", "README.md", "LICENSE", "NOTICE.md"],
+        "exports": {
+          ".": {
+            "types": "./dist/index.d.mts",
+            "import": "./dist/index.mjs"
+          }
+        },
+        "publishConfig": {
+          "access": "public"
+        },
+        "repository": {
+          "type": "git",
+          "url": "git+https://github.com/PaterSantyago/puncta.git",
+          "directory": "packages/core"
+        },
+        "dependencies": {
+          "entities": "6.0.1",
+          "parse5": "8.0.0"
+        },
+        "scripts": {
+          "build": "tsdown src/index.ts --format esm --dts --clean"
+        }
+      }
+    },
+    {
+      "name": "@use-puncta/with-en-gb",
+      "version": "0.1.0-alpha.2",
+      "changelogSha256": "3d95c665c82f8cbc4a0df72fe4853bf68350ee7d01f981b908470b67aa3ed342",
+      "manifest": {
+        "name": "@use-puncta/with-en-gb",
+        "version": "0.1.0-alpha.2",
+        "type": "module",
+        "license": "MIT",
+        "files": [
+          "dist",
+          "README.md",
+          "LICENSE",
+          "NOTICE.md",
+          "hyphenation-manifest.json"
+        ],
+        "exports": {
+          ".": {
+            "types": "./dist/index.d.mts",
+            "import": "./dist/index.mjs"
+          }
+        },
+        "publishConfig": {
+          "access": "public"
+        },
+        "peerDependencies": {
+          "@use-puncta/core": "^0.1.0-alpha.2"
+        },
+        "devDependencies": {
+          "@use-puncta/core": "^0.1.0-alpha.2"
+        },
+        "repository": {
+          "type": "git",
+          "url": "git+https://github.com/PaterSantyago/puncta.git",
+          "directory": "packages/with-en-gb"
+        },
+        "scripts": {
+          "build": "tsdown src/index.ts --format esm --dts --clean"
+        }
+      }
+    },
+    {
+      "name": "@use-puncta/with-es-es",
+      "version": "0.1.0-alpha.2",
+      "changelogSha256": "d228627b5bccf8528ce20f937b3505b2b10803ec7106274ee35db58a101e7c93",
+      "manifest": {
+        "name": "@use-puncta/with-es-es",
+        "version": "0.1.0-alpha.2",
+        "type": "module",
+        "license": "MIT",
+        "files": [
+          "dist",
+          "README.md",
+          "LICENSE",
+          "NOTICE.md",
+          "hyphenation-manifest.json"
+        ],
+        "exports": {
+          ".": {
+            "types": "./dist/index.d.mts",
+            "import": "./dist/index.mjs"
+          }
+        },
+        "publishConfig": {
+          "access": "public"
+        },
+        "peerDependencies": {
+          "@use-puncta/core": "^0.1.0-alpha.2"
+        },
+        "devDependencies": {
+          "@use-puncta/core": "^0.1.0-alpha.2"
+        },
+        "repository": {
+          "type": "git",
+          "url": "git+https://github.com/PaterSantyago/puncta.git",
+          "directory": "packages/with-es-es"
+        },
+        "scripts": {
+          "build": "tsdown src/index.ts --format esm --dts --clean"
+        }
+      }
+    },
+    {
+      "name": "@use-puncta/with-react",
+      "version": "0.1.0-alpha.2",
+      "changelogSha256": "8c6f7be0c513864450cc0b5a37307f2bcecfa25d2648431fde049b36c085efe9",
+      "manifest": {
+        "name": "@use-puncta/with-react",
+        "version": "0.1.0-alpha.2",
+        "type": "module",
+        "license": "MIT",
+        "files": ["dist", "README.md", "LICENSE"],
+        "exports": {
+          ".": {
+            "types": "./dist/index.d.mts",
+            "import": "./dist/index.mjs"
+          },
+          "./pure": {
+            "types": "./dist/pure.d.mts",
+            "import": "./dist/pure.mjs"
+          }
+        },
+        "publishConfig": {
+          "access": "public"
+        },
+        "dependencies": {
+          "@use-puncta/core": "^0.1.0-alpha.2"
+        },
+        "peerDependencies": {
+          "react": "^19.3.0"
+        },
+        "repository": {
+          "type": "git",
+          "url": "git+https://github.com/PaterSantyago/puncta.git",
+          "directory": "packages/with-react"
+        },
+        "scripts": {
+          "build": "tsdown"
+        }
+      }
+    }
+  ]
+}
