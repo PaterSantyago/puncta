@@ -8,9 +8,14 @@ This page separates declared requirements from checked environments.
 
 | Version         | Status                                                                           |
 | --------------- | -------------------------------------------------------------------------------- |
-| `0.1.0-alpha.2` | Documentation correction. The API is unchanged from `0.1.0-alpha.1`.             |
+| `0.1.0-alpha.2` | Published documentation correction. The API is unchanged from `0.1.0-alpha.1`.   |
 | `0.1.0-alpha.1` | Published functional alpha for all four packages. Public npm/pnpm checks passed. |
 | `0.1.0-alpha.0` | Historical scaffold. It does not have the functional API in this guide.          |
+
+The `0.1.0-alpha.2` package tags identify commit `989c8e4bd49b382343d437717500e28ee77a287a`.
+The [corrective release report](acceptance/documentation-116-alpha2.md) records
+public installation, corrected README contents, provenance, and release-link checks.
+At verification, `next` selects `0.1.0-alpha.2`; `latest` selects `0.1.0-alpha.0`.
 
 The original `0.1.0-alpha.1` functional release tags identify commit `932ab23b959c92eef435cca7fb55a08ec12d93bc`:
 
@@ -51,8 +56,8 @@ See [the scaffold publication record](https://github.com/PaterSantyago/puncta/is
 
 | Checked environment    | Evidence or limit                                                                                                                                                 |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Node 24 consumer       | Public npm/pnpm installation checks for `0.1.0-alpha.1`.                                                                                                          |
-| Documentation examples | Published `0.1.0-alpha.1` packages. See the [public-installation report](acceptance/documentation-116.md) for the environment and results.                        |
+| Node 24 consumer       | Public npm/pnpm installation checks for `0.1.0-alpha.2`.                                                                                                          |
+| Documentation examples | Published `0.1.0-alpha.2` packages. See the [public-installation report](acceptance/documentation-116-alpha2.md) for the environment and results.                 |
 | Browser, SSR, and RSC  | Historical reports are in the [first-version acceptance record](acceptance/first-version.md). See the current [server evidence](acceptance/documentation-113.md). |
 
 Repository tool versions are Node 24.21.0 and pnpm 12.4.1. These pins do not define

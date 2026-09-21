@@ -119,7 +119,7 @@ verified the authorized archive hashes, public npm/pnpm consumers, and remote pa
 All four tags identify `932ab23b959c92eef435cca7fb55a08ec12d93bc`.
 The [functional release plan](https://github.com/PaterSantyago/puncta/blob/932ab23b959c92eef435cca7fb55a08ec12d93bc/release/plan.json)
 stays at that commit; the completed plan was removed from the current checkout.
-`next` selects `0.1.0-alpha.1`; `latest` stays on `0.1.0-alpha.0`.
+At the alpha.1 publication, `next` selected `0.1.0-alpha.1`; `latest` stayed on `0.1.0-alpha.0`.
 See the [post-publication documentation report](acceptance/documentation-116.md).
 
 Trusted publisher setup is recorded in [the configuration task](https://github.com/PaterSantyago/puncta/issues/14).
@@ -127,3 +127,12 @@ The successful functional publication supplies the real OIDC and provenance evid
 The historical alpha.0 archives were not changed or republished.
 
 References: [npm trust CLI](https://docs.npmjs.com/cli/v11/commands/npm-trust/), [trusted publishing](https://docs.npmjs.com/trusted-publishers/) and [provenance prerequisites](https://docs.npmjs.com/generating-provenance-statements/), checked 2026-09-15.
+
+The four `0.1.0-alpha.2` packages correct the README notices and version-specific links.
+The [completed workflow](https://github.com/PaterSantyago/puncta/actions/runs/35596508069)
+published through OIDC and checked the authorized archives and public consumers.
+All four tags identify `989c8e4bd49b382343d437717500e28ee77a287a`.
+The [corrective release plan](https://github.com/PaterSantyago/puncta/blob/989c8e4bd49b382343d437717500e28ee77a287a/release/plan.json)
+stays at that commit. The completed active plan is removed from the current checkout.
+At verification, `next` selects `0.1.0-alpha.2`; `latest` stays on `0.1.0-alpha.0`.
+See the [corrective documentation report](acceptance/documentation-116-alpha2.md).
