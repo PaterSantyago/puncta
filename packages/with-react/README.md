@@ -6,10 +6,10 @@ The declared React peer range is `^19.3.0`. Your application supplies React DOM.
 
 ## Install
 
-The functional API is available in `0.1.0-alpha.1`. The earlier `0.1.0-alpha.0` scaffold does not have this API.
-Use version `0.1.0-alpha.1` for core, the adapter, and each selected locale.
+The functional API is available in `0.1.0-alpha.2`. The earlier `0.1.0-alpha.0` scaffold does not have this API.
+Use version `0.1.0-alpha.2` for core, the adapter, and each selected locale.
 Declare core directly when your application imports it.
-Use the [npm or pnpm installation procedure](https://github.com/PaterSantyago/puncta/blob/main/docs/getting-started/installation.md).
+Use the [npm or pnpm installation procedure](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.2/docs/getting-started/installation.md).
 
 ## Example
 
@@ -42,24 +42,24 @@ Wait…
 
 ## Guide and reference
 
-- [React quick start](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/getting-started/react.md).
-- [React guide: scopes, protection, pure calls, and state limits](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/react.md).
-- [React API and public types](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/reference/react.md).
+- [React quick start](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.2/docs/getting-started/react.md).
+- [React guide: scopes, protection, pure calls, and state limits](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.2/docs/guides/react.md).
+- [React API and public types](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.2/docs/reference/react.md).
 
-The guide and reference links use this package’s immutable `0.1.0-alpha.1` tag.
-Use the current installation page for corrected release notices and commands.
+The guide and reference links use this package’s immutable `0.1.0-alpha.2` tag.
+Use the installation page for commands that select this version.
 
 ## Soft-hyphen removal
 
-Use the [React removal example](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/hyphenation.md#remove-shy-from-react)
-and [pure removal reference](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/reference/react.md#stripsofthyphensreact).
+Use the [React removal example](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.2/docs/guides/hyphenation.md#remove-shy-from-react)
+and [pure removal reference](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.2/docs/reference/react.md#stripsofthyphensreact).
 
 ## Server integration
 
-Use the [server-rendering guide](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/server-rendering.md)
+Use the [server-rendering guide](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.2/docs/guides/server-rendering.md)
 for synchronous SSR, hydration, streaming, Suspense, and RSC ownership.
-See [checked environments](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/compatibility.md#server-environments)
-and [the runnable RSC integration](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/examples/rsc/README.md).
+See [checked environments](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.2/docs/compatibility.md#server-environments)
+and [the runnable RSC integration](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.2/examples/rsc/README.md).
 
 ## License
 
@@ -67,18 +67,18 @@ MIT.
 
 ## Opt-in digit grouping
 
-Use the [grouping guide](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/configuration.md#enable-digit-grouping)
-and [notation, bonds, ranges, and exclusions](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/reference/locales-and-rules.md#digit-grouping).
-The [settings reference](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/reference/settings.md#digit-grouping)
+Use the [grouping guide](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.2/docs/guides/configuration.md#enable-digit-grouping)
+and [notation, bonds, ranges, and exclusions](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.2/docs/reference/locales-and-rules.md#digit-grouping).
+The [settings reference](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.2/docs/reference/settings.md#digit-grouping)
 defines defaults, validation, inheritance, and reset.
 
 ### Inheritance and grouping reports
 
-See [grouping in React](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/react.md#group-digits-in-react)
+See [grouping in React](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.2/docs/guides/react.md#group-digits-in-react)
 for component and pure calls, scopes, source paths, and separator ownership.
 
 ### Numeric children and runtime updates
 
-See [numeric children](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/react.md#group-digits-in-react)
-and [state during updates](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.1/docs/guides/react.md#preserve-state-during-updates).
+See [numeric children](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.2/docs/guides/react.md#group-digits-in-react)
+and [state during updates](https://github.com/PaterSantyago/puncta/blob/%40use-puncta%2Fwith-react%400.1.0-alpha.2/docs/guides/react.md#preserve-state-during-updates).
 These sections define precision, recomputation, and protection-change limits.

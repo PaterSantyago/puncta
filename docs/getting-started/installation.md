@@ -7,11 +7,12 @@ only for React input.
 
 ## Release status
 
-Functional alpha **`0.1.0-alpha.1`** is published for core, the React adapter,
+This guide is for functional alpha **`0.1.0-alpha.2`** for core, the React adapter,
 and both locales. The commands below select those exact versions.
+This version corrects documentation. The API is unchanged from `0.1.0-alpha.1`.
 The earlier `0.1.0-alpha.0` scaffold does not have the API in this guide.
 
-At publication, `next` selects `0.1.0-alpha.1`; `latest` still selects the scaffold.
+The `next` tag selects alpha releases; `latest` selects the earlier scaffold.
 Use exact versions for a reproducible installation. See
 [release tags and verification](../compatibility.md#release-status).
 
@@ -20,7 +21,7 @@ Use exact versions for a reproducible installation. See
 For British English:
 
 ```sh
-npm install --save-exact @use-puncta/core@0.1.0-alpha.1 @use-puncta/with-en-gb@0.1.0-alpha.1
+npm install --save-exact @use-puncta/core@0.1.0-alpha.2 @use-puncta/with-en-gb@0.1.0-alpha.2
 ```
 
 ## pnpm
@@ -28,14 +29,14 @@ npm install --save-exact @use-puncta/core@0.1.0-alpha.1 @use-puncta/with-en-gb@0
 For British English:
 
 ```sh
-pnpm add --save-exact @use-puncta/core@0.1.0-alpha.1 @use-puncta/with-en-gb@0.1.0-alpha.1
+pnpm add --save-exact @use-puncta/core@0.1.0-alpha.2 @use-puncta/with-en-gb@0.1.0-alpha.2
 ```
 
 For Spanish, replace the British English package with
-`@use-puncta/with-es-es@0.1.0-alpha.1`. If the application uses the two locales, install the two locale packages. If you import `createPuncta`, install
+`@use-puncta/with-es-es@0.1.0-alpha.2`. If the application uses the two locales, install the two locale packages. If you import `createPuncta`, install
 `@use-puncta/core` as a direct dependency.
 
-For React, also install `@use-puncta/with-react@0.1.0-alpha.1` and a
+For React, also install `@use-puncta/with-react@0.1.0-alpha.2` and a
 compatible `react` version. The declared React peer range is `^19.3.0`.
 If a DOM renderer is necessary, the application supplies `react-dom`.
 See the [React quick start](react.md).
@@ -44,18 +45,18 @@ For the React quick start with British English and a DOM renderer, use one of
 these commands:
 
 ```sh
-npm install --save-exact @use-puncta/core@0.1.0-alpha.1 @use-puncta/with-en-gb@0.1.0-alpha.1 @use-puncta/with-react@0.1.0-alpha.1 react@19.3.0 react-dom@19.3.0
+npm install --save-exact @use-puncta/core@0.1.0-alpha.2 @use-puncta/with-en-gb@0.1.0-alpha.2 @use-puncta/with-react@0.1.0-alpha.2 react@19.3.0 react-dom@19.3.0
 ```
 
 ```sh
-pnpm add --save-exact @use-puncta/core@0.1.0-alpha.1 @use-puncta/with-en-gb@0.1.0-alpha.1 @use-puncta/with-react@0.1.0-alpha.1 react@19.3.0 react-dom@19.3.0
+pnpm add --save-exact @use-puncta/core@0.1.0-alpha.2 @use-puncta/with-en-gb@0.1.0-alpha.2 @use-puncta/with-react@0.1.0-alpha.2 react@19.3.0 react-dom@19.3.0
 ```
 
 ## Fresh versions with pnpm
 
 pnpm 12.4.1 can select an older version for `@next` during its default one-day
-release delay. The exact-version commands above were checked without a policy
-exception. If your project enforces a stricter release-age policy, wait until the
+release delay. Exact versions select the requested release.
+If your project enforces a stricter release-age policy, wait until the
 version is old enough or follow your project's dependency approval procedure.
 Do not change `next` to `latest`: `latest` still selects the scaffold.
 
@@ -74,8 +75,8 @@ Run the [first text example](text-and-html.md#process-text). Make sure that its 
 `Wait…`. If `createPuncta` is missing, examine the installed versions. The old
 scaffold is not the functional version.
 
-The [public-installation report](../acceptance/documentation-116.md) records checks
-against the published packages with npm and pnpm. These checks include installed
+The [first functional release report](../acceptance/documentation-116.md) records
+checks against `0.1.0-alpha.1` with npm and pnpm. These checks include installed
 public imports, TypeScript declarations, and exact example results.
 
 Maintainers can run these checks with the
