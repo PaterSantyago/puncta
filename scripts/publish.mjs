@@ -12,9 +12,17 @@ const { values } = parseArgs({
     state: { type: "string" },
     registry: { type: "string", default: "https://registry.npmjs.org" },
     mode: { type: "string" },
+    "registry-wait-ms": { type: "string", default: "300000" },
   },
 });
 const { mode } = values;
+const registryWaitMs = Number(values["registry-wait-ms"]);
+assert.ok(
+  Number.isSafeInteger(registryWaitMs) &&
+    registryWaitMs > 0 &&
+    registryWaitMs <= 900000,
+  "--registry-wait-ms must be an integer between 1 and 900000",
+);
 assert.ok(
   ["test", "bootstrap", "oidc"].includes(mode),
   "Choose --mode bootstrap (owner 2FA), oidc, or test (loopback only)",
@@ -47,6 +55,8 @@ const state = resolve(values.state);
 const run = (cmd, args, options = {}) =>
   execFileSync(cmd, args, { encoding: "utf8", ...options })?.trim();
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
+const isRecord = (value) =>
+  value !== null && typeof value === "object" && !Array.isArray(value);
 const json = async (path) => JSON.parse(await readFile(path));
 const script = (name) => new URL(name, import.meta.url).pathname;
 const git = (...args) => run("git", args);
@@ -210,29 +220,88 @@ try {
     attempts,
   };
   await save();
-  async function confirm(p, archive) {
-    const response = await fetch(
-      new URL(`${encodeURIComponent(p.name)}/${p.version}`, registry),
-      { signal: AbortSignal.timeout(30000) },
+  class RegistryPending extends Error {}
+  async function waitForRegistry(check, description, deadline) {
+    let interval = 1000;
+    let reason = "not checked";
+    while (true) {
+      const remaining = deadline - performance.now();
+      if (remaining <= 0)
+        throw new Error(
+          `Registry readiness timed out for ${description}: ${reason}; resume the same bundle and state`,
+        );
+      try {
+        return await check();
+      } catch (error) {
+        if (!(error instanceof RegistryPending)) throw error;
+        reason = error.message;
+      }
+      const pause = Math.min(
+        interval,
+        Math.max(0, deadline - performance.now()),
+      );
+      console.log(`Waiting for ${description}: ${reason}; retry in ${pause}ms`);
+      await delay(pause);
+      interval = Math.min(interval * 2, 15000);
+    }
+  }
+  async function registryBytes(
+    url,
+    description,
+    deadline,
+    allowMissing = false,
+  ) {
+    const remaining = Math.ceil(deadline - performance.now());
+    if (remaining <= 0) throw new RegistryPending("waiting budget exhausted");
+    try {
+      const response = await fetch(url, {
+        signal: AbortSignal.timeout(Math.min(30000, remaining)),
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        await response.body?.cancel();
+        if (response.status === 404 && allowMissing) return null;
+        if (
+          response.status === 404 ||
+          response.status === 429 ||
+          response.status >= 500
+        )
+          throw new RegistryPending(`HTTP ${response.status}`);
+        throw new Error(`${description}: ${response.status}`);
+      }
+      return Buffer.from(await response.arrayBuffer());
+    } catch (error) {
+      if (error.name === "TimeoutError" || error instanceof TypeError)
+        throw new RegistryPending(`Registry request failed: ${error.message}`);
+      throw error;
+    }
+  }
+  async function versionMetadata(p, deadline, allowMissing = false) {
+    return waitForRegistry(
+      async () => {
+        const bytes = await registryBytes(
+          new URL(`${encodeURIComponent(p.name)}/${p.version}`, registry),
+          `Registry lookup failed for ${p.name}`,
+          deadline,
+          allowMissing,
+        );
+        if (bytes === null) return null;
+        const metadata = JSON.parse(bytes);
+        assert.equal(metadata.name, p.name);
+        assert.equal(metadata.version, p.version);
+        assert.ok(
+          typeof metadata.dist?.tarball === "string" &&
+            URL.canParse(metadata.dist.tarball) &&
+            ["http:", "https:"].includes(
+              new URL(metadata.dist.tarball).protocol,
+            ),
+          `Invalid archive URL for ${p.name}`,
+        );
+        return metadata;
+      },
+      `${p.name}@${p.version} version`,
+      deadline,
     );
-    if (response.status === 404) return false;
-    assert.ok(
-      response.ok,
-      `Registry lookup failed for ${p.name}: ${response.status}`,
-    );
-    const metadata = await response.json();
-    assert.equal(metadata.name, p.name);
-    assert.equal(metadata.version, p.version);
-    const tarball = await fetch(metadata.dist.tarball, {
-      signal: AbortSignal.timeout(30000),
-    });
-    assert.ok(tarball.ok, `Cannot retrieve existing archive: ${p.name}`);
-    assert.equal(
-      hash(Buffer.from(await tarball.arrayBuffer())),
-      archive.sha256,
-      `Existing version mismatch: ${p.name}@${p.version}. Stop and create a correcting release; never overwrite or unpublish.`,
-    );
-    return true;
   }
   for (const p of ordered) {
     const archive = verification.archives.find((a) => a.name === p.name);
@@ -244,8 +313,23 @@ try {
     };
     report.packages.push(entry);
     await save();
-    const exists = await confirm(p, archive);
-    if (!exists) {
+    // Persisted acceptance prevents a recovery run from resubmitting a version
+    // which npm accepted but has not yet made readable.
+    const accepted = [previous, ...(previous?.attempts ?? [])].some((attempt) =>
+      attempt?.packages.some(
+        (item) =>
+          item.name === p.name &&
+          item.version === p.version &&
+          (item.accepted || ["published", "matched"].includes(item.status)),
+      ),
+    );
+    entry.accepted = Boolean(accepted);
+    await save();
+    let deadline = performance.now() + registryWaitMs;
+    let metadata = await versionMetadata(p, deadline, !accepted);
+    const exists = metadata !== null;
+    if (!metadata) {
+      const publicationStarted = performance.now();
       run(
         "npm",
         [
@@ -262,64 +346,97 @@ try {
         ],
         { stdio: "inherit" },
       );
-      assert.ok(
-        await confirm(p, archive),
-        `Published version not visible: ${p.name}; rerun the same bundle`,
-      );
+      // This is a read-wait budget, not a timeout that can interrupt a write.
+      deadline += performance.now() - publicationStarted;
+      entry.accepted = true;
+      entry.status = "awaiting-registry";
+      await save();
+      metadata = await versionMetadata(p, deadline);
     }
+    entry.accepted = true;
+    entry.status = "awaiting-registry";
+    await save();
+    await waitForRegistry(
+      async () => {
+        const bytes = await registryBytes(
+          metadata.dist.tarball,
+          `Cannot retrieve existing archive: ${p.name}`,
+          deadline,
+        );
+        assert.equal(
+          hash(bytes),
+          archive.sha256,
+          `Existing version mismatch: ${p.name}@${p.version}. Stop and create a correcting release; never overwrite or unpublish.`,
+        );
+      },
+      `${p.name}@${p.version} archive`,
+      deadline,
+    );
     entry.status = exists ? "matched" : "published";
     await save();
-    const tagsResponse = await fetch(
-      new URL(`-/package/${encodeURIComponent(p.name)}/dist-tags`, registry),
-      {
-        signal: AbortSignal.timeout(30000),
+    entry.distTags = await waitForRegistry(
+      async () => {
+        const bytes = await registryBytes(
+          new URL(
+            `-/package/${encodeURIComponent(p.name)}/dist-tags`,
+            registry,
+          ),
+          `Registry dist-tags lookup failed for ${p.name}`,
+          deadline,
+        );
+        const tags = JSON.parse(bytes);
+        assert.ok(
+          isRecord(tags) &&
+            Object.values(tags).every((value) => typeof value === "string"),
+          `Invalid registry dist-tags for ${p.name}`,
+        );
+        if (tags.next !== p.version)
+          throw new RegistryPending(
+            `next does not identify ${p.name}@${p.version}`,
+          );
+        return tags;
       },
+      `${p.name}@${p.version} next tag`,
+      deadline,
     );
-    assert.ok(
-      tagsResponse.ok,
-      `Registry dist-tags lookup failed for ${p.name}: ${tagsResponse.status}; rerun the same bundle`,
-    );
-    const distTags = await tagsResponse.json();
-    assert.ok(
-      distTags &&
-        typeof distTags === "object" &&
-        !Array.isArray(distTags) &&
-        Object.values(distTags).every((value) => typeof value === "string"),
-      `Invalid registry dist-tags for ${p.name}`,
-    );
-    assert.equal(
-      distTags.next,
-      p.version,
-      `next does not identify ${p.name}@${p.version}; review registry tags before recovery`,
-    );
-    entry.distTags = distTags;
     await save();
-    // npm may expose the version and tags before its installable package index.
-    let visible = false;
-    for (let attempt = 0; attempt < 6; attempt++) {
-      if (attempt) await delay(2000);
-      const response = await fetch(
-        new URL(encodeURIComponent(p.name), registry),
-        {
-          signal: AbortSignal.timeout(30000),
-          cache: "no-store",
-        },
-      );
-      assert.ok(
-        response.ok || response.status === 404,
-        `Registry package index lookup failed for ${p.name}: ${response.status}; rerun the same bundle`,
-      );
-      if (response.ok) {
-        const index = await response.json();
-        if (index.name === p.name && index.versions?.[p.version]) {
-          visible = true;
-          break;
+    await waitForRegistry(
+      async () => {
+        const bytes = await registryBytes(
+          new URL(encodeURIComponent(p.name), registry),
+          `Registry package index lookup failed for ${p.name}`,
+          deadline,
+        );
+        const index = JSON.parse(bytes);
+        assert.ok(
+          isRecord(index) &&
+            isRecord(index.versions) &&
+            isRecord(index["dist-tags"]) &&
+            Object.values(index["dist-tags"]).every(
+              (value) => typeof value === "string",
+            ),
+          `Invalid registry package index for ${p.name}`,
+        );
+        assert.equal(index.name, p.name);
+        if (Object.hasOwn(index.versions, p.version)) {
+          const manifest = index.versions[p.version];
+          assert.ok(
+            isRecord(manifest) &&
+              manifest.name === p.name &&
+              manifest.version === p.version,
+            `Invalid registry package index version for ${p.name}@${p.version}`,
+          );
         }
-      } else await response.arrayBuffer();
-    }
-    assert.ok(
-      visible,
-      `Package index not visible: ${p.name}; rerun the same bundle after npm makes it available`,
+        if (
+          !index.versions?.[p.version] ||
+          index["dist-tags"]?.next !== p.version
+        )
+          throw new RegistryPending(
+            `Package index not visible: ${p.name}@${p.version}`,
+          );
+      },
+      `${p.name}@${p.version} package index`,
+      deadline,
     );
   }
   report.status = "verifying-consumers";
